@@ -1,0 +1,49 @@
+{
+    "title": "more in OR",
+    "query": {
+        "WHERE": {
+            "OR": [
+                {
+                    "AND": [
+                        {
+                            "GT": {
+                                "courses_avg": 95
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_dept": "cpsc"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "EQ": {
+                        "courses_avg": 90.12
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg": 99
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_dept":"audi","courses_avg":90.12},
+        {"courses_dept":"audi","courses_avg":90.12},
+        {"courses_dept":"cnps","courses_avg":90.12},
+        {"courses_dept":"cnps","courses_avg":99.19},
+        {"courses_dept":"math","courses_avg":99.78},
+        {"courses_dept":"math","courses_avg":99.78}
+    ]
+}

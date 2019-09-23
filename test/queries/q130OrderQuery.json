@@ -1,0 +1,38 @@
+{
+    "title": "test lower case order",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "AND": [
+                        {
+                            "EQ": {
+                                "courses_avg": 90
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_dept": "c*"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "GT": {
+                        "courses_year": 2014
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER": {}
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}
