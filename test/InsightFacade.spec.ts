@@ -168,7 +168,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         }).then((result2: string[]) => {
             expect.fail(result2, expected2, "Should have rejected");
         }).catch((error: any) => {
-            Log.error(error);
+            // Log.error(error);
             expect(error).to.be.instanceOf(InsightError);
         });
     });
