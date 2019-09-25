@@ -395,7 +395,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     it("succeed to remove one valid dataset under two valid dataset", function () {
         const id: string = "courses";
         const id2: string = "manyFolder";
-        let expected: string[];
+        let expected: string[] = [id2];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             return insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses).
             then((result2: string[]) => {
@@ -447,13 +447,13 @@ describe("InsightFacade Add/Remove Dataset", function () {
 
     it("fail to remove a valid dataset with wrong id", function () {
         const id: string = "courses";
-        let expected: string[];
+        let expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             return insightFacade.removeDataset("manyFolder");
         }).then((result2: string) => {
             expect.fail(result2, expected, "Should have rejected because of wrong id ");
         }).catch((error: any) => {
-            expect(error).to.be.instanceOf(InsightError);
+            expect(error).to.be.instanceOf(NotFoundError);
         });
     });
 });

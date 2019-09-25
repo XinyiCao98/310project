@@ -139,25 +139,32 @@ export default class InsightFacade implements IInsightFacade {
     public removeDataset(id: string): Promise<string> {
         // check whether dataset ID is in right format
         if (!id || id.length === 0) {
+            // reject(new InsightError("ID is empty or undefined."));
             return Promise.reject(new InsightError("ID is empty or undefined."));
         }
         if (id.includes("_") || id === " ") {
+            // reject(new InsightError("ID is whitespace or underscore."));
             return Promise.reject(new InsightError("ID is whitespace or underscore."));
         }
-        // check whether dataset ID is not exists
+        // check whether dataset ID is exists
+        // Log.trace("1");
         if (this.datasetID.indexOf(id) < 0) {
+            // Log.trace("2");
+            // reject(new NotFoundError("ID is not existed."));
             return Promise.reject(new NotFoundError("ID is not existed."));
         }
         return new Promise((fulfill, reject) => {
+            // Log.trace("3");
             let idx = this.datasetID.indexOf(id);
             this.datasetID.splice(idx, 1);
             this.datasetMap.delete(id);
             fs.unlink("./data/" + id + ".json", (e) => {
                 if (e !== null) {
                     reject(new InsightError("Unable to delete dataset"));
+                } else {
+                    fulfill(id);
                 }
             });
-            fulfill(id);
         });
     }
 
