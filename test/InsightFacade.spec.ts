@@ -381,9 +381,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
                     return insightFacade.removeDataset(id2).then((result4: string) => {
                         return insightFacade.listDatasets();
                     }).then((result5: InsightDataset[]) => {
-                        expect(result5[0].id).to.deep.equal(id);
-                        expect(result5[1].id).to.deep.equal(id2);
-                        expect(result5.length).to.deep.equal(2);
+                        expect(result5.length).to.deep.equal(0);
                     }).catch((error: any) => {
                         expect.fail(error, expected, "Should not have rejected this");
                     });
@@ -402,7 +400,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
                 return insightFacade.removeDataset(id).then((result3: string) => {
                     return insightFacade.listDatasets();
                 }).then((result4: InsightDataset[]) => {
-                    expect(result4[0].id).to.deep.equal(id);
+                    expect(result4[0].id).to.deep.equal(id2);
                     expect(result4.length).to.deep.equal(1);
                 }).catch((error: any) => {
                     expect.fail(error, expected, "Should not have rejected this");
