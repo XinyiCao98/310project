@@ -59,8 +59,8 @@ export default class InsightFacade implements IInsightFacade {
                         fulfill(that.datasetID);
                     }
                 }).catch(function (e) {
-                    Log.trace("Invalid JSON");
-                    reject(new InsightError("This is not a valid JSON"));
+                    Log.trace("Empty promise list");
+                    reject(new InsightError("This is no item in promise list"));
                 });
             }).catch(function (e) {
                 Log.trace("not zip");
@@ -138,14 +138,27 @@ export default class InsightFacade implements IInsightFacade {
     }
     public removeDataset(id: string): Promise<string> {
         // check whether dataset ID is in right format
-        if (id.includes("_") || id === "" || id === null) {
-            return Promise.reject(new InsightError("ID in wrong format."));
+        if (!id || id.length === 0) {
+            return Promise.reject(new InsightError("ID is empty or undefined."));
         }
-        // check whether dataset ID is already exists
-        if (!this.datasetID.includes(id)) {
-            return Promise.reject(new NotFoundError("ID is not exists."));
+        if (id.includes("_") || id === " ") {
+            return Promise.reject(new InsightError("ID is whitespace or underscore."));
         }
-        return Promise.reject("Not implemented.");
+        // check whether dataset ID is not exists
+        if (this.datasetID.indexOf(id) < 0) {
+            return Promise.reject(new NotFoundError("ID is not existed."));
+        }
+        return new Promise((fulfill, reject) => {
+            let idx = this.datasetID.indexOf(id);
+            this.datasetID.splice(idx, 1);
+            this.datasetMap.delete(id);
+            fs.unlink("./data/" + id + ".json", (e) => {
+                if (e !== null) {
+                    reject(new InsightError("Unable to delete dataset"));
+                }
+            });
+            fulfill(id);
+        });
     }
 
     public performQuery(query: any): Promise <any[]> {

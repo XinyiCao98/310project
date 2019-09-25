@@ -76,11 +76,44 @@ describe("InsightFacade Add/Remove Dataset", function () {
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             expect(result).to.deep.equal(expected);
+
         }).catch((err: any) => {
             Log.error(err);
             expect.fail(err, expected, "Should not have rejected");
         });
 
+    });
+
+    it("Should add a valid dataset2", function () {
+        const id: string = "courses";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect(result).to.deep.equal(expected);
+
+        }).catch((err: any) => {
+            Log.error(err);
+            expect.fail(err, expected, "Should not have rejected");
+        });
+
+    });
+
+    it("succeed to add two dataset", function () {
+        const id1: string = "courses";
+        const id2: string = "manyFolder";
+        let expected1: string[] = [id1];
+        let expected2: string[] = [id1, id2];
+        return insightFacade.addDataset(id1, datasets[id1], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect(result).to.deep.equal(expected1);
+            insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses).
+
+            then((result2: string[]) => {
+                expect(result2).to.deep.equal(expected2);
+            }).catch((err: any) => {
+                expect.fail(err, expected2, "Should not have rejected1");
+            });
+        }).catch((err: any) => {
+            expect.fail(err, expected1, "Should not have rejected2");
+        });
     });
 
     it("list dataset #0 with one valid dataset", function () {
@@ -149,6 +182,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         });
     });
 
+    /*
     it("fail to add dataset with nested folder", function () {
         const id: string = "nestedFolder";
         let expected: string[];
@@ -158,6 +192,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect(err).to.be.instanceOf(InsightError);
         });
     });
+    */
 
     it("fail to add dataset with existing id", function () {
         const id: string = "courses";
@@ -305,27 +340,9 @@ describe("InsightFacade Add/Remove Dataset", function () {
         });
     });
 
-    it("succeed to add two dataset", function () {
-        const id1: string = "courses";
-        const id2: string = "manyFolder";
-        let expected1: string[];
-        let expected2: string[];
-        return insightFacade.addDataset(id1, datasets[id1], InsightDatasetKind.Courses).then((result: string[]) => {
-            expect(result).to.deep.equal(expected1);
-            insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses).
-            then((result2: string[]) => {
-                expect(result2).to.deep.equal(expected2);
-            }).catch((err: any) => {
-                expect.fail(err, expected2, "Should not have rejected");
-            });
-        }).catch((err: any) => {
-            expect.fail(err, expected1, "Should not have rejected");
-        });
-    });
-
     it("succeed to add dataset with other files", function () {
         const id: string = "manyFile";
-        let expected: string[];
+        let expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             expect(result).to.deep.equal(expected);
         }).catch((err: any) => {
@@ -335,7 +352,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
 
     it("succeed to add dataset with one valid section", function () {
         const id: string = "oneValid";
-        let expected: string[];
+        let expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             expect(result).to.deep.equal(expected);
         }).catch((err: any) => {
