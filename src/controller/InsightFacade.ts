@@ -1,11 +1,7 @@
 import Log from "../Util";
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
 import * as JSZip from "jszip";
-import {relative} from "path";
-import {type} from "os";
 import * as fs from "fs";
-import {rejects, throws} from "assert";
-import {promises} from "fs";
 
 /**
  * This is the main programmatic entry point for the project.
