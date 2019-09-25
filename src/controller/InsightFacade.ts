@@ -4,6 +4,7 @@ import * as JSZip from "jszip";
 import {relative} from "path";
 import {type} from "os";
 import * as fs from "fs";
+import {rejects} from "assert";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -11,10 +12,10 @@ import * as fs from "fs";
  *
  */
 export default class InsightFacade implements IInsightFacade {
-    private datasetID: string[] = [];
-    private datasetMap: Map<string, any[]> = new Map<string, any[]>();
-    private validSection: any[] = [];
     private datasets: string[] = [];
+    private CourseMap: Map<string , any> = new  Map<string, any>();
+    private VS: any[];
+    private IDS: string[] = [];
 
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
@@ -22,123 +23,123 @@ export default class InsightFacade implements IInsightFacade {
 
     // tslint:disable-next-line:max-func-body-length
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-        // check whether dataset ID is in right format
-        if (id.includes("_") || id === "" || id === null) {
-            return Promise.reject(new InsightError("ID in wrong format."));
-        }
-        // check whether dataset ID is already exists
-        if (this.datasets.indexOf(id) < 0) {
-            return Promise.reject(new InsightError("already existed"));
-        }
-        // check whether dataset ID is in correct InsightDatasetKind
-        if (kind !== InsightDatasetKind.Courses) {
-            return Promise.reject(new InsightError("ID is incorrect InsightDatasetKind."));
-        }
-        return new Promise((fulfill, reject) => {
-            let currZip = new JSZip();
-            const promiseArray: Array<Promise<string>> = [];
-            // unzip my current zip file
-            const that = this;
-            currZip.loadAsync(content, {base64: true}).then(async function () {
-                return currZip.folder("courses");
-            }).catch(function (e) {
-                reject(new InsightError("This is not a zip"));
-            }).then(function (zipInfo: JSZip) {
-                zipInfo.forEach(function (relativePath, file) {
+
+            // tslint:disable-next-line:no-empty
+            let zip = new JSZip();
+            const PromiseArray: Array <Promise<string>> = [];
+            if (!this.CheckId(id)) {
+                return Promise.reject(new InsightError("invalid id"));
+            }
+            if (this.datasets.indexOf(id) >= 0) {
+                return Promise.reject(new InsightError("already added"));
+            }
+            // check whether dataset ID is in correct InsightDataSet Kind
+            if (kind! !== InsightDatasetKind.Courses) {
+                return Promise.reject(new InsightError("Wrong InsightDataSet"));
+            }
+            try {
+                zip.loadAsync(content, {base64: true});
+                // tslint:disable-next-line:align no-empty
+            } catch (e) {
+                return Promise.reject(new InsightError("not correct format"));
+            }
+            return zip.loadAsync(content, {base64: true}).then(function (zipInformation: JSZip) {
+                zipInformation.forEach(function (relativePath, file) {
                     try {
-                        promiseArray.push(file.async("text"));
-                    } catch {
-                        reject(new InsightError("File not in JSON format"));
+                        PromiseArray.push(file.async("text"));
+                    } catch (e) {
+                        return Promise.reject(new InsightError("FILE NOT IN JSON FORMAT"));
                     }
                 });
-                Promise.all(promiseArray).then(function (allJFile: any) {
-                    for (const singleCourse of allJFile) {
-                        let sectionArray = JSON.parse(singleCourse).result;
-                        for (const singleSection of sectionArray) {
-                            that.checkValidDataset(singleSection);
+                return Promise.all(PromiseArray).then(function (allJsonF: any) {
+                    for (const singleC of allJsonF) {
+                        let ArrayOfSection = singleC.parse().result;
+                        for (const singleSection of ArrayOfSection) {
+                            // tslint:disable-next-line:no-unused-expression
+                            this.AnalyzeDataset(singleSection);
                         }
                     }
-                    if (that.validSection.length === 0) {
-                        reject(new InsightError("No valid section"));
-                    } else {// These files should be saved to the <PROJECT_DIR>/data directory.
-                        // Make sure not to commit these files to version control,
-                        // as this may cause unpredicted test failures.
-                        fs.writeFile("./data/" + id, JSON.stringify(that.validSection),
+                    if (this.VS.length === 0)  {
+                        return Promise.reject("NO Valid Section Exists");
+                    } else {
+                        fs.writeFile("./data/" + id, JSON.stringify(this.VS),
                             (e) => {
                                 if (e !== null) {
-                                    reject(new InsightError("Error occurs when saving to data"));
+                                    return Promise.reject("Fail to save Data");
                                 }
+                                this.CourseMap.set(id, this.VS);
+                                this.IDS.push(id);
+                                this.datasets.push(id);
+                                return Promise.resolve(this.datasets);
                             });
-                        that.datasetMap.set(id, that.validSection);
-                        that.datasetID.push(id);
-                        fulfill(that.datasetID);
-                        that.datasets.push(id);
                     }
-                });
-            });
-        });
-    }
-    // Check the details of whether a section has all features
-    private  checkValidDataset(singleSection: any) {
-        try {
-            if (typeof singleSection.Title === "string"
-                && typeof singleSection.Section === "string"
-                && typeof singleSection.id === "number"
-                && typeof singleSection.Professor === "string"
-                && typeof singleSection.Audit === "number"
-                && typeof singleSection.Year === "string"
-                && typeof singleSection.Course === "string"
-                && typeof singleSection.Session === "string"
-                && typeof singleSection.Pass === "number"
-                && typeof singleSection.Fail === "number"
-                && typeof singleSection.Avg === "number") {
-                const title = singleSection.Title;
-                const section = singleSection.Section;
-                const cid = singleSection.id.toString();
-                const professor = singleSection.Professor;
-                const audit = singleSection.Audit;
-                const year = parseInt(singleSection.Year, 10);
-                const course = singleSection.Course;
-                const session = singleSection.Session;
-                const pass = singleSection.Pass;
-                const fail = singleSection.Fail;
-                const avg = singleSection.Avg;
-                const validSec = new Map<string, number | string>([
-                    ["title", title],
-                    ["section", section],
-                    ["cid", cid],
-                    ["professor", professor],
-                    ["audit", audit],
-                    ["year", year],
-                    ["course", course],
-                    ["session", session],
-                    ["pass", pass],
-                    ["fail", fail],
-                    ["avg", avg],
-                ]);
-                this.validSection.push(validSec);
-            }
-        } catch {
-            // If an individual file is invalid for any reason, skip over it
-        }
-    }
+                }).catch();
+            }); }
+
     public removeDataset(id: string): Promise<string> {
         // check whether dataset ID is in right format
         if (id.includes("_") || id === "" || id === null) {
             return Promise.reject(new InsightError("ID in wrong format."));
         }
         // check whether dataset ID is already exists
-        if (!this.datasetID.includes(id)) {
+        if (!this.datasets.includes(id)) {
             return Promise.reject(new NotFoundError("ID is not exists."));
         }
         return Promise.reject("Not implemented.");
     }
 
     public performQuery(query: any): Promise <any[]> {
-        return Promise.reject("Not implemented.");
-    }
+        return Promise.reject("Not implemented."); }
 
     public listDatasets(): Promise<InsightDataset[]> {
         return Promise.reject("Not implemented.");
+    }
+    public CheckId (id: string): boolean {
+        if (id === null) {
+            return false; }
+        if (id.includes("_")) {
+            return false;
+        }
+        if (!id.replace(/\s/g, "").length) {
+            return  false;
+        }
+        return true;
+    }
+    public AnalyzeDataset (SingleSection: any ): void {
+        if    (typeof SingleSection.Title === "string"
+            && typeof SingleSection.Section === "string"
+            && typeof SingleSection.Avg === "number"
+            && typeof SingleSection.Professor === "string"
+            && typeof SingleSection.Subject === "string"
+            && typeof SingleSection.Pass === "number"
+            && typeof SingleSection.Fail === "number"
+            && typeof SingleSection.Audit === "string"
+            && typeof SingleSection.id === "number"
+            && typeof SingleSection.Year === "number") {
+            let dept = SingleSection.Subject;
+            let id    = SingleSection.Section;
+            let avg   = SingleSection.Avg;
+            let instructor = SingleSection.Professor;
+            let title = SingleSection.Title;
+            let pass  = SingleSection.Pass;
+            let fail  = SingleSection.Fail;
+            let audit = SingleSection.Audit;
+            let uuid = SingleSection.id;
+            let year = SingleSection.Year;
+            let ValidSec = new Map<string, number|string>([
+                ["courses_dept", dept],
+                ["course_id", id],
+                ["courses_avg", avg],
+                ["courses_instructor", instructor],
+                ["courses_title", title],
+                ["courses_pass", pass],
+                ["courses_fail", fail],
+                ["courses_audit", audit],
+                ["courses_uuid", uuid],
+                ["courses_year", year]
+            ]);
+            this.VS.push(ValidSec);
+
+        }
     }
 }
