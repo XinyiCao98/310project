@@ -15,6 +15,9 @@ export default class InsightFacade implements IInsightFacade {
     private validSection: any[] = [];
     private properties: string[] = ["courses_dept", "courses_id", "courses_avg", "courses_title",
         "courses_pass", "courses_fail", "courses_audit", "courses_uuid", "courses_year", "courses_instructor"];
+    private  NProperties: string[] = ["courses_avg", "courses_pass", "courses_fail", "courses_audit", "courses_year" ];
+    private  SProperties: string[] = ["courses_dept", "courses_id",
+        "courses_instructor", "courses_title", "courses_uuid"];
 
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
@@ -190,18 +193,40 @@ export default class InsightFacade implements IInsightFacade {
         });
     }
     public CheckQuery (query: any): boolean {
-      if (query == null || !query.hasOwnProperty("WHERE") || !query.hasOwnProperty("OPTIONS")
-      || query["WHERE"] == null) {
+      if (query == null ||
+          !query.hasOwnProperty("WHERE") ||
+          !query.hasOwnProperty("OPTIONS")
+      || query["WHERE"] == null ||
+      Object.keys(query["OPTIONS"]).length > 2 ||
+      Object.keys(query["WHERE"]).length !== 1) {
       return false; }
-      if (!query["OPTIONS"].hasOwnProperty("COLUMNS") || query["OPTIONS"]["COLUMNS"].length <= 0
-          || query["OPTIONS"]["COLUMNS"] == null ) {return false; }
+      let where = query["WHERE"];
+      let Comparator = Object.keys(where)[0];
+      let itemsInCom = where[Comparator];
+      // Log.trace(itemsInCom);
+      if (Comparator === "EQ" ||
+          Comparator === "GT" ||
+          Comparator === "LT") {
+          if (!this.CheckCWL(itemsInCom)) {return false; }
+
+      }
+      if (Comparator === "IS") {
+          if (!this.CheckIWL(itemsInCom)) {return true; }
+      }
+      if (!query["OPTIONS"].hasOwnProperty("COLUMNS") ||
+          query["OPTIONS"]["COLUMNS"].length <= 0
+          || query["OPTIONS"]["COLUMNS"] == null ) {
+          return false; }
       let itemsinCOL: string[] = query["OPTIONS"]["COLUMNS"];
       if (!this.CheckCol(itemsinCOL)) {
           return false; }
       if (query["OPTIONS"].hasOwnProperty("ORDER")) {
               if (query["OPTIONS"]["ORDER"] == null
-              || !this.CheckOrd(itemsinCOL, query["OPTIONS"]["ORDER"])) { return false;
-          } else {return true; }}
+              || !this.CheckOrd(itemsinCOL, query["OPTIONS"]["ORDER"])) {
+                  return false;
+          }
+      }
+      return true;
 
       }
 
@@ -217,4 +242,29 @@ export default class InsightFacade implements IInsightFacade {
         public  CheckOrd (Col: string[], Ord: string): boolean {
         if (Col.indexOf(Ord) < 0) {return false; }
         return true; }
+       // Check Compare Statement without logic
+     public  CheckCWL (ItemInComparator: any): boolean {
+      if (ItemInComparator === null) {
+          return false; }
+      let Bool = Array.isArray(ItemInComparator);
+      let Key = Object.keys(ItemInComparator).toString();
+      let Values = Object.values(ItemInComparator);
+      if (Bool) {return false; }
+      if (this.NProperties.indexOf(Key) < 0) {return  false; }
+      if ( typeof Values !== "number") { return false; }
+      return true;
+
+     }
+     public CheckIWL (ItemInComparator: any): boolean {
+        if (ItemInComparator === null) {
+            return false;
+        }
+        let Bool = Array.isArray(ItemInComparator);
+        let Key = Object.keys(ItemInComparator).toString();
+        let Values = Object.values(ItemInComparator);
+        if (Bool) {return false; }
+        if (this.SProperties.indexOf(Key) < 0 ) { return false; }
+        if (typeof Values !== "string") { return false; }
+        return true;
+     }
 }
