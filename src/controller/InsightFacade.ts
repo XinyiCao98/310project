@@ -98,34 +98,38 @@ export default class InsightFacade implements IInsightFacade {
                 // Log.trace("222");
                 try {
                     // Log.trace("333");
-                    if (typeof singleSection.Title === "string"
-                        && typeof singleSection.Section === "string"
-                        && typeof singleSection.id === "number"
-                        && typeof singleSection.Professor === "string"
-                        && typeof singleSection.Audit === "number"
-                        && typeof singleSection.Year === "string"
+                    if (typeof singleSection.Subject === "string"
                         && typeof singleSection.Course === "string"
-                        && typeof singleSection.Session === "string"
+                        && typeof singleSection.Avg === "number"
+                        && typeof singleSection.Professor === "string"
+                        && typeof singleSection.Title === "string"
                         && typeof singleSection.Pass === "number"
                         && typeof singleSection.Fail === "number"
-                        && typeof singleSection.Avg === "number") {
+                        && typeof singleSection.Audit === "number"
+                        && typeof singleSection.id === "number"
+                        && typeof singleSection.Year === "string") {
+                        const dept = singleSection.Subject;
+                        const id = singleSection.Course;
+                        const avg = singleSection.Avg;
+                        const instructor = singleSection.Professor;
                         const title = singleSection.Title;
-                        const section = singleSection.Section;
-                        const cid = singleSection.id.toString();
-                        const professor = singleSection.Professor;
-                        const audit = singleSection.Audit;
-                        const year = parseInt(singleSection.Year, 10);
-                        const course = singleSection.Course;
-                        const session = singleSection.Session;
                         const pass = singleSection.Pass;
                         const fail = singleSection.Fail;
-                        const avg = singleSection.Avg;
+                        const audit = singleSection.Audit;
+                        const uuid  = singleSection.id.toString;
+                        const year  = parseInt(singleSection.Year, 10);
                         const validSec = new Map<string, number | string>([
-                            ["title", title], ["section", section],
-                            ["cid", cid], ["professor", professor],
-                            ["audit", audit], ["year", year],
-                            ["course", course], ["session", session],
-                            ["pass", pass], ["fail", fail], ["avg", avg],
+                            ["courses_dept", dept],
+                            ["courses_id", id],
+                            ["courses_avg", avg],
+                            ["courses_instructor", instructor],
+                            ["courses_title", title],
+                            ["courses_pass", pass],
+                            ["courses_fail", fail],
+                            ["courses_audit", audit],
+                            ["courses_uuid", uuid],
+                            ["courses_year", year]
+
                         ]);
                         this.validSection.push(validSec);
                     }
