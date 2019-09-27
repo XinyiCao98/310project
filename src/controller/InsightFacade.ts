@@ -213,6 +213,11 @@ export default class InsightFacade implements IInsightFacade {
       if (Comparator === "IS") {
           if (!this.CheckIWL(itemsInCom)) {return false; }
       }
+      if (Comparator === "AND" ||
+          Comparator === "NOT" ||
+          Comparator === "OR") {
+          if (!this.CheckL(itemsInCom)) {return false; }
+      }
       if (!query["OPTIONS"].hasOwnProperty("COLUMNS") ||
           query["OPTIONS"]["COLUMNS"].length <= 0
           || query["OPTIONS"]["COLUMNS"] == null ) {
@@ -267,6 +272,12 @@ export default class InsightFacade implements IInsightFacade {
         if (Bool) {return false; }
         if (this.SProperties.indexOf(Key) < 0 ) { return false; }
         if (typeof Values !== "string") { return false; }
+        return true;
+     }
+     public CheckL (ItemInComparator: any): boolean {
+        if (ItemInComparator === null ) {
+            return false;
+        }
         return true;
      }
 }
