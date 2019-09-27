@@ -211,7 +211,7 @@ export default class InsightFacade implements IInsightFacade {
 
       }
       if (Comparator === "IS") {
-          if (!this.CheckIWL(itemsInCom)) {return true; }
+          if (!this.CheckIWL(itemsInCom)) {return false; }
       }
       if (!query["OPTIONS"].hasOwnProperty("COLUMNS") ||
           query["OPTIONS"]["COLUMNS"].length <= 0
@@ -229,7 +229,7 @@ export default class InsightFacade implements IInsightFacade {
       return true;
 
       }
-
+      // Check the properties from Column are in given information or not
       public CheckCol(Col: string[]): boolean {
         let m: number = Col.length;
         let i: number = 0;
@@ -239,6 +239,7 @@ export default class InsightFacade implements IInsightFacade {
             }}
 
         return true; }
+        // Check key of Order in Coloumn  or not
         public  CheckOrd (Col: string[], Ord: string): boolean {
         if (Col.indexOf(Ord) < 0) {return false; }
         return true; }
@@ -255,6 +256,7 @@ export default class InsightFacade implements IInsightFacade {
       return true;
 
      }
+     // Check Is Statement without logic
      public CheckIWL (ItemInComparator: any): boolean {
         if (ItemInComparator === null) {
             return false;
