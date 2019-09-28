@@ -1,4 +1,3 @@
-
 import Log from "../Util";
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
 import * as JSZip from "jszip";
@@ -15,13 +14,14 @@ export default class InsightFacade implements IInsightFacade {
     private validSection: any[] = [];
     private properties: string[] = ["courses_dept", "courses_id", "courses_avg", "courses_title",
         "courses_pass", "courses_fail", "courses_audit", "courses_uuid", "courses_year", "courses_instructor"];
-    private  NProperties: string[] = ["courses_avg", "courses_pass", "courses_fail", "courses_audit", "courses_year" ];
-    private  SProperties: string[] = ["courses_dept", "courses_id",
+    private NProperties: string[] = ["courses_avg", "courses_pass", "courses_fail", "courses_audit", "courses_year"];
+    private SProperties: string[] = ["courses_dept", "courses_id",
         "courses_instructor", "courses_title", "courses_uuid"];
 
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
     }
+
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         // check whether dataset ID is in right format
         return new Promise((fulfill, reject) => {
@@ -70,6 +70,7 @@ export default class InsightFacade implements IInsightFacade {
             });
         });
     }
+
     private checkInput(id: string, kind: InsightDatasetKind) {
         // check whether dataset ID is in right format
         if (!id || id.length === 0) {
@@ -87,6 +88,7 @@ export default class InsightFacade implements IInsightFacade {
             throw new InsightError("ID is incorrect InsightDatasetKind.");
         }
     }
+
     // Check the details of whether a section has all features
     private checkValidDataset(allJFile: any) {
         for (const singleCourse of allJFile) {
@@ -119,20 +121,14 @@ export default class InsightFacade implements IInsightFacade {
                         const pass = singleSection.Pass;
                         const fail = singleSection.Fail;
                         const audit = singleSection.Audit;
-                        const uuid  = singleSection.id.toString;
-                        const year  = parseInt(singleSection.Year, 10);
+                        const uuid = singleSection.id.toString;
+                        const year = parseInt(singleSection.Year, 10);
                         const validSec = new Map<string, number | string>([
-                            ["courses_dept", dept],
-                            ["courses_id", id],
-                            ["courses_avg", avg],
-                            ["courses_instructor", instructor],
-                            ["courses_title", title],
-                            ["courses_pass", pass],
-                            ["courses_fail", fail],
-                            ["courses_audit", audit],
-                            ["courses_uuid", uuid],
-                            ["courses_year", year]
-
+                            ["courses_dept", dept], ["courses_id", id],
+                            ["courses_avg", avg], ["courses_instructor", instructor],
+                            ["courses_title", title], ["courses_pass", pass],
+                            ["courses_fail", fail], ["courses_audit", audit],
+                            ["courses_uuid", uuid], ["courses_year", year]
                         ]);
                         this.validSection.push(validSec);
                     }
@@ -142,6 +138,7 @@ export default class InsightFacade implements IInsightFacade {
             }
         }
     }
+
     public removeDataset(id: string): Promise<string> {
         // check whether dataset ID is in right format
         if (!id || id.length === 0) {
@@ -174,13 +171,13 @@ export default class InsightFacade implements IInsightFacade {
         });
     }
 
-    public performQuery(query: any): Promise <any[]> {
-     let Validornot = this.CheckQuery(query);
-     let Output: string[] = ["KAIWEN"];
-     if (!Validornot) {
+    public performQuery(query: any): Promise<any[]> {
+        let Validornot = this.CheckQuery(query);
+        let Output: string[] = ["KAIWEN"];
+        if (!Validornot) {
             return Promise.reject(new InsightError("Invalid Query"));
         }
-     return Promise.resolve(Output);
+        return Promise.resolve(Output);
     }
 
     public listDatasets(): Promise<InsightDataset[]> {
@@ -192,92 +189,137 @@ export default class InsightFacade implements IInsightFacade {
             fulfill(presentList);
         });
     }
-    public CheckQuery (query: any): boolean {
-      if (query == null ||
-          !query.hasOwnProperty("WHERE") ||
-          !query.hasOwnProperty("OPTIONS")
-      || query["WHERE"] == null ||
-      Object.keys(query["OPTIONS"]).length > 2 ||
-      Object.keys(query["WHERE"]).length !== 1) {
-      return false; }
-      let where = query["WHERE"];
-      let Comparator = Object.keys(where)[0];
-      let itemsInCom = where[Comparator];
-      // Log.trace(itemsInCom);
-      if (Comparator === "EQ" ||
-          Comparator === "GT" ||
-          Comparator === "LT") {
-          if (!this.CheckCWL(itemsInCom)) {return false; }
 
-      }
-      if (Comparator === "IS") {
-          if (!this.CheckIWL(itemsInCom)) {return false; }
-      }
-      if (Comparator === "AND" ||
-          Comparator === "NOT" ||
-          Comparator === "OR") {
-          if (!this.CheckL(itemsInCom)) {return false; }
-      }
-      if (!query["OPTIONS"].hasOwnProperty("COLUMNS") ||
-          query["OPTIONS"]["COLUMNS"].length <= 0
-          || query["OPTIONS"]["COLUMNS"] == null ) {
-          return false; }
-      let itemsinCOL: string[] = query["OPTIONS"]["COLUMNS"];
-      if (!this.CheckCol(itemsinCOL)) {
-          return false; }
-      if (query["OPTIONS"].hasOwnProperty("ORDER")) {
-              if (query["OPTIONS"]["ORDER"] == null
-              || !this.CheckOrd(itemsinCOL, query["OPTIONS"]["ORDER"])) {
-                  return false;
-          }
-      }
-      return true;
-
-      }
-      // Check the properties from Column are in given information or not
-      public CheckCol(Col: string[]): boolean {
-        let m: number = Col.length;
-        let i: number = 0;
-        for (i; i < m ; i++) {
-            if (this.properties.indexOf(Col[i]) < 0) {
-                return false;
-            }}
-
-        return true; }
-        // Check key of Order in Coloumn  or not
-        public  CheckOrd (Col: string[], Ord: string): boolean {
-        if (Col.indexOf(Ord) < 0) {return false; }
-        return true; }
-       // Check Compare Statement without logic
-     public  CheckCWL (ItemInComparator: any): boolean {
-      if (ItemInComparator === null) {
-          return false; }
-      let Bool = Array.isArray(ItemInComparator);
-      let Key = Object.keys(ItemInComparator).toString();
-      let Values = Object.values(ItemInComparator);
-      if (Bool) {return false; }
-      if (this.NProperties.indexOf(Key) < 0) {return  false; }
-      if ( typeof Values !== "number") { return false; }
-      return true;
-
-     }
-     // Check Is Statement without logic
-     public CheckIWL (ItemInComparator: any): boolean {
-        if (ItemInComparator === null) {
+    public CheckQuery(query: any): boolean {
+        if (query == null || !query.hasOwnProperty("WHERE") || !query.hasOwnProperty("OPTIONS") ||
+            !this.queryOrNot(query["WHERE"]) || !this.queryOrNot(query["OPTIONS"]) || // first layer has be queries
+            Object.keys(query).length > 2 ||   // extra element in query
+            query["WHERE"] == null ||          // nothing inside where
+            Object.keys(query["OPTIONS"]).length > 2 || // extra element in option
+            Object.keys(query["WHERE"]).length !== 1) { // extra element in where
             return false;
         }
-        let Bool = Array.isArray(ItemInComparator);
+        let where = query["WHERE"];
+        let options = query["OPTIONS"];
+        // Log.trace(itemsInCom);
+        if (Object.keys(where).length === 0) {
+            // TODO: Result too large ???
+        }
+        this.checkWhere(where);
+        if (!Array.isArray(options["COLUMNS"]) || Array.isArray(options["ORDER"])) { // Order cannot be array
+            return false; // columns has be array
+        }
+        let itemsInCOL: string[] = options["COLUMNS"]; // stuff inside columns
+        for (const key of Object.keys(options)) { // check options has valid elements
+            if (key === "COLUMNS") {
+                return this.CheckCol(itemsInCOL);
+            } else if (key === "ORDER" && typeof options["ORDER"] === "string") {
+                return this.CheckOrd(itemsInCOL, options["ORDER"]);
+            } else {
+                return false;
+            }
+        }
+    }
+
+    public  checkWhere(where: any): boolean {
+        let Comparator = Object.keys(where)[0];
+        let itemsInCom = where[Comparator];
+        Log.trace(Object.keys(itemsInCom));
+        if (Comparator === "EQ" || Comparator === "GT" || Comparator === "LT") {
+            if (!this.CheckCWL(itemsInCom)) {
+                return false;
+            }
+        } else if (Comparator === "IS") {
+            if (!this.CheckIWL(itemsInCom)) {
+                return false;
+            }
+        } else if (Comparator === "AND" || Comparator === "OR") {
+            if (!this.CheckL(itemsInCom)) {
+                return false;
+            }
+        } else if (Comparator === "NOT") {
+            // TODO: Check Negation !!!
+        } else {
+            return false;
+        }
+    }
+    // Check if input is a query e.g. {}
+    public queryOrNot(q: any): boolean {
+        if (typeof q === "string" || typeof q === "number" ||
+            Array.isArray(q) || q === null) {
+            return false;
+        }
+    }
+
+    // Check the properties from Column are in given information or not
+    public CheckCol(Col: string[]): boolean {
+        let i: number = 0;
+        if (Col.length > 0 || Col !== null) {
+            for (i; i < Col.length; i++) {
+                if (this.properties.indexOf(Col[i]) < 0) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Check if element inside order is valid
+    public CheckOrd(Col: string[], Ord: string): boolean {
+        Log.trace(Ord);
+        if (Col === null || Col.indexOf(Ord) < 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    // Check Compare Statement without logic
+    public CheckCWL(ItemInComparator: any): boolean {
+        if (!this.queryOrNot(ItemInComparator)) {
+            return false;
+        }
         let Key = Object.keys(ItemInComparator).toString();
         let Values = Object.values(ItemInComparator);
-        if (Bool) {return false; }
-        if (this.SProperties.indexOf(Key) < 0 ) { return false; }
-        if (typeof Values !== "string") { return false; }
-        return true;
-     }
-     public CheckL (ItemInComparator: any): boolean {
-        if (ItemInComparator === null ) {
+        if (this.NProperties.indexOf(Key) < 0) {
+            return false;
+        }
+        if (typeof Values !== "number") {
             return false;
         }
         return true;
-     }
+
+    }
+
+    // Check Is Statement without logic
+    public CheckIWL(ItemInComparator: any): boolean {
+        if (!this.queryOrNot(ItemInComparator) || Object.keys(ItemInComparator).length !== 1) {
+            return false;
+        }
+        let Key = Object.keys(ItemInComparator).toString();
+        let Values = Object.values(ItemInComparator);
+        if (this.SProperties.indexOf(Key) < 0) {
+            return false;
+        }
+        if (typeof Values !== "string") {
+            return false;
+        }
+        return true;
+    }
+
+    public CheckL(ItemInComparator: any): boolean { // check AND || OR logic
+        if (ItemInComparator === null || !Array.isArray(ItemInComparator) || ItemInComparator.length < 1) {
+            return false;
+        } else {
+            for (let everyLogic of ItemInComparator) {
+                if (!this.checkWhere(everyLogic) || Object.keys(everyLogic).length === 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+// tslint:disable-next-line:max-file-line-count
 }

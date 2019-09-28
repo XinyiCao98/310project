@@ -1,0 +1,47 @@
+{
+    "title": "test complex or case1",
+    "query": {
+        "WHERE": {
+            "OR": [
+                {
+                    "OR": [
+                        {
+                            "EQ": {
+                                "courses_avg": 98
+                            }
+                        },
+                        {
+                            "GT": {
+                                "courses_fail": 300
+                            }
+                        }
+                    ]
+                },
+                {
+                    "EQ": {
+                        "courses_avg": 92.9
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_fail",
+                "courses_id"
+            ],
+            "ORDER": "courses_fail"
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_dept":"audi","courses_fail":0,"courses_id":"522"},
+        {"courses_dept":"audi","courses_fail":0,"courses_id":"522"},
+        {"courses_dept":"crwr","courses_fail":0,"courses_id":"599"},
+        {"courses_dept":"crwr","courses_fail":0,"courses_id":"599"},
+        {"courses_dept":"epse","courses_fail":0,"courses_id":"535"},
+        {"courses_dept":"epse","courses_fail":0,"courses_id":"535"},
+        {"courses_dept":"plan","courses_fail":0,"courses_id":"561"},
+        {"courses_dept":"plan","courses_fail":0,"courses_id":"561"}
+    ]
+}

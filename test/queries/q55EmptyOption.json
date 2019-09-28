@@ -1,0 +1,22 @@
+{
+    "title": "test with empty option",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept":"adhe"
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg":92
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {}
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

@@ -1,0 +1,20 @@
+{
+    "title": "test mfield",
+    "query": {
+        "WHERE": {
+            "EQ": {
+                "courses_dept": ""
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_year",
+                "courses_title",
+                "courses_pass"
+            ],
+            "ORDER": "courses_pass"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}
