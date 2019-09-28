@@ -175,12 +175,11 @@ export default class InsightFacade implements IInsightFacade {
         });
     }
 
-    public CheckQuery(query: any): boolean {
+    public CheckQuery(query: any): boolean { // check basic element exists
         if (query == null || !query.hasOwnProperty("WHERE") || !query.hasOwnProperty("OPTIONS") ||
             !this.queryOrNot(query["WHERE"]) || !this.queryOrNot(query["OPTIONS"]) || // first layer has be queries
             Object.keys(query).length > 2 ||   // extra element in query
-            query["WHERE"] == null ||          // nothing inside where
-            Object.keys(query["OPTIONS"]).length > 2 || // extra element in option
+            Object.keys(query["OPTIONS"]).length > 2 || Object.keys(query["OPTIONS"]).length === 0 ||
             Object.keys(query["WHERE"]).length !== 1) { // extra element in where
             return false;
         }
@@ -191,17 +190,14 @@ export default class InsightFacade implements IInsightFacade {
             // TODO: Result too large ???
         }
         this.checkWhere(where);
-        if (!Array.isArray(options["COLUMNS"]) || Array.isArray(options["ORDER"])) { // Order cannot be array
-            return false; // columns has be array
-        }
         let itemsInCOL: string[] = options["COLUMNS"]; // stuff inside columns
         for (const key of Object.keys(options)) { // check options has valid elements
-            if (key === "COLUMNS") {
+            if (key === "COLUMNS" && Array.isArray(options["COLUMNS"])) {
                 return this.CheckCol(itemsInCOL);
-            } else if (key === "ORDER" && typeof options["ORDER"] === "string") {
+            } else if (key === "ORDER" && !Array.isArray(options["ORDER"]) && typeof options["ORDER"] === "string") {
                 return this.CheckOrd(itemsInCOL, options["ORDER"]);
             } else {
-                return false;
+                return false; // if contains more than col/order, return false
             }
         }
     }
@@ -222,7 +218,9 @@ export default class InsightFacade implements IInsightFacade {
                 return false;
             }
         } else if (Comparator === "NOT") {
-            // TODO: Check Negation !!!
+            if (!this.CheckNeg(itemsInCom)) {
+                return false;
+            }
         } else {
             return false;
         }
@@ -237,7 +235,7 @@ export default class InsightFacade implements IInsightFacade {
     // Check the properties from Column are in given information or not
     public CheckCol(Col: string[]): boolean {
         let i: number = 0;
-        if (Col.length > 0 || Col !== null) {
+        if (Col.length > 0) {
             for (i; i < Col.length; i++) {
                 if (this.properties.indexOf(Col[i]) < 0) {
                     return false;
@@ -296,4 +294,11 @@ export default class InsightFacade implements IInsightFacade {
             return true;
         }
     }
+
+    public CheckNeg(ItemInComparator: any): boolean { // check AND || OR logic
+        if (!this.queryOrNot(ItemInComparator) || Object.keys(ItemInComparator).length !== 1) {
+            return this.checkWhere(ItemInComparator);
+        }
+    }
+// tslint:disable-next-line:max-file-line-count
 }
