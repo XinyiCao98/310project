@@ -61,11 +61,11 @@ export default class InsightFacade implements IInsightFacade {
                         fulfill(that.datasetID);
                     }
                 }).catch(function (e) {
-                    Log.trace("Empty promise list");
+                    // Log.trace("Empty promise list");
                     reject(new InsightError("This is no item in promise list"));
                 });
             }).catch(function (e) {
-                Log.trace("not zip");
+                // Log.trace("not zip");
                 reject(new InsightError("This is not a zip"));
             });
         });
@@ -224,7 +224,6 @@ export default class InsightFacade implements IInsightFacade {
     public  checkWhere(where: any): boolean {
         let Comparator = Object.keys(where)[0];
         let itemsInCom = where[Comparator];
-        Log.trace(Object.keys(itemsInCom));
         if (Comparator === "EQ" || Comparator === "GT" || Comparator === "LT") {
             if (!this.CheckCWL(itemsInCom)) {
                 return false;
@@ -268,7 +267,6 @@ export default class InsightFacade implements IInsightFacade {
 
     // Check if element inside order is valid
     public CheckOrd(Col: string[], Ord: string): boolean {
-        Log.trace(Ord);
         if (Col === null || Col.indexOf(Ord) < 0) {
             return false;
         } else {
