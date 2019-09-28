@@ -2,6 +2,8 @@ import Log from "../Util";
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
 import * as JSZip from "jszip";
 import * as fs from "fs";
+import * as QT from "./QueryTree";
+import QueryTree from "./QueryTree";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -98,9 +100,7 @@ export default class InsightFacade implements IInsightFacade {
                 continue;
             }
             for (const singleSection of sectionArray) {
-                // Log.trace("222");
                 try {
-                    // Log.trace("333");
                     if (typeof singleSection.Subject === "string" && typeof singleSection.Course === "string"
                         && typeof singleSection.Avg === "number" && typeof singleSection.Professor === "string"
                         && typeof singleSection.Title === "string" && typeof singleSection.Pass === "number"
@@ -162,8 +162,9 @@ export default class InsightFacade implements IInsightFacade {
         let Output: string[] = ["KAIWEN"];
         if (!Validornot) {
             return Promise.reject(new InsightError("Invalid Query"));
+        } else {
+            return Promise.resolve(Output);
         }
-        return Promise.resolve(Output);
     }
     public listDatasets(): Promise<InsightDataset[]> {
         return new Promise<InsightDataset[]>((fulfill, reject) => {
@@ -176,54 +177,65 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public CheckQuery(query: any): boolean { // check basic element exists
-        if (query == null || !query.hasOwnProperty("WHERE") || !query.hasOwnProperty("OPTIONS") ||
+        if (query === null || !query.hasOwnProperty("WHERE") || !query.hasOwnProperty("OPTIONS") ||
             !this.queryOrNot(query["WHERE"]) || !this.queryOrNot(query["OPTIONS"]) || // first layer has be queries
             Object.keys(query).length > 2 ||   // extra element in query
             Object.keys(query["OPTIONS"]).length > 2 || Object.keys(query["OPTIONS"]).length === 0 ||
-            Object.keys(query["WHERE"]).length !== 1) { // extra element in where
+            Object.keys(query["WHERE"]).length > 2) { // extra element in where
             return false;
         }
         let where = query["WHERE"];
         let options = query["OPTIONS"];
         // Log.trace(itemsInCom);
-        if (Object.keys(where).length === 0) {
-            // TODO: Result too large ???
+        if (!this.checkWhere(where)) {
+            return false;
         }
-        this.checkWhere(where);
+        if (!options.hasOwnProperty("COLUMNS")) {
+            return false;
+        }
         let itemsInCOL: string[] = options["COLUMNS"]; // stuff inside columns
         for (const key of Object.keys(options)) { // check options has valid elements
             if (key === "COLUMNS" && Array.isArray(options["COLUMNS"])) {
-                return this.CheckCol(itemsInCOL);
+                if (!this.CheckCol(itemsInCOL)) {
+                    return false;
+                }
             } else if (key === "ORDER" && !Array.isArray(options["ORDER"]) && typeof options["ORDER"] === "string") {
-                return this.CheckOrd(itemsInCOL, options["ORDER"]);
+                if (!this.CheckOrd(itemsInCOL, options["ORDER"])) {
+                    return false;
+                }
             } else {
                 return false; // if contains more than col/order, return false
             }
         }
+        Log.trace("VALID");
+        let QueryTR = new QueryTree();
+        let  Qtree = QueryTR.buildQT(where, options);
+        Log.trace(Qtree.nodeValue);
+        Log.trace(Qtree.Columns);
+        Log.trace(Qtree.nodeType);
+        Log.trace(Qtree.nodeProperty);
+        Log.trace(Qtree.children);
+        return true;
     }
 
     public  checkWhere(where: any): boolean {
+        if (Object.keys(where).length === 0) {
+            return false;
+        }
         let Comparator = Object.keys(where)[0];
         let itemsInCom = where[Comparator];
         if (Comparator === "EQ" || Comparator === "GT" || Comparator === "LT") {
-            if (!this.CheckCWL(itemsInCom)) {
-                return false;
-            }
+            return this.CheckCWL(itemsInCom);
         } else if (Comparator === "IS") {
-            if (!this.CheckIWL(itemsInCom)) {
-                return false;
-            }
+            return this.CheckIWL(itemsInCom);
         } else if (Comparator === "AND" || Comparator === "OR") {
-            if (!this.CheckL(itemsInCom)) {
-                return false;
-            }
+            return this.CheckL(itemsInCom);
         } else if (Comparator === "NOT") {
-            if (!this.CheckNeg(itemsInCom)) {
-                return false;
-            }
+            return this.CheckNeg(itemsInCom);
         } else {
             return false;
         }
+        return true;
     }
     // Check if input is a query e.g. {}
     public queryOrNot(q: any): boolean {
@@ -231,6 +243,7 @@ export default class InsightFacade implements IInsightFacade {
             Array.isArray(q) || q === null) {
             return false;
         }
+        return true;
     }
     // Check the properties from Column are in given information or not
     public CheckCol(Col: string[]): boolean {
@@ -242,8 +255,6 @@ export default class InsightFacade implements IInsightFacade {
                 }
             }
             return true;
-        } else {
-            return false;
         }
     }
     public CheckOrd(Col: string[], Ord: string): boolean { // Check if element inside order is valid
@@ -255,11 +266,12 @@ export default class InsightFacade implements IInsightFacade {
     }
     // Check Compare Statement without logic
     public CheckCWL(ItemInComparator: any): boolean {
-        if (!this.queryOrNot(ItemInComparator)) {
+        if (!this.queryOrNot(ItemInComparator) || Object.keys(ItemInComparator).length !== 1) {
             return false;
         }
         let Key = Object.keys(ItemInComparator).toString();
-        let Values = Object.values(ItemInComparator);
+        let Values = Object.values(ItemInComparator)[0];
+
         if (this.NProperties.indexOf(Key) < 0) {
             return false;
         }
@@ -273,7 +285,7 @@ export default class InsightFacade implements IInsightFacade {
             return false;
         }
         let Key = Object.keys(ItemInComparator).toString();
-        let Values = Object.values(ItemInComparator);
+        let Values =  Object.values(ItemInComparator)[0];
         if (this.SProperties.indexOf(Key) < 0) {
             return false;
         }
