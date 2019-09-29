@@ -13,21 +13,23 @@ export class CheckQueryHelper {
     }
 
     public CheckQuery(query: any): boolean { // check basic element exists
-        if (query === null || !query.hasOwnProperty("WHERE") || !query.hasOwnProperty("OPTIONS") ||
+        if (query === null || !this.queryOrNot(query) ||
+            !query.hasOwnProperty("WHERE") || !query.hasOwnProperty("OPTIONS") ||
             !this.queryOrNot(query["WHERE"]) || !this.queryOrNot(query["OPTIONS"]) || // first layer has be queries
             Object.keys(query).length !== 2 || Object.keys(query["OPTIONS"]).length > 2 ||
-            Object.keys(query["OPTIONS"]).length === 0 || Object.keys(query["WHERE"]).length !== 1) {
+            Object.keys(query["OPTIONS"]).length === 0 || Object.keys(query["WHERE"]).length > 2) {
             return false;
         }
-        let where = query["WHERE"]; let options = query["OPTIONS"];
+        let where = query["WHERE"];
+        let options = query["OPTIONS"];
         // Log.trace(itemsInCom);
         if (!this.checkWhere(where)) { return false; }
         if (!options.hasOwnProperty("COLUMNS") || !Array.isArray(options["COLUMNS"])) {
             return false;
-        }
+        } // columns exists plus it is an array
         for (const item of options["COLUMNS"]) {
-            if (typeof item !== "string") { return false; } // every element inside columns are string
-        }
+            if (typeof item !== "string") { return false; }
+        } // every element inside columns are string
         let itemsInCOL: string[] = options["COLUMNS"]; // stuff inside columns
         for (const key of Object.keys(options)) { // check options has valid elements
             if (key === "COLUMNS") {
@@ -50,6 +52,9 @@ export class CheckQueryHelper {
     }
 
     public checkWhere(where: any): boolean {
+        if (Object.keys(where).length === 0) {
+            return true;
+        }
         let Comparator = Object.keys(where)[0];
         let itemsInCom = where[Comparator];
         if (Comparator === "EQ" || Comparator === "GT" || Comparator === "LT") {
