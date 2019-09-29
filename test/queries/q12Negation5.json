@@ -1,0 +1,45 @@
+{
+    "title": "SELECT dept, id, avg WHERE avg != 51 && course_id IS 155 ORDER BY avg, Negation with EQ and AND",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "NOT": {
+                        "AND": [
+                            {
+                                "GT": {
+                                    "courses_avg": 85
+                                }
+                            },
+                            {
+                                "LT": {
+                                    "courses_avg": 99
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "IS": {
+                        "courses_id": "167"
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result": [
+        {"courses_dept":"musc","courses_id":"167","courses_avg":83.09},
+        {"courses_dept":"musc","courses_id":"167","courses_avg":83.09},
+        {"courses_dept":"musc","courses_id":"167","courses_avg":83.09},
+        {"courses_dept":"musc","courses_id":"167","courses_avg":83.09}
+    ]
+}

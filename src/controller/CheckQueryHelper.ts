@@ -11,26 +11,26 @@ export class CheckQueryHelper {
     constructor() {
         //
     }
+
     public CheckQuery(query: any): boolean { // check basic element exists
         if (query === null || !query.hasOwnProperty("WHERE") || !query.hasOwnProperty("OPTIONS") ||
             !this.queryOrNot(query["WHERE"]) || !this.queryOrNot(query["OPTIONS"]) || // first layer has be queries
-            Object.keys(query).length > 2 ||   // extra element in query
-            Object.keys(query["OPTIONS"]).length > 2 || Object.keys(query["OPTIONS"]).length === 0 ||
-            Object.keys(query["WHERE"]).length > 2) { // extra element in where
+            Object.keys(query).length !== 2 || Object.keys(query["OPTIONS"]).length > 2 ||
+            Object.keys(query["OPTIONS"]).length === 0 || Object.keys(query["WHERE"]).length !== 1) {
             return false;
         }
-        let where = query["WHERE"];
-        let options = query["OPTIONS"];
+        let where = query["WHERE"]; let options = query["OPTIONS"];
         // Log.trace(itemsInCom);
-        if (!this.checkWhere(where)) {
+        if (!this.checkWhere(where)) { return false; }
+        if (!options.hasOwnProperty("COLUMNS") || !Array.isArray(options["COLUMNS"])) {
             return false;
         }
-        if (!options.hasOwnProperty("COLUMNS")) {
-            return false;
+        for (const item of options["COLUMNS"]) {
+            if (typeof item !== "string") { return false; } // every element inside columns are string
         }
         let itemsInCOL: string[] = options["COLUMNS"]; // stuff inside columns
         for (const key of Object.keys(options)) { // check options has valid elements
-            if (key === "COLUMNS" && Array.isArray(options["COLUMNS"])) {
+            if (key === "COLUMNS") {
                 if (!this.CheckCol(itemsInCOL)) {
                     return false;
                 }
@@ -44,20 +44,12 @@ export class CheckQueryHelper {
         }
         Log.trace("VALID");
         let QueryTR = new QueryTree();
-        let  Qtree = QueryTR.buildQT(where, options);
+        let Qtree = QueryTR.buildQT(where, options);
         Log.trace(Qtree.children[0].nodeType);
-        Log.trace(Qtree.children[0].nodeValue);
-        Log.trace(Qtree.children[0].nodeProperty);
-        Log.trace(Qtree.children[1].nodeType);
-        Log.trace(Qtree.children[1].nodeValue);
-        Log.trace(Qtree.children[1].nodeProperty);
         return true;
     }
 
-    public  checkWhere(where: any): boolean {
-        if (Object.keys(where).length === 0) {
-            return false;
-        }
+    public checkWhere(where: any): boolean {
         let Comparator = Object.keys(where)[0];
         let itemsInCom = where[Comparator];
         if (Comparator === "EQ" || Comparator === "GT" || Comparator === "LT") {
@@ -73,6 +65,7 @@ export class CheckQueryHelper {
         }
         return true;
     }
+
     // Check if input is a query e.g. {}
     public queryOrNot(q: any): boolean {
         if (typeof q === "string" || typeof q === "number" ||
@@ -81,6 +74,7 @@ export class CheckQueryHelper {
         }
         return true;
     }
+
     // Check the properties from Column are in given information or not
     public CheckCol(Col: string[]): boolean {
         let i: number = 0;
@@ -93,6 +87,7 @@ export class CheckQueryHelper {
             return true;
         }
     }
+
     public CheckOrd(Col: string[], Ord: string): boolean { // Check if element inside order is valid
         if (Col === null || Col.indexOf(Ord) < 0) {
             return false;
@@ -100,6 +95,7 @@ export class CheckQueryHelper {
             return true;
         }
     }
+
     // Check Compare Statement without logic
     public CheckCWL(ItemInComparator: any): boolean {
         if (!this.queryOrNot(ItemInComparator) || Object.keys(ItemInComparator).length !== 1) {
@@ -116,20 +112,26 @@ export class CheckQueryHelper {
         }
         return true;
     }
-    public CheckIWL(ItemInComparator: any): boolean { // Check Is Statement without logic
+
+    public CheckIWL(ItemInComparator: any): boolean { // Check IS Statement without logic
         if (!this.queryOrNot(ItemInComparator) || Object.keys(ItemInComparator).length !== 1) {
             return false;
         }
         let Key = Object.keys(ItemInComparator).toString();
-        let Values =  Object.values(ItemInComparator)[0];
+        let Values = Object.values(ItemInComparator)[0];
         if (this.SProperties.indexOf(Key) < 0) {
             return false;
         }
         if (typeof Values !== "string") {
             return false;
         }
+        let pattern = /^((\*)?[^*]*(\*)?)$/;
+        if (!pattern.test(Values)) {
+            return false;
+        }
         return true;
     }
+
     public CheckL(ItemInComparator: any): boolean { // check AND || OR logic
         if (ItemInComparator === null || !Array.isArray(ItemInComparator) || ItemInComparator.length < 1) {
             return false;
@@ -145,6 +147,8 @@ export class CheckQueryHelper {
 
     public CheckNeg(ItemInComparator: any): boolean { // check AND || OR logic
         if (!this.queryOrNot(ItemInComparator) || Object.keys(ItemInComparator).length !== 1) {
+            return false;
+        } else {
             return this.checkWhere(ItemInComparator);
         }
     }

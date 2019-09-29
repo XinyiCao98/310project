@@ -1,0 +1,33 @@
+{
+    "title": "SELECT dept, id, avg WHERE avg <= 63.01 && avg > 63 ORDER BY avg, Negation with GT",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "NOT": {
+                        "GT": {
+                            "courses_avg": 63.01
+                        }
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg": 63
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result": [
+        {"courses_dept":"psyc","courses_id":"101","courses_avg":63.01}
+    ]
+}

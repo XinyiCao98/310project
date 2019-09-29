@@ -2,7 +2,6 @@ import Log from "../Util";
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
 import * as JSZip from "jszip";
 import * as fs from "fs";
-import QueryTree from "./QueryTree";
 import {CheckQueryHelper} from "./CheckQueryHelper";
 
 /**

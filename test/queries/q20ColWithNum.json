@@ -1,0 +1,25 @@
+{
+    "title": "test wrong column format",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "GT": {
+                        "courses_audit": 2
+                    }
+                },
+                {
+                    "EQ": {
+                        "courses_fail": 10
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": 123,
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}
