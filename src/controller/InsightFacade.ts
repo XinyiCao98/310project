@@ -107,7 +107,7 @@ export default class InsightFacade implements IInsightFacade {
                         const title = singleSection.Title; const pass = singleSection.Pass;
                         const fail = singleSection.Fail; const audit = singleSection.Audit;
                         const uuid = singleSection.id.toString; const year = parseInt(singleSection.Year, 10);
-                        let validSec = {
+                        let validSec: InsightCourses = {
                             courses_dept: dept, courses_id: id,
                             courses_avg: avg, courses_instructor: instructor,
                             courses_title: title, courses_pass: pass,
