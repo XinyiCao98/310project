@@ -1,5 +1,6 @@
 import Log from "../Util";
-import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
+import {IInsightFacade, InsightCourses, InsightDataset,
+    InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
 import * as JSZip from "jszip";
 import * as fs from "fs";
 import {CheckQueryHelper} from "./CheckQueryHelper";
@@ -9,6 +10,7 @@ import {CheckQueryHelper} from "./CheckQueryHelper";
  * Method documentation is in IInsightFacade
  *
  */
+
 export default class InsightFacade implements IInsightFacade {
     private datasetID: string[] = [];
     private datasetMap: Map<string, any[]> = new Map<string, any[]>();
@@ -105,13 +107,13 @@ export default class InsightFacade implements IInsightFacade {
                         const title = singleSection.Title; const pass = singleSection.Pass;
                         const fail = singleSection.Fail; const audit = singleSection.Audit;
                         const uuid = singleSection.id.toString; const year = parseInt(singleSection.Year, 10);
-                        const validSec = new Map<string, number | string>([
-                            ["courses_dept", dept], ["courses_id", id],
-                            ["courses_avg", avg], ["courses_instructor", instructor],
-                            ["courses_title", title], ["courses_pass", pass],
-                            ["courses_fail", fail], ["courses_audit", audit],
-                            ["courses_uuid", uuid], ["courses_year", year]
-                        ]);
+                        let validSec = {
+                            courses_dept: dept, courses_id: id,
+                            courses_avg: avg, courses_instructor: instructor,
+                            courses_title: title, courses_pass: pass,
+                            courses_fail: fail, courses_audit: audit,
+                            courses_uuid: uuid, courses_year: year
+                        };
                         this.validSection.push(validSec);
                     }
                 } catch {
