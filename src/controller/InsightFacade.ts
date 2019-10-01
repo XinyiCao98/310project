@@ -4,6 +4,8 @@ import {IInsightFacade, InsightCourses, InsightDataset,
 import * as JSZip from "jszip";
 import * as fs from "fs";
 import {CheckQueryHelper} from "./CheckQueryHelper";
+import * as DS from "./Datasets";
+import Datasets from "./Datasets";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -159,10 +161,15 @@ export default class InsightFacade implements IInsightFacade {
         let Output: string[] = ["KAIWEN"];
         if (!Validornot) {
             return Promise.reject(new InsightError("Invalid Query"));
-        } else {
-            return Promise.resolve(Output);
         }
-    }
+        let DataBase = new Datasets();
+        DataBase.getDatasets("courses");
+        let VSS = DataBase.getData("courses");
+        let dataone = VSS[0];
+        let keys = Object.keys(dataone);
+        Log.trace(keys);
+
+ }
     public listDatasets(): Promise<InsightDataset[]> {
         return new Promise<InsightDataset[]>((fulfill, reject) => {
             let presentList: any[] = [];
