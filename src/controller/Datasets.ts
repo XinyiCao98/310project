@@ -1,20 +1,23 @@
 import * as fs from "fs";
+import {rejects} from "assert";
+import {InsightError} from "./IInsightFacade";
 export default class Datasets {
-    public Databse: Map<string, any>;
+    public Datasets: Map<string, object[]>;
     constructor() {
-        this.Databse = new Map<string, any[]>();
+        this.Datasets = new Map<string, object[]>();
     }
     public getDatasets (DataId: string): any {
         if (! fs.existsSync("./data/" + DataId + ".json")) {
             return null;
         }
-        if ( this.Databse.get(DataId) === [] || this.Databse.get(DataId) === undefined) {
+        if ( this.Datasets.get(DataId) === [] || this.Datasets.get(DataId) === undefined) {
+            // fs.readFile
             let Data = fs.readFileSync("./data/" + DataId + ".json", "utf8");
-            this.Databse.set (DataId, JSON.parse(Data) );
+            this.Datasets.set (DataId, JSON.parse(Data) );
         }
-        return this.Databse.get(DataId);
+        return this.Datasets;
     }
     public getData (DataId: string): any {
-        return this.Databse.get(DataId);
+       return this.Datasets.get(DataId);
     }
 }

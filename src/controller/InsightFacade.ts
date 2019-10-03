@@ -6,6 +6,8 @@ import * as fs from "fs";
 import {CheckQueryHelper} from "./CheckQueryHelper";
 import * as DS from "./Datasets";
 import Datasets from "./Datasets";
+import PerformQuery from "./PerformQuery";
+import QueryTree from "./QueryTree";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -108,7 +110,10 @@ export default class InsightFacade implements IInsightFacade {
                         const avg = singleSection.Avg; const instructor = singleSection.Professor;
                         const title = singleSection.Title; const pass = singleSection.Pass;
                         const fail = singleSection.Fail; const audit = singleSection.Audit;
-                        const uuid = singleSection.id.toString; const year = parseInt(singleSection.Year, 10);
+                        const uuid = singleSection.id.toString; let year = parseInt(singleSection.Year, 10);
+                        if (singleSection.Section === "overall") {
+                            year = 1990;
+                        }
                         let validSec: InsightCourses = {
                             courses_dept: dept, courses_id: id,
                             courses_avg: avg, courses_instructor: instructor,
@@ -158,17 +163,52 @@ export default class InsightFacade implements IInsightFacade {
     public performQuery(query: any): Promise<any[]> {
         const helper = new CheckQueryHelper();
         let Validornot = helper.CheckQuery(query);
-        let Output: string[] = ["KAIWEN"];
+        let Output: object[] = [ { KAIWEN: "zhenbang"}];
         if (!Validornot) {
             return Promise.reject(new InsightError("Invalid Query"));
         }
-        let DataBase = new Datasets();
-        DataBase.getDatasets("courses");
-        let VSS = DataBase.getData("courses");
-        let dataone = VSS[0];
-        let keys = Object.keys(dataone);
-        Log.trace(keys);
-
+        const datasets = new Datasets();
+        datasets.getDatasets("courses");
+        let ObjectArray = datasets.getData("courses");
+        let filter = query["WHERE"];
+        let selection = query["OPTIONS"];
+        let QueryTR = new QueryTree();
+        let Qtree = QueryTR.buildQT(filter, selection);
+        let Col = Qtree.Columns;
+        let Ord = Qtree.Order;
+        const PQ = new PerformQuery();
+        const performQuery = new PerformQuery();
+        if (query["WHERE"].length === 0) {
+            return Promise.reject(new InsightError("ResultTooLarge"));
+        }
+        if (Qtree.nodeType === "IS") {
+            let key = Qtree.nodeProperty;
+            let value = Qtree.nodeValue;
+            Output = performQuery.PerformIS(key, value, ObjectArray);
+        }
+        if (Qtree.nodeType === "EQ") {
+            let key = Qtree.nodeProperty;
+            let value = Qtree.nodeValue;
+            Output = performQuery.PerformEQ(key, value, ObjectArray);
+        }
+        if (Qtree.nodeType === "GT") {
+            let key = Qtree.nodeProperty;
+            let value = Qtree.nodeValue;
+            Output = performQuery.PerformGT(key, value, ObjectArray);
+        }
+        if (Qtree.nodeType === "LT") {
+            let key = Qtree.nodeProperty;
+            let value = Qtree.nodeValue;
+            Output = performQuery.PerformLT(key, value, ObjectArray);
+        }
+        Output = PQ.PerformColumns(Col, Output);
+        if (Object.keys(query["OPTIONS"]).length === 2) {
+         Output = PQ.SortbyNP(Output, Ord);
+        }
+        if (Output.length > 5000) {
+            return Promise.reject(new InsightError("ResultTooLarge"));
+        }
+        return Promise.resolve(Output);
  }
     public listDatasets(): Promise<InsightDataset[]> {
         return new Promise<InsightDataset[]>((fulfill, reject) => {
@@ -178,5 +218,11 @@ export default class InsightFacade implements IInsightFacade {
             }
             fulfill(presentList);
         });
+    }
+    public checktype (one: any): boolean {
+        if (typeof one === "number" ) {
+            return true;
+        }
+        return false;
     }
 }

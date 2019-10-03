@@ -23,11 +23,11 @@ export default class QueryTree {
         let Col = options["COLUMNS"];
         let ORDER = options["ORDER"];
         let QT = new QueryTree();
+        QT.nodeType = start;
         if (start === "IS" ||
             start === "GT" ||
             start === "LT" ||
             start === "EQ") {
-           QT.nodeType = start;
            let ItemsInside = where[start];
            let Key = Object.keys(ItemsInside).toString();
            let Value = Object.values(ItemsInside)[0];
@@ -40,7 +40,6 @@ export default class QueryTree {
         if (start === "AND" ||
            start === "NOT" ||
            start === "OR") {
-            QT.nodeType = start;
             let m = where[start].length;
             let i = 0;
             for ( i; i < m; i++) {

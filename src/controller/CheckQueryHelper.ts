@@ -44,10 +44,7 @@ export class CheckQueryHelper {
                 return false; // if contains more than col/order, return false
             }
         }
-        Log.trace("VALID");
-        let QueryTR = new QueryTree();
-        let Qtree = QueryTR.buildQT(where, options);
-        Log.trace(Qtree.children[0].nodeType);
+
         return true;
     }
 
