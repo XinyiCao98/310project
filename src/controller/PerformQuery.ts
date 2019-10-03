@@ -15,10 +15,11 @@ export default class PerformQuery {
         if (queryTree.nodeType === "AND") {
             let children = queryTree.children;
             let m = children.length;
-            let i = 0;
-            for (i; i < m; i++) {
-                Log.trace(children[i]);
-            }
+            let start = this.GetResult(courses, children[0]);
+            let output = [];
+            let i = 1;
+            // for (i; i < m; i++) {
+            // }
         }
         if (queryTree.nodeType === "IS") {
             let key = queryTree.nodeProperty;

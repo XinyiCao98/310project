@@ -17,7 +17,7 @@ export class CheckQueryHelper {
             !query.hasOwnProperty("WHERE") || !query.hasOwnProperty("OPTIONS") ||
             !this.queryOrNot(query["WHERE"]) || !this.queryOrNot(query["OPTIONS"]) || // first layer has be queries
             Object.keys(query).length !== 2 || Object.keys(query["OPTIONS"]).length > 2 ||
-            Object.keys(query["OPTIONS"]).length === 0 || Object.keys(query["WHERE"]).length > 2) {
+            Object.keys(query["OPTIONS"]).length === 0 || Object.keys(query["WHERE"]).length > 1) {
             return false;
         }
         let where = query["WHERE"];
