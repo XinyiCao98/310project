@@ -1,5 +1,6 @@
 import {createInterface} from "readline";
-
+import QueryTree from "./QueryTree";
+import Log from "../Util";
 export default class PerformQuery {
     private NProperties: string[] = ["courses_avg", "courses_pass", "courses_fail", "courses_audit", "courses_year"];
     private SProperties: string[] = ["courses_dept", "courses_id",
@@ -8,6 +9,38 @@ export default class PerformQuery {
         "courses_pass", "courses_fail", "courses_audit", "courses_uuid", "courses_year", "courses_instructor"];
     constructor() {
         //
+    }
+    public GetResult (courses: [], queryTree: QueryTree): any {
+        let result = null;
+        if (queryTree.nodeType === "AND") {
+            let children = queryTree.children;
+            let m = children.length;
+            let i = 0;
+            for (i; i < m; i++) {
+                Log.trace(children[i]);
+            }
+        }
+        if (queryTree.nodeType === "IS") {
+            let key = queryTree.nodeProperty;
+            let value = queryTree.nodeValue;
+            result = this.PerformIS(key, value, courses);
+        }
+        if (queryTree.nodeType === "EQ") {
+            let key = queryTree.nodeProperty;
+            let value = queryTree.nodeValue;
+            result = this.PerformEQ(key, value, courses);
+        }
+        if (queryTree.nodeType === "GT") {
+            let key = queryTree.nodeProperty;
+            let value = queryTree.nodeValue;
+            result = this.PerformGT(key, value, courses);
+        }
+        if (queryTree.nodeType === "LT") {
+            let key = queryTree.nodeProperty;
+            let value = queryTree.nodeValue;
+            result = this.PerformLT(key, value, courses);
+        }
+        return result;
     }
     public PerformIS (key: string, value: string, courses: []): object[] {
         let m = courses.length;

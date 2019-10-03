@@ -177,33 +177,14 @@ export default class InsightFacade implements IInsightFacade {
         let Col = Qtree.Columns;
         let Ord = Qtree.Order;
         const PQ = new PerformQuery();
-        const performQuery = new PerformQuery();
         if (query["WHERE"].length === 0) {
+            Log.trace("超了");
             return Promise.reject(new InsightError("ResultTooLarge"));
         }
-        if (Qtree.nodeType === "IS") {
-            let key = Qtree.nodeProperty;
-            let value = Qtree.nodeValue;
-            Output = performQuery.PerformIS(key, value, ObjectArray);
-        }
-        if (Qtree.nodeType === "EQ") {
-            let key = Qtree.nodeProperty;
-            let value = Qtree.nodeValue;
-            Output = performQuery.PerformEQ(key, value, ObjectArray);
-        }
-        if (Qtree.nodeType === "GT") {
-            let key = Qtree.nodeProperty;
-            let value = Qtree.nodeValue;
-            Output = performQuery.PerformGT(key, value, ObjectArray);
-        }
-        if (Qtree.nodeType === "LT") {
-            let key = Qtree.nodeProperty;
-            let value = Qtree.nodeValue;
-            Output = performQuery.PerformLT(key, value, ObjectArray);
-        }
+        Output = PQ.GetResult(ObjectArray, Qtree);
         Output = PQ.PerformColumns(Col, Output);
-        if (Object.keys(query["OPTIONS"]).length === 2) {
-         Output = PQ.SortbyNP(Output, Ord);
+        if (query["OPTIONS"].length === 2 ) {
+            Output = PQ.SortbyNP(Output, Ord);
         }
         if (Output.length > 5000) {
             return Promise.reject(new InsightError("ResultTooLarge"));
@@ -218,11 +199,5 @@ export default class InsightFacade implements IInsightFacade {
             }
             fulfill(presentList);
         });
-    }
-    public checktype (one: any): boolean {
-        if (typeof one === "number" ) {
-            return true;
-        }
-        return false;
     }
 }
