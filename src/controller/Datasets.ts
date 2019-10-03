@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import {rejects} from "assert";
 import {InsightError} from "./IInsightFacade";
 export default class Datasets {
     public Datasets: Map<string, object[]>;
