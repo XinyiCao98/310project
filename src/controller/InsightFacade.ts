@@ -178,12 +178,11 @@ export default class InsightFacade implements IInsightFacade {
         let Ord = Qtree.Order;
         const PQ = new PerformQuery();
         if (query["WHERE"].length === 0) {
-            Log.trace("超了");
             return Promise.reject(new InsightError("ResultTooLarge"));
         }
         Output = PQ.GetResult(ObjectArray, Qtree);
         Output = PQ.PerformColumns(Col, Output);
-        if (query["OPTIONS"].length === 2 ) {
+        if (Object.keys(query["OPTIONS"]).length === 2 ) {
             Output = PQ.SortbyNP(Output, Ord);
         }
         if (Output.length > 5000) {

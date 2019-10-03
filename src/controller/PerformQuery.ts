@@ -2,9 +2,6 @@ import {createInterface} from "readline";
 import QueryTree from "./QueryTree";
 import Log from "../Util";
 export default class PerformQuery {
-    private NProperties: string[] = ["courses_avg", "courses_pass", "courses_fail", "courses_audit", "courses_year"];
-    private SProperties: string[] = ["courses_dept", "courses_id",
-        "courses_instructor", "courses_title", "courses_uuid"];
     private properties: string[] = ["courses_dept", "courses_id", "courses_avg", "courses_title",
         "courses_pass", "courses_fail", "courses_audit", "courses_uuid", "courses_year", "courses_instructor"];
     constructor() {
@@ -12,15 +9,15 @@ export default class PerformQuery {
     }
     public GetResult (courses: [], queryTree: QueryTree): any {
         let result = null;
-        if (queryTree.nodeType === "AND") {
-            let children = queryTree.children;
-            let m = children.length;
-            let start = this.GetResult(courses, children[0]);
-            let output = [];
-            let i = 1;
-            // for (i; i < m; i++) {
-            // }
-        }
+        // if (queryTree.nodeType === "AND") {
+        //     let children = queryTree.children;
+        //     let m = children.length;
+        //     let start = this.GetResult(courses, children[0]);
+        //     let output = [];
+        //     let i = 1;
+        //     // for (i; i < m; i++) {
+        //     // }
+        // }
         if (queryTree.nodeType === "IS") {
             let key = queryTree.nodeProperty;
             let value = queryTree.nodeValue;
@@ -126,7 +123,7 @@ export default class PerformQuery {
 
     }
     // Sort an array of objects by numerical properties
-     public SortbyNP (Expected: object[], Property: string): object[] {
+    public SortbyNP (Expected: object[], Property: string): object[] {
         let cfirst: {[key: string]: any};
         let csecond: {[key: string]: any};
         Expected.sort((cone, ctwo) => {
@@ -141,4 +138,4 @@ export default class PerformQuery {
             return 0;
         });
         return Expected;
-     } }
+    }  }
