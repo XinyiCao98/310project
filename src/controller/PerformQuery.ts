@@ -71,10 +71,10 @@ export default class PerformQuery {
         if (LP === "NOT") {
             let children = queryTree.children;
             let start = children[0];
-            let initial = this.GetResult(courses, start);
-            let UP       = "courses_uuid";
-            let negation = this.FindNegation(initial, courses, UP);
-            return negation;
+            // let initial = this.GetResult(courses, start);
+            // let UP       = "courses_uuid";
+            // let negation = this.FindNegation(initial, courses, UP);
+            return null;
         }
     }
 
