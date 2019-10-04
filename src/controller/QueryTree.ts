@@ -38,7 +38,6 @@ export default class QueryTree {
            return QT;
         }
         if (start === "AND" ||
-           start === "NOT" ||
            start === "OR") {
             let m = where[start].length;
             let i = 0;
@@ -51,7 +50,16 @@ export default class QueryTree {
             QT.Order = ORDER;
             return QT;
 
-        }}
+        }
+        if (start === "NOT") {
+        let Qt = new QueryTree();
+        let C = Qt.buildQTC(where[start]);
+        QT.children.push(C);
+    }
+        QT.Columns = Col;
+        QT.Order = ORDER;
+        return QT;
+    }
     public buildQTC (where: any): QueryTree {
         let start = Object.keys(where)[0];
         let QT = new QueryTree();
@@ -68,7 +76,6 @@ export default class QueryTree {
             return QT;
         }
         if (start === "AND" ||
-            start === "NOT" ||
             start === "OR") {
             QT.nodeType = start;
             let m = where[start].length;
@@ -80,4 +87,11 @@ export default class QueryTree {
                 return QT;
             }
     }
+        if (start === "NOT") {
+            QT.nodeType = start;
+            let Qt = new QueryTree();
+            let C = Qt.buildQTC(where[start]);
+            QT.children.push(C);
+            return QT;
+        }
 }}

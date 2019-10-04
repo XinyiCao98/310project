@@ -34,7 +34,8 @@ describe("InsightFacade Add/Remove Dataset", function () {
         oneValid: "./test/data/oneValid.zip",
         brokenJSON: "./test/data/brokenJSON.zip",
         nestedFolder: "./test/data/nestedFolder.zip",
-        removeButValid: "./test/data/removeButValid.zip"
+        removeButValid: "./test/data/removeButValid.zip",
+        smallvalid : "./test/data/smallvalid.zip"
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
@@ -302,6 +303,15 @@ describe("InsightFacade Add/Remove Dataset", function () {
 
     it("succeed to add dataset that have many folder", function () {
         const id: string = "manyFolder";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect(result).to.deep.equal(expected);
+        }).catch((err: any) => {
+            expect.fail(err, expected, "Should not have rejected");
+        });
+    });
+    it("succeed to add dataset with two courses", function () {
+        const id: string = "smallvalid";
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             expect(result).to.deep.equal(expected);

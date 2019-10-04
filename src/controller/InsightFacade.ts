@@ -1,6 +1,8 @@
 import Log from "../Util";
-import {IInsightFacade, InsightCourses, InsightDataset,
-    InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
+import {
+    IInsightFacade, InsightCourses, InsightDataset,
+    InsightDatasetKind, InsightError, NotFoundError, ResultTooLargeError
+} from "./IInsightFacade";
 import * as JSZip from "jszip";
 import * as fs from "fs";
 import {CheckQueryHelper} from "./CheckQueryHelper";
@@ -46,12 +48,11 @@ export default class InsightFacade implements IInsightFacade {
                     }
                 });
                 Promise.all(promiseArray).then(function (allJFile: any) {
-                    // Log.trace("3");
                     that.checkValidDataset(allJFile);
                     if (that.validSection.length === 0) {
                         reject(new InsightError("No valid section"));
                     } else {
-                        // Log.trace("4");
+
                         fs.writeFile("./data/" + id + ".json", JSON.stringify(that.validSection, null, " "),
                             (e) => {
                                 if (e !== null) {
@@ -110,9 +111,10 @@ export default class InsightFacade implements IInsightFacade {
                         const avg = singleSection.Avg; const instructor = singleSection.Professor;
                         const title = singleSection.Title; const pass = singleSection.Pass;
                         const fail = singleSection.Fail; const audit = singleSection.Audit;
-                        const uuid = singleSection.id.toString; let year = parseInt(singleSection.Year, 10);
+                        const uuid = singleSection.id.toString(10);
+                        let year = parseInt(singleSection.Year, 10);
                         if (singleSection.Section === "overall") {
-                            year = 1990;
+                            year = 1900;
                         }
                         let validSec: InsightCourses = {
                             courses_dept: dept, courses_id: id,
@@ -167,6 +169,12 @@ export default class InsightFacade implements IInsightFacade {
         if (!Validornot) {
             return Promise.reject(new InsightError("Invalid Query"));
         }
+        if (Object.keys(query["WHERE"]).length === 0) { // TODO: last check!
+            return Promise.reject(new ResultTooLargeError("ResultTooLarge"));
+        }
+        if (Output.length > 5000) {
+            return Promise.reject(new InsightError("ResultTooLarge"));
+        }
         const datasets = new Datasets();
         datasets.getDatasets("courses");
         let ObjectArray = datasets.getData("courses");
@@ -177,16 +185,10 @@ export default class InsightFacade implements IInsightFacade {
         let Col = Qtree.Columns;
         let Ord = Qtree.Order;
         const PQ = new PerformQuery();
-        if (query["WHERE"].length === 0) {
-            return Promise.reject(new InsightError("ResultTooLarge"));
-        }
         Output = PQ.GetResult(ObjectArray, Qtree);
         Output = PQ.PerformColumns(Col, Output);
         if (Object.keys(query["OPTIONS"]).length === 2 ) {
             Output = PQ.SortbyNP(Output, Ord);
-        }
-        if (Output.length > 5000) {
-            return Promise.reject(new InsightError("ResultTooLarge"));
         }
         return Promise.resolve(Output);
  }

@@ -7,17 +7,14 @@ export default class PerformQuery {
     constructor() {
         //
     }
-    public GetResult (courses: [], queryTree: QueryTree): any {
-        let result = null;
-        // if (queryTree.nodeType === "AND") {
-        //     let children = queryTree.children;
-        //     let m = children.length;
-        //     let start = this.GetResult(courses, children[0]);
-        //     let output = [];
-        //     let i = 1;
-        //     // for (i; i < m; i++) {
-        //     // }
-        // }
+    public GetResult (courses: [], queryTree: QueryTree): object[] {
+        let result: object[] = [];
+        if (queryTree.nodeType === "AND" ||
+            queryTree.nodeType === "OR"  ||
+            queryTree.nodeType === "NOT") {
+            result = this.PerformLogic(queryTree.nodeType, courses, queryTree);
+
+        }
         if (queryTree.nodeType === "IS") {
             let key = queryTree.nodeProperty;
             let value = queryTree.nodeValue;
@@ -40,6 +37,47 @@ export default class PerformQuery {
         }
         return result;
     }
+    public PerformLogic (LP: string, courses: [], queryTree: QueryTree) {
+        if (LP === "AND") {
+            let children = queryTree.children;
+            let m = children.length;
+            let start = children[0];
+            let i = 1;
+            let initial = this.GetResult(courses, start);
+            for (i; i < m ; i++) {
+                let anotherT = children[i];
+                let anotherR = this.GetResult(courses, anotherT);
+                let UP       = "courses_uuid";
+                let intersection = this.FindIntersection( initial, anotherR, UP);
+                initial = intersection;
+            }
+            return initial;
+        }
+        if (LP === "OR") {
+            let children = queryTree.children;
+            let m = children.length;
+            let start = children[0];
+            let i = 1;
+            let initial = this.GetResult(courses, start);
+            for (i; i < m ; i++) {
+                let anotherT = children[i];
+                let anotherR = this.GetResult(courses, anotherT);
+                let UP       = "courses_uuid";
+                let union = this.FindUnion( initial, anotherR, UP);
+                initial = union;
+            }
+            return initial;
+        }
+        if (LP === "NOT") {
+            let children = queryTree.children;
+            let start = children[0];
+            let initial = this.GetResult(courses, start);
+            let UP       = "courses_uuid";
+            let negation = this.FindNegation(initial, courses, UP);
+            return negation;
+        }
+    }
+
     public PerformIS (key: string, value: string, courses: []): object[] {
         let m = courses.length;
         let i = 0;
@@ -138,4 +176,74 @@ export default class PerformQuery {
             return 0;
         });
         return Expected;
-    }  }
+    }
+    // Find Intersection of two array of objects
+   public FindIntersection (ArrayOne: object[], ArrayTwo: object[], UniqueProperty: string): object[] {
+       let A: {[key: string]: any};
+       let B: {[key: string]: any};
+       let m = Object.keys(ArrayOne).length;
+       let n = Object.keys(ArrayTwo).length;
+       let intersection: object[] = [];
+       for (let i: number = 0; i <  m ; i++) {
+           A = ArrayOne[i];
+           let same      = false;
+           for (let k: number = 0; k < n; k++) {
+               B = ArrayTwo[k];
+               if (B[UniqueProperty] === A[UniqueProperty]) {
+                   same = true;
+               }
+               }
+           if (same === true) {
+               intersection.push(A);
+           }}
+       return intersection;
+
+   }
+    // Find Union of two array of objects
+    public FindUnion (ArrayOne: object[], ArrayTwo: object[], UniqueProperty: string): object[] {
+        let A: {[key: string]: any};
+        let B: {[key: string]: any};
+        let m = Object.keys(ArrayOne).length;
+        let n = Object.keys(ArrayTwo).length;
+        let union: object[] = [];
+        for (let l: number = 0; l < m ; l ++) {
+            A = ArrayOne[l];
+            union.push(A);
+        }
+        for (let i: number = 0; i <  n ; i++) {
+            B = ArrayTwo[i];
+            let same      = false;
+            for (let k: number = 0; k < m; k++) {
+                A = ArrayOne[k];
+                if (B[UniqueProperty] === A[UniqueProperty]) {
+                    same = true;
+                }
+            }
+            if (same !== true) {
+                union.push(B);
+            }}
+        return union;
+
+    }
+    // Find Negation of two array of objects
+    public FindNegation (ArrayOne: object[], courses: object[], UniqueProperty: string): object[] {
+        let A: {[key: string]: any};
+        let B: {[key: string]: any};
+        let m = Object.keys(ArrayOne).length;
+        let n = Object.keys(courses).length;
+        let negation: object[] = [];
+        for (let i: number = 0; i <  n; i++) {
+            B = courses[i];
+            let same      = false;
+            for (let k: number = 0; k < m; k++) {
+                A = ArrayOne[k];
+                if (B[UniqueProperty] === A[UniqueProperty]) {
+                    same = true;
+                }
+            }
+            if (same !== true) {
+                negation.push(B);
+            }}
+        return negation;
+
+    }}
