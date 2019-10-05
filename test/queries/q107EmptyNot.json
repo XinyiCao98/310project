@@ -1,0 +1,28 @@
+{
+    "title": "SELECT dept, id, avg WHERE avg >= 63 && avg < 63.1 ORDER BY avg, Negation with LT",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "NOT": {
+                    }
+                },
+                {
+                    "LT": {
+                        "courses_avg": 63.01
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

@@ -28,20 +28,20 @@ export default class QueryTree {
             start === "GT" ||
             start === "LT" ||
             start === "EQ") {
-           let ItemsInside = where[start];
-           let Key = Object.keys(ItemsInside).toString();
-           let Value = Object.values(ItemsInside)[0];
-           QT.nodeProperty = Key;
-           QT.nodeValue    = Value;
-           QT.Columns = Col;
-           QT.Order = ORDER;
-           return QT;
+            let ItemsInside = where[start];
+            let Key = Object.keys(ItemsInside).toString();
+            let Value = Object.values(ItemsInside)[0];
+            QT.nodeProperty = Key;
+            QT.nodeValue = Value;
+            QT.Columns = Col;
+            QT.Order = ORDER;
+            return QT;
         }
         if (start === "AND" ||
-           start === "OR") {
+            start === "OR") {
             let m = where[start].length;
             let i = 0;
-            for ( i; i < m; i++) {
+            for (i; i < m; i++) {
                 let Qt = new QueryTree();
                 let Qtree = Qt.buildQTC(where[start][i]);
                 QT.children.push(Qtree);
@@ -52,15 +52,16 @@ export default class QueryTree {
 
         }
         if (start === "NOT") {
-        let Qt = new QueryTree();
-        let C = Qt.buildQTC(where[start]);
-        QT.children.push(C);
-    }
+            let Qt = new QueryTree();
+            let C = Qt.buildQTC(where[start]);
+            QT.children.push(C);
+        }
         QT.Columns = Col;
         QT.Order = ORDER;
         return QT;
     }
-    public buildQTC (where: any): QueryTree {
+
+    public buildQTC(where: any): QueryTree {
         let start = Object.keys(where)[0];
         let QT = new QueryTree();
         if (start === "IS" ||
@@ -72,7 +73,7 @@ export default class QueryTree {
             let Key = Object.keys(ItemsInside).toString();
             let Value = Object.values(ItemsInside)[0];
             QT.nodeProperty = Key;
-            QT.nodeValue    = Value;
+            QT.nodeValue = Value;
             return QT;
         }
         if (start === "AND" ||
@@ -80,13 +81,13 @@ export default class QueryTree {
             QT.nodeType = start;
             let m = where[start].length;
             let i = 0;
-            for ( i; i < m; i++) {
+            for (i; i < m; i++) {
                 let Qt = new QueryTree();
                 let Qtree = Qt.buildQTC(where[start][i]);
                 QT.children.push(Qtree);
                 return QT;
             }
-    }
+        }
         if (start === "NOT") {
             QT.nodeType = start;
             let Qt = new QueryTree();
@@ -94,4 +95,5 @@ export default class QueryTree {
             QT.children.push(C);
             return QT;
         }
-}}
+    }
+}

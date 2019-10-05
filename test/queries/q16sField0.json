@@ -1,0 +1,41 @@
+{
+    "title": "test sfield0",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "OR": [
+                        {
+                            "IS": {
+                                "courses_uuid": "12375"
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_title": "immunology"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "EQ": {
+                        "courses_fail": 11
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_uuid",
+                "courses_title",
+                "courses_fail"
+            ],
+            "ORDER": "courses_fail"
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_uuid":"9657","courses_title":"immunology","courses_fail":11},
+        {"courses_uuid":"9658","courses_title":"immunology","courses_fail":11}
+    ]
+}

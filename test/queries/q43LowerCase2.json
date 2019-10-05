@@ -1,0 +1,28 @@
+{
+    "title": "test lower case at and",
+    "query": {
+        "WHERE": {
+            "and": [
+                {
+                    "IS": {
+                        "courses_dept":"*"
+                    }
+                },
+                {
+                    "EQ": {
+                        "courses_avg":94.4
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

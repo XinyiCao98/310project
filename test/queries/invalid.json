@@ -1,6 +1,6 @@
 {
-    "title": "empty query",
-    "query": { },
+    "title": "Very invalid query",
+    "query": { "OPTIONS": {} },
     "isQueryValid": false,
     "result": "InsightError"
 }
