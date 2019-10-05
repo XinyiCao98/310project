@@ -73,6 +73,7 @@ export default class InsightFacade implements IInsightFacade {
             });
         });
     }
+
     private checkInput(id: string, kind: InsightDatasetKind) {
         // check whether dataset ID is in right format
         if (!id || id.length === 0) {
@@ -90,6 +91,7 @@ export default class InsightFacade implements IInsightFacade {
             throw new InsightError("ID is incorrect InsightDatasetKind.");
         }
     }
+
     // Check the details of whether a section has all features
     private checkValidDataset(allJFile: any) {
         for (const singleCourse of allJFile) {
@@ -107,10 +109,14 @@ export default class InsightFacade implements IInsightFacade {
                         && typeof singleSection.Title === "string" && typeof singleSection.Pass === "number"
                         && typeof singleSection.Fail === "number" && typeof singleSection.Audit === "number"
                         && typeof singleSection.id === "number" && typeof singleSection.Year === "string") {
-                        const dept = singleSection.Subject; const id = singleSection.Course;
-                        const avg = singleSection.Avg; const instructor = singleSection.Professor;
-                        const title = singleSection.Title; const pass = singleSection.Pass;
-                        const fail = singleSection.Fail; const audit = singleSection.Audit;
+                        const dept = singleSection.Subject;
+                        const id = singleSection.Course;
+                        const avg = singleSection.Avg;
+                        const instructor = singleSection.Professor;
+                        const title = singleSection.Title;
+                        const pass = singleSection.Pass;
+                        const fail = singleSection.Fail;
+                        const audit = singleSection.Audit;
                         const uuid = singleSection.id.toString(10);
                         let year = parseInt(singleSection.Year, 10);
                         if (singleSection.Section === "overall") {
@@ -131,6 +137,7 @@ export default class InsightFacade implements IInsightFacade {
             }
         }
     }
+
     public removeDataset(id: string): Promise<string> {
         // check whether dataset ID is in right format
         if (!id || id.length === 0) {
@@ -162,10 +169,11 @@ export default class InsightFacade implements IInsightFacade {
             });
         });
     }
+
     public performQuery(query: any): Promise<any[]> {
         const helper = new CheckQueryHelper();
         let Validornot = helper.CheckQuery(query);
-        let Output: object[] = [ { KAIWEN: "zhenbang"}];
+        let Output: object[] = [{KAIWEN: "zhenbang"}];
         if (!Validornot) {
             return Promise.reject(new InsightError("Invalid Query"));
         }
@@ -187,11 +195,12 @@ export default class InsightFacade implements IInsightFacade {
         const PQ = new PerformQuery();
         Output = PQ.GetResult(ObjectArray, Qtree);
         Output = PQ.PerformColumns(Col, Output);
-        if (Object.keys(query["OPTIONS"]).length === 2 ) {
+        if (Object.keys(query["OPTIONS"]).length === 2) {
             Output = PQ.SortbyNP(Output, Ord);
         }
         return Promise.resolve(Output);
- }
+    }
+
     public listDatasets(): Promise<InsightDataset[]> {
         return new Promise<InsightDataset[]>((fulfill, reject) => {
             let presentList: any[] = [];

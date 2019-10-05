@@ -1,16 +1,18 @@
 {
-    "title": "SELECT dept, avg WHERE avg >98",
+    "title": "Invalid Or",
     "query": {
         "WHERE": {
+            "OR": 110
         },
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
-                "courses_title"
+                "courses_id",
+                "courses_avg"
             ],
-            "ORDER": "courses_dept"
+            "ORDER": "courses_avg"
         }
     },
     "isQueryValid": false,
-    "result": "ResultTooLargeError"
+    "result": "InsightError"
 }

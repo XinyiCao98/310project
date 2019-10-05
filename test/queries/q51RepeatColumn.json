@@ -1,0 +1,33 @@
+{
+    "title": "test with repeated column element",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept":"adhe"
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg":92
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_dept":"adhe","courses_id":"329","courses_avg":93.33},
+        {"courses_dept":"adhe","courses_id":"329","courses_avg":96.11},
+        {"courses_dept":"adhe","courses_id":"329","courses_avg":92.54}
+    ]
+}

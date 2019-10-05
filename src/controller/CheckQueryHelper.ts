@@ -23,12 +23,16 @@ export class CheckQueryHelper {
         let where = query["WHERE"];
         let options = query["OPTIONS"];
         // Log.trace(itemsInCom);
-        if (!this.checkWhere(where)) { return false; }
+        if (!this.checkWhere(where)) {
+            return false;
+        }
         if (!options.hasOwnProperty("COLUMNS") || !Array.isArray(options["COLUMNS"])) {
             return false;
         } // columns exists plus it is an array
         for (const item of options["COLUMNS"]) {
-            if (typeof item !== "string") { return false; }
+            if (typeof item !== "string") {
+                return false;
+            }
         } // every element inside columns are string
         let itemsInCOL: string[] = options["COLUMNS"]; // stuff inside columns
         for (const key of Object.keys(options)) { // check options has valid elements

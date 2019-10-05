@@ -1,0 +1,33 @@
+{
+    "title": "test mfield",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "GT": {
+                        "courses_year": 2015
+                    }
+                },
+                {
+                    "EQ": {
+                        "courses_pass": 100
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_year",
+                "courses_title",
+                "courses_pass"
+            ],
+            "ORDER": "courses_pass"
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_year":2016,"courses_title":"child & yng adlt","courses_pass":100},
+        {"courses_year":2016,"courses_title":"fmly human dvlpm","courses_pass":100},
+        {"courses_year":2016,"courses_title":"intro philosophy","courses_pass":100}
+    ]
+}
