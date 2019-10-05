@@ -15,7 +15,7 @@ export default class PerformQuery {
         if (queryTree.nodeType === "AND" ||
             queryTree.nodeType === "OR" ||
             queryTree.nodeType === "NOT") {
-            let logicResult = this.PerformLogic(queryTree.nodeType, courses,  queryTree);
+            let logicResult = this.PerformLogic(queryTree.nodeType, courses, queryTree);
             result = logicResult;
             return result;
 
@@ -81,14 +81,14 @@ export default class PerformQuery {
         if (LP === "NOT") {
             let children = queryTree.children;
             let start = children[0];
-            // let initial = this.GetResult(courses, start);
-            // let UP       = "courses_uuid";
-            // let negation = this.FindNegation(initial, courses, UP);
-            return null;
+            let initial = this.GetResult(courses, start);
+            let UP       = "courses_uuid";
+            let negation = this.FindNegation(initial, courses, UP);
+            return negation;
         }
     }
 
-    public PerformIS(key: string, value: string, courses: []): object[]  {
+    public PerformIS(key: string, value: string, courses: []): object[] {
         let m = courses.length;
         let i = 0;
         let result: object[] = [];
@@ -103,12 +103,12 @@ export default class PerformQuery {
                         result.push(element);
                     }
                 } else {
-                    if (ev.includes(value.substring(1))) {
+                    if (ev.endsWith(value.substring(1))) {
                         result.push(element);
                     }
                 }
             } else if (value.endsWith("*")) {
-                if (ev.includes(value.substring(0, value.length - 1))) {
+                if (ev.startsWith(value.substring(0, value.length - 1))) {
                     result.push(element);
                 }
             } else if (ev === value) {
@@ -265,25 +265,25 @@ export default class PerformQuery {
 
     // Find Negation of two array of objects
     public FindNegation(ArrayOne: object[], courses: object[], UniqueProperty: string): object[] {
-        let A: { [key: string]: any };
-        let B: { [key: string]: any };
-        let m = Object.keys(ArrayOne).length;
-        let n = Object.keys(courses).length;
         let negation: object[] = [];
-        for (let i: number = 0; i < n; i++) {
-            B = courses[i];
-            let same = false;
-            for (let k: number = 0; k < m; k++) {
-                A = ArrayOne[k];
-                if (B[UniqueProperty] === A[UniqueProperty]) {
-                    same = true;
-                }
-            }
-            if (same !== true) {
-                negation.push(B);
+        for (let item of courses) {
+            if (!ArrayOne.includes(item)) {
+                negation.push(item);
             }
         }
         return negation;
-
+        // for (let i: number = 0; i < n; i++) {
+        //     B = courses[i];
+        //     let same = false;
+        //     for (let k: number = 0; k < m; k++) {
+        //         A = ArrayOne[k];
+        //         if (B[UniqueProperty] === A[UniqueProperty]) {
+        //             same = true;
+        //         }
+        //     }
+        //     if (same !== true) {
+        //         negation.push(B);
+        //     }
+        // }
     }
 }
