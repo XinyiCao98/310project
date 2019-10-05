@@ -79,13 +79,11 @@ export default class QueryTree {
             start === "OR") {
             QT.nodeType = start;
             let m = where[start].length;
-            let i = 0;
-            for ( i; i < m; i++) {
+            for (let i: number = 0 ; i < m; i++) {
                 let Qt = new QueryTree();
                 let Qtree = Qt.buildQTC(where[start][i]);
-                QT.children.push(Qtree);
-                return QT;
-            }
+                QT.children.push(Qtree); }
+            return QT;
     }
         if (start === "NOT") {
             QT.nodeType = start;
