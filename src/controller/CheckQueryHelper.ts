@@ -139,10 +139,14 @@ export class CheckQueryHelper {
     }
 
     public CheckL(ItemInComparator: any): boolean { // check AND || OR logic
+        // Log.trace(ItemInComparator.length);
         if (ItemInComparator === null || !Array.isArray(ItemInComparator) || ItemInComparator.length < 1) {
             return false;
         } else {
             for (let everyLogic of ItemInComparator) {
+                if (Object.keys(everyLogic).length !== 1) {
+                    return false;
+                }
                 if (!this.checkWhere(everyLogic) || Object.keys(everyLogic).length === 0) {
                     return false;
                 }
