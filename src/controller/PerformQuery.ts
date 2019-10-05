@@ -88,14 +88,30 @@ export default class PerformQuery {
         }
     }
 
-    public PerformIS(key: string, value: string, courses: []): object[] {
+    public PerformIS(key: string, value: string, courses: []): object[]  {
         let m = courses.length;
         let i = 0;
         let result: object[] = [];
         for (i; i < m; i++) {
             let element = courses[i];
             let ev = String(element[key]);
-            if (ev === value) {
+            if (value === "*" || value === "**") {
+                result.push(element);
+            } else if (value.startsWith("*")) {
+                if (value.endsWith("*")) {
+                    if (ev.includes(value.substring(1, value.length - 1))) {
+                        result.push(element);
+                    }
+                } else {
+                    if (ev.includes(value.substring(1))) {
+                        result.push(element);
+                    }
+                }
+            } else if (value.endsWith("*")) {
+                if (ev.includes(value.substring(0, value.length - 1))) {
+                    result.push(element);
+                }
+            } else if (ev === value) {
                 result.push(element);
             }
         }
