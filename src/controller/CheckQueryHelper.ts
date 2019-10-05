@@ -58,6 +58,7 @@ export class CheckQueryHelper {
         }
         let Comparator = Object.keys(where)[0];
         let itemsInCom = where[Comparator];
+        // Log.trace(itemsInCom);
         if (Comparator === "EQ" || Comparator === "GT" || Comparator === "LT") {
             return this.CheckCWL(itemsInCom);
         } else if (Comparator === "IS") {
@@ -140,14 +141,16 @@ export class CheckQueryHelper {
 
     public CheckL(ItemInComparator: any): boolean { // check AND || OR logic
         // Log.trace(ItemInComparator.length);
+        // Log.trace(ItemInComparator);
         if (ItemInComparator === null || !Array.isArray(ItemInComparator) || ItemInComparator.length < 1) {
             return false;
         } else {
             for (let everyLogic of ItemInComparator) {
-                if (Object.keys(everyLogic).length !== 1) {
+                // Log.trace(everyLogic);
+                if (everyLogic === null) {
                     return false;
                 }
-                if (!this.checkWhere(everyLogic) || Object.keys(everyLogic).length === 0) {
+                if (!this.checkWhere(everyLogic) || Object.keys(everyLogic).length !== 1) {
                     return false;
                 }
             }
