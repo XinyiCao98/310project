@@ -82,8 +82,7 @@ export default class PerformQuery {
             let children = queryTree.children;
             let start = children[0];
             let initial = this.GetResult(courses, start);
-            let UP       = "courses_uuid";
-            let negation = this.FindNegation(initial, courses, UP);
+            let negation = this.FindNegation(initial, courses);
             return negation;
         }
     }
@@ -187,7 +186,6 @@ export default class PerformQuery {
         for (i; i < m; i++) {
             let selectedP = keys[i];
             picked[selectedP] = cour[selectedP];
-
         }
         return picked;
 
@@ -225,6 +223,7 @@ export default class PerformQuery {
                 B = ArrayTwo[k];
                 if (B[UniqueProperty] === A[UniqueProperty]) {
                     same = true;
+                    break;
                 }
             }
             if (same === true) {
@@ -253,6 +252,7 @@ export default class PerformQuery {
                 A = ArrayOne[k];
                 if (B[UniqueProperty] === A[UniqueProperty]) {
                     same = true;
+                    break;
                 }
             }
             if (same !== true) {
@@ -264,7 +264,7 @@ export default class PerformQuery {
     }
 
     // Find Negation of two array of objects
-    public FindNegation(ArrayOne: object[], courses: object[], UniqueProperty: string): object[] {
+    public FindNegation(ArrayOne: object[], courses: object[]): object[] {
         let negation: object[] = [];
         for (let item of courses) {
             if (!ArrayOne.includes(item)) {
