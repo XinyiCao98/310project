@@ -192,7 +192,7 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.reject(new ResultTooLargeError("ResultTooLarge"));
         }
         if (Object.keys(query["WHERE"]).length === 0 &&
-            Object.keys(ObjectArray).length < 5000) { // TODO: last check!
+            Object.keys(ObjectArray).length <= 5000) { // TODO: last check!
             Output = PQ.PerformColumns(Col, ObjectArray);
             if (Object.keys(query["OPTIONS"]).length === 2) {
                 Output = PQ.SortbyNP(Output, Ord);

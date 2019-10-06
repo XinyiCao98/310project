@@ -51,8 +51,6 @@ export default class PerformQuery {
             let i = 1;
             let initial = this.GetResult(courses, start);
             let c = queryTree.children;
-            let cone = c[0];
-            let ctwo = c[1];
             for (i; i < m; i++) {
                 let anotherT = children[i];
                 let anotherR = this.GetResult(courses, anotherT);
@@ -115,7 +113,6 @@ export default class PerformQuery {
                 result.push(element);
             }
         }
-        Log.trace(result.length);
         return result;
     }
 
@@ -273,18 +270,5 @@ export default class PerformQuery {
             }
         }
         return negation;
-        // for (let i: number = 0; i < n; i++) {
-        //     B = courses[i];
-        //     let same = false;
-        //     for (let k: number = 0; k < m; k++) {
-        //         A = ArrayOne[k];
-        //         if (B[UniqueProperty] === A[UniqueProperty]) {
-        //             same = true;
-        //         }
-        //     }
-        //     if (same !== true) {
-        //         negation.push(B);
-        //     }
-        // }
     }
 }
