@@ -50,7 +50,6 @@ export default class PerformQuery {
             let start = children[0];
             let i = 1;
             let initial = this.GetResult(courses, start);
-            let c = queryTree.children;
             for (i; i < m; i++) {
                 let anotherT = children[i];
                 let anotherR = this.GetResult(courses, anotherT);

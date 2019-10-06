@@ -12,7 +12,7 @@ export default class Datasets {
         if (!fs.existsSync("./data/" + DataId + ".json")) {
             return null;
         }
-        if (this.Datasets.get(DataId) === [] || this.Datasets.get(DataId) === undefined) {
+        if (this.Datasets.get(DataId) === [] || this.Datasets.get(DataId) === undefined || this.Datasets.has(DataId)) {
             // fs.readFile
             const Data = fs.readFileSync("./data/" + DataId + ".json", "utf8");
             this.Datasets.set(DataId, JSON.parse(Data));
@@ -21,6 +21,6 @@ export default class Datasets {
     }
 
     public getData(DataId: string): any {
-        return JSON.parse(JSON.stringify(this.Datasets.get(DataId)));
+        return this.Datasets.get(DataId);
     }
 }

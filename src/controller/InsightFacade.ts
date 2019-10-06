@@ -173,13 +173,13 @@ export default class InsightFacade implements IInsightFacade {
     public performQuery(query: any): Promise<any[]> {
         const helper = new CheckQueryHelper();
         let Validornot = helper.CheckQuery(query);
-        let Output: object[] = [{KAIWEN: "zhenbang"}];
+        let Output: object[] = [];
         if (!Validornot) {
             return Promise.reject(new InsightError("Invalid Query"));
         }
         const datasets = new Datasets();
         datasets.getDatasets("courses");
-        let ObjectArray = datasets.getData("courses");
+        let ObjectArray = JSON.parse(JSON.stringify(datasets.getData("courses")));
         let filter = query["WHERE"];
         let selection = query["OPTIONS"];
         let QueryTR = new QueryTree();
@@ -191,7 +191,7 @@ export default class InsightFacade implements IInsightFacade {
         if (Object.keys(query["WHERE"]).length === 0 &&
             Object.keys(ObjectArray).length > 5000) {
             // Log.trace("2");
-            return Promise.reject(new ResultTooLargeError("ResultTooLarge"));
+            return Promise.reject(new ResultTooLargeError("ResultTooLargeError"));
         }
         // Log.trace("3");
         if (Object.keys(query["WHERE"]).length === 0 &&
@@ -211,7 +211,7 @@ export default class InsightFacade implements IInsightFacade {
         }
         // Log.trace("6");
         if (Output.length > 5000) {
-            return Promise.reject(new ResultTooLargeError("ResultTooLarge"));
+            return Promise.reject(new ResultTooLargeError("ResultTooLargeError"));
         }
         return Promise.resolve(Output);
     }
