@@ -177,9 +177,6 @@ export default class InsightFacade implements IInsightFacade {
         if (!Validornot) {
             return Promise.reject(new InsightError("Invalid Query"));
         }
-        if (Object.keys(query["WHERE"]).length === 0) { // TODO: last check!
-            return Promise.reject(new ResultTooLargeError("ResultTooLarge"));
-        }
         const datasets = new Datasets();
         datasets.getDatasets("courses");
         let ObjectArray = datasets.getData("courses");
@@ -190,6 +187,18 @@ export default class InsightFacade implements IInsightFacade {
         let Col = Qtree.Columns;
         let Ord = Qtree.Order;
         const PQ = new PerformQuery();
+        if (Object.keys(query["WHERE"]).length === 0 &&
+            Object.keys(ObjectArray).length > 5000) { // TODO: last check!
+            return Promise.reject(new ResultTooLargeError("ResultTooLarge"));
+        }
+        if (Object.keys(query["WHERE"]).length === 0 &&
+            Object.keys(ObjectArray).length < 5000) { // TODO: last check!
+            Output = PQ.PerformColumns(Col, ObjectArray);
+            if (Object.keys(query["OPTIONS"]).length === 2) {
+                Output = PQ.SortbyNP(Output, Ord);
+            }
+            return Promise.resolve(Output);
+        }
         Output = PQ.GetResult(ObjectArray, Qtree);
         Output = PQ.PerformColumns(Col, Output);
         if (Object.keys(query["OPTIONS"]).length === 2) {
