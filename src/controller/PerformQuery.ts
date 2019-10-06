@@ -52,6 +52,7 @@ export default class PerformQuery {
             let initial = this.GetResult(courses, start);
             let c = queryTree.children;
             let cone = c[0];
+            let ctwo = c[1];
             for (i; i < m; i++) {
                 let anotherT = children[i];
                 let anotherR = this.GetResult(courses, anotherT);
@@ -114,8 +115,8 @@ export default class PerformQuery {
                 result.push(element);
             }
         }
+        Log.trace(result.length);
         return result;
-
     }
 
     public PerformEQ(key: string, value: number, courses: []): object[] {

@@ -93,7 +93,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     // Check the details of whether a section has all features
-    private checkValidDataset(allJFile: any) {
+    public checkValidDataset(allJFile: any) {
         for (const singleCourse of allJFile) {
             let sectionArray: any;
             try {
@@ -180,9 +180,6 @@ export default class InsightFacade implements IInsightFacade {
         if (Object.keys(query["WHERE"]).length === 0) { // TODO: last check!
             return Promise.reject(new ResultTooLargeError("ResultTooLarge"));
         }
-        if (Output.length > 5000) {
-            return Promise.reject(new InsightError("ResultTooLarge"));
-        }
         const datasets = new Datasets();
         datasets.getDatasets("courses");
         let ObjectArray = datasets.getData("courses");
@@ -197,6 +194,9 @@ export default class InsightFacade implements IInsightFacade {
         Output = PQ.PerformColumns(Col, Output);
         if (Object.keys(query["OPTIONS"]).length === 2) {
             Output = PQ.SortbyNP(Output, Ord);
+        }
+        if (Output.length > 5000) {
+            return Promise.reject(new ResultTooLargeError("ResultTooLarge"));
         }
         return Promise.resolve(Output);
     }

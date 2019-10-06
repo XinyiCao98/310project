@@ -165,4 +165,11 @@ export class CheckQueryHelper {
             return this.checkWhere(ItemInComparator);
         }
     }
+    public fixKey (key: string): string {
+        let one = key.split( "_")[0];
+        let two = key.split("_")[1];
+        Log.trace(one);
+        Log.trace(two);
+        return "haha";
+    }
 }
