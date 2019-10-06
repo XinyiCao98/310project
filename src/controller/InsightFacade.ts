@@ -187,23 +187,29 @@ export default class InsightFacade implements IInsightFacade {
         let Col = Qtree.Columns;
         let Ord = Qtree.Order;
         const PQ = new PerformQuery();
+        // Log.trace("1");
         if (Object.keys(query["WHERE"]).length === 0 &&
-            Object.keys(ObjectArray).length > 5000) { // TODO: last check!
+            Object.keys(ObjectArray).length > 5000) {
+            // Log.trace("2");
             return Promise.reject(new ResultTooLargeError("ResultTooLarge"));
         }
+        // Log.trace("3");
         if (Object.keys(query["WHERE"]).length === 0 &&
-            Object.keys(ObjectArray).length <= 5000) { // TODO: last check!
+            Object.keys(ObjectArray).length <= 5000) {
             Output = PQ.PerformColumns(Col, ObjectArray);
             if (Object.keys(query["OPTIONS"]).length === 2) {
                 Output = PQ.SortbyNP(Output, Ord);
             }
             return Promise.resolve(Output);
         }
+        // Log.trace("4");
         Output = PQ.GetResult(ObjectArray, Qtree);
         Output = PQ.PerformColumns(Col, Output);
+        // Log.trace("5");
         if (Object.keys(query["OPTIONS"]).length === 2) {
             Output = PQ.SortbyNP(Output, Ord);
         }
+        // Log.trace("6");
         if (Output.length > 5000) {
             return Promise.reject(new ResultTooLargeError("ResultTooLarge"));
         }
