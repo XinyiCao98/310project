@@ -15,7 +15,11 @@ export default class Datasets {
         if (this.Datasets.get(DataId) === [] || this.Datasets.get(DataId) === undefined || !this.Datasets.has(DataId)) {
             // fs.readFile
             const Data = fs.readFileSync("./data/" + DataId + ".json", "utf8");
-            this.Datasets.set(DataId, JSON.parse(Data));
+            try {
+                this.Datasets.set(DataId, JSON.parse(Data));
+            } catch (err) {
+                this.Datasets = new Map<string, object[]>();
+            }
         }
         return this.Datasets;
     }
