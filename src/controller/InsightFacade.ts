@@ -212,9 +212,7 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.resolve(Output);
         }
         Output = PQ.GetResult(ObjectArray, Qtree);
-        // if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
         Output = PQ.PerformColumns(Col, Output);
-        // if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
         if (Object.keys(query["OPTIONS"]).length === 2) {
             Output = PQ.SortbyNP(Output, Ord);
          }
