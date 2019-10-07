@@ -20,7 +20,7 @@ import QueryTree from "./QueryTree";
 export default class InsightFacade implements IInsightFacade {
     private datasetID: string[] = [];
     private datasetMap: Map<string, any[]> = new Map<string, any[]>();
-    private validSection: any[] = [];
+    // private validSection: any[] = [];
 
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
@@ -29,6 +29,7 @@ export default class InsightFacade implements IInsightFacade {
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         // check whether dataset ID is in right format
         return new Promise((fulfill, reject) => {
+            let validSection: any[] = [];
             try {
                 this.checkInput(id, kind);
             } catch (e) {
@@ -39,7 +40,7 @@ export default class InsightFacade implements IInsightFacade {
             // unzip my current zip file
             const that = this;
             currZip.loadAsync(content, {base64: true}).then(function (zipInfo) {
-                currZip.folder("courses");
+                currZip.folder(id); // folder name
                 zipInfo.forEach(function (relativePath, file) {
                     try {
                         promiseArray.push(file.async("text"));
@@ -48,18 +49,17 @@ export default class InsightFacade implements IInsightFacade {
                     }
                 });
                 Promise.all(promiseArray).then(function (allJFile: any) {
-                    that.checkValidDataset(allJFile, id);
-                    if (that.validSection.length === 0) {
+                    validSection = that.checkValidDataset(allJFile, id);
+                    if (validSection.length === 0) {
                         reject(new InsightError("No valid section"));
                     } else {
-
-                        fs.writeFile("./data/" + id + ".json", JSON.stringify(that.validSection, null, " "),
+                        fs.writeFile("./data/" + id + ".json", JSON.stringify(validSection, null, " "),
                             (e) => {
                                 if (e !== null) {
                                     reject(new InsightError("Error occurs when saving to data"));
                                 }
                             });
-                        that.datasetMap.set(id, that.validSection);
+                        that.datasetMap.set(id, validSection);
                         that.datasetID.push(id);
                         fulfill(that.datasetID);
                     }
@@ -94,6 +94,7 @@ export default class InsightFacade implements IInsightFacade {
 
     // Check the details of whether a section has all features
     public checkValidDataset(allJFile: any, id: string) {
+        let validSection: any[] = [];
         for (const singleCourse of allJFile) {
             let sectionArray: any;
             try {
@@ -128,13 +129,14 @@ export default class InsightFacade implements IInsightFacade {
                             [id + "_fail"]: fail, [id + "_audit"]: audit,
                             [id + "_uuid"]: uuid, [id + "_year"]: year
                         };
-                        this.validSection.push(validSec);
+                        validSection.push(validSec);
                     }
                 } catch {
                     // If an individual file is invalid for any reason, skip over it
                 }
             }
         }
+        return validSection;
     }
 
     public removeDataset(id: string): Promise<string> {

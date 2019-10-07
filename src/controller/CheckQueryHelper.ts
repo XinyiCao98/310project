@@ -90,7 +90,7 @@ export class CheckQueryHelper {
     }
 
     // Check the properties from Column are in given information or not
-    public CheckCol(Col: string[]): boolean { // TODO: 这个是修改好的
+    public CheckCol(Col: string[]): boolean {
         let i: number = 0;
         if (Col.length > 0) {
             for (i; i < Col.length; i++) {
