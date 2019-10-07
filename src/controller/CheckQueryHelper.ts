@@ -43,7 +43,7 @@ export class CheckQueryHelper {
         for (const key of Object.keys(options)) { // check options has valid elements
             if (key === "COLUMNS") {
                 // this.tempID = (query["OPTIONS"]["COLUMNS"][0]).split("_")[0];
-                Log.trace(this.tempID);
+                // Log.trace(this.tempID);
                 if (!this.CheckCol(itemsInCOL)) {
                     return false;
                 }

@@ -174,10 +174,13 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.reject(new InsightError("Invalid Query"));
         }
         const target = this.getQueryID(query);
-        const datasets = new Datasets();
+        const datasets = new Datasets(this.datasetMap);
         datasets.getDatasets(target);
         const PQ = new PerformQuery(target);
         let ObjectArray = datasets.getData(target);
+        if (ObjectArray === undefined) {
+            return Promise.reject(new InsightError("Datasets not exists"));
+        }
         // Log.trace(ObjectArray);
         let filter = query["WHERE"];
         let selection = query["OPTIONS"];

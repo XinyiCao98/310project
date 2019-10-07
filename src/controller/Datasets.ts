@@ -4,8 +4,8 @@ import {InsightError} from "./IInsightFacade";
 export default class Datasets {
     public Datasets: Map<string, object[]>;
 
-    constructor() {
-        this.Datasets = new Map<string, object[]>();
+    constructor(DataMap: Map<string, object[]>) {
+        this.Datasets = DataMap;
     }
 
     public getDatasets(DataId: string): any {
