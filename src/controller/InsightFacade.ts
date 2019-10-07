@@ -19,12 +19,11 @@ import QueryTree from "./QueryTree";
 
 export default class InsightFacade implements IInsightFacade {
     private datasetID: string[] = [];
-    private datasetMap: Map<string, any[]>;
-    // private validSection: any[] = [];
+    private datasetMap: Map<string, any[]> = new Map<string, any[]>();
+    private validSection: any[] = [];
 
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
-        this.datasetMap = new Map<string, any[]>();
     }
 
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
@@ -36,12 +35,11 @@ export default class InsightFacade implements IInsightFacade {
                 reject(new InsightError(e));
             }
             let currZip = new JSZip();
-            let validSection: any[] = [];
             const promiseArray: Array<Promise<string>> = [];
             // unzip my current zip file
             const that = this;
             currZip.loadAsync(content, {base64: true}).then(function (zipInfo) {
-                currZip.folder(id);
+                currZip.folder("courses");
                 zipInfo.forEach(function (relativePath, file) {
                     try {
                         promiseArray.push(file.async("text"));
@@ -50,22 +48,18 @@ export default class InsightFacade implements IInsightFacade {
                     }
                 });
                 Promise.all(promiseArray).then(function (allJFile: any) {
-                    validSection = that.checkValidDataset(allJFile, id, validSection);
-                    if (validSection.length === 0) {
+                    that.checkValidDataset(allJFile, id);
+                    if (that.validSection.length === 0) {
                         reject(new InsightError("No valid section"));
                     } else {
-                        // Log.trace("ENTER ELSE CASE");
-                        fs.writeFile("./data/" + id + ".json", JSON.stringify(validSection, null, " "),
+
+                        fs.writeFile("./data/" + id + ".json", JSON.stringify(that.validSection, null, " "),
                             (e) => {
                                 if (e !== null) {
                                     reject(new InsightError("Error occurs when saving to data"));
                                 }
                             });
-                        // Log.trace("ENTER ELSE CASE1");
-                        // Log.trace("id: " + id + " length: " + validSection.length + "!!");
-                        that.datasetMap.set(id, validSection);
-                        // Log.trace("ENTER ELSE CASE2");
-                        // Log.trace("courses length = " + that.datasetMap.get("courses").length);
+                        that.datasetMap.set(id, that.validSection);
                         that.datasetID.push(id);
                         fulfill(that.datasetID);
                     }
@@ -99,7 +93,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     // Check the details of whether a section has all features
-    public checkValidDataset(allJFile: any, id: string, validSection: any[]): any[] {
+    public checkValidDataset(allJFile: any, id: string) {
         for (const singleCourse of allJFile) {
             let sectionArray: any;
             try {
@@ -134,14 +128,13 @@ export default class InsightFacade implements IInsightFacade {
                             [id + "_fail"]: fail, [id + "_audit"]: audit,
                             [id + "_uuid"]: uuid, [id + "_year"]: year
                         };
-                        validSection.push(validSec);
+                        this.validSection.push(validSec);
                     }
                 } catch {
                     // If an individual file is invalid for any reason, skip over it
                 }
             }
         }
-        return validSection;
     }
 
     public removeDataset(id: string): Promise<string> {
@@ -175,15 +168,12 @@ export default class InsightFacade implements IInsightFacade {
 
     public performQuery(query: any): Promise<any[]> {
         const helper = new CheckQueryHelper();
-        let Validornot = helper.CheckQuery(query);
-        let Output: []; // before: any
-        if (!Validornot) {
+        let validorNot = helper.CheckQuery(query);
+        let Output: any;
+        if (!validorNot) {
             return Promise.reject(new InsightError("Invalid Query"));
         }
         const target = this.getQueryID(query);
-        // Log.trace(this.datasetMap.get("courses").length + "before");
-        // Log.trace(this.datasetMap.get("courses2").length + "before");
-        // Log.trace(this.datasetMap.keys() + "before");
         const datasets = new Datasets(this.datasetMap);
         datasets.getDatasets(target);
         const PQ = new PerformQuery(target);
@@ -191,17 +181,16 @@ export default class InsightFacade implements IInsightFacade {
         if (ObjectArray === undefined) {
             return Promise.reject(new InsightError("Datasets not exists"));
         }
+        // Log.trace(ObjectArray);
         let filter = query["WHERE"];
         let selection = query["OPTIONS"];
         let QueryTR = new QueryTree();
         let Qtree = QueryTR.buildQT(filter, selection);
         let Col = Qtree.Columns;
         let Ord = Qtree.Order;
-        // Log.trace(target);
-        // Log.trace(ObjectArray.length);
         if (Object.keys(query["WHERE"]).length === 0 &&
             Object.keys(ObjectArray).length > 5000) {
-            return Promise.reject(new ResultTooLargeError("ResultTooLargeError1"));
+            return Promise.reject(new ResultTooLargeError("ResultTooLargeError"));
         }
         if (Object.keys(query["WHERE"]).length === 0 &&
             Object.keys(ObjectArray).length <= 5000) {
@@ -219,7 +208,7 @@ export default class InsightFacade implements IInsightFacade {
         // if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
         Output = PQ.PerformColumns(Col, Output);
         if (Output.length > 5000) {
-            return Promise.reject(new ResultTooLargeError("ResultTooLargeError2"));
+            return Promise.reject(new ResultTooLargeError("ResultTooLargeError"));
         }
         return Promise.resolve(Output);
     }
