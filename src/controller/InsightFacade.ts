@@ -56,7 +56,7 @@ export default class InsightFacade implements IInsightFacade {
                         fs.writeFile("./data/" + id + ".json", JSON.stringify(validSection, null, " "),
                             (e) => {
                                 if (e !== null) {
-                                    reject(new InsightError("Error occurs when saving to data"));
+                                    reject(new InsightError("Error occurs when saving the data"));
                                 }
                             });
                         that.datasetMap.set(id, validSection);
