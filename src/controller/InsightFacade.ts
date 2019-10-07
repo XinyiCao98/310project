@@ -50,7 +50,7 @@ export default class InsightFacade implements IInsightFacade {
                     }
                 });
                 Promise.all(promiseArray).then(function (allJFile: any) {
-                    that.checkValidDataset(allJFile, id, validSection);
+                    validSection = that.checkValidDataset(allJFile, id, validSection);
                     if (validSection.length === 0) {
                         reject(new InsightError("No valid section"));
                     } else {
@@ -62,13 +62,10 @@ export default class InsightFacade implements IInsightFacade {
                                 }
                             });
                         // Log.trace("ENTER ELSE CASE1");
-                        Log.trace("id: " + id + " length: " + validSection.length + "!!");
+                        // Log.trace("id: " + id + " length: " + validSection.length + "!!");
                         that.datasetMap.set(id, validSection);
                         // Log.trace("ENTER ELSE CASE2");
                         // Log.trace("courses length = " + that.datasetMap.get("courses").length);
-                        Log.trace("courses2 length = " + that.datasetMap.get("courses2").length);
-                        Log.trace(that.datasetMap.keys());
-                        // Log.trace("id:" + id + "length" + that.validSection.length + "!!");
                         that.datasetID.push(id);
                         fulfill(that.datasetID);
                     }
@@ -102,7 +99,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     // Check the details of whether a section has all features
-    public checkValidDataset(allJFile: any, id: string, validSection: any[]) {
+    public checkValidDataset(allJFile: any, id: string, validSection: any[]): any[] {
         for (const singleCourse of allJFile) {
             let sectionArray: any;
             try {
@@ -144,6 +141,7 @@ export default class InsightFacade implements IInsightFacade {
                 }
             }
         }
+        return validSection;
     }
 
     public removeDataset(id: string): Promise<string> {

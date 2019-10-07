@@ -7,9 +7,9 @@ export default class Datasets {
 
     constructor(DataMap: Map<string, object[]>) {
         this.Datasets = DataMap;
-        Log.trace(DataMap.get("courses").length);
-        Log.trace(DataMap.get("courses2").length);
-        Log.trace(DataMap.keys());
+        // Log.trace(DataMap.get("courses").length);
+        // Log.trace(DataMap.get("courses2").length);
+        // Log.trace(DataMap.keys());
     }
 
     public getDatasets(DataId: string): any {
@@ -31,7 +31,7 @@ export default class Datasets {
     }
 
     public getData(DataId: string): any {
-        Log.trace(DataId);
+        // Log.trace(DataId);
         // Log.trace(this.Datasets.get(DataId).length);
         return this.Datasets.get(DataId);
     }

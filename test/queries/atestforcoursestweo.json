@@ -16,12 +16,13 @@
     "isQueryValid": true,
     "result":[
         {
-            "courses2_dept": "cpsc",
+            "courses2_dept": "aanb",
             "courses2_avg": 94.44,
             "courses2_fail": 0
         },
         {
-            "courses2_dept": "haha",
+            "courses2_dept": "cpsc",
             "courses2_avg": 94.44,
-            "courses2_fail": 1
-        }]}
+            "courses2_fail": 0
+        }
+        ]}
