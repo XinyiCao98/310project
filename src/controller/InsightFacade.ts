@@ -173,7 +173,7 @@ export default class InsightFacade implements IInsightFacade {
     public performQuery(query: any): Promise<any[]> {
         const helper = new CheckQueryHelper();
         let Validornot = helper.CheckQuery(query);
-        let Output: object[] = [];
+        let Output: any;
         if (!Validornot) {
             return Promise.reject(new InsightError("Invalid Query"));
         }
@@ -189,13 +189,10 @@ export default class InsightFacade implements IInsightFacade {
         let Qtree = QueryTR.buildQT(filter, selection);
         let Col = Qtree.Columns;
         let Ord = Qtree.Order;
-        // Log.trace("1");
         if (Object.keys(query["WHERE"]).length === 0 &&
             Object.keys(ObjectArray).length > 5000) {
-            // Log.trace("2");
             return Promise.reject(new ResultTooLargeError("ResultTooLargeError"));
         }
-        // Log.trace("3");
         if (Object.keys(query["WHERE"]).length === 0 &&
             Object.keys(ObjectArray).length <= 5000) {
             Output = PQ.PerformColumns(Col, ObjectArray);
@@ -204,14 +201,14 @@ export default class InsightFacade implements IInsightFacade {
             }
             return Promise.resolve(Output);
         }
-        // Log.trace("4");
         Output = PQ.GetResult(ObjectArray, Qtree);
+        if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
         Output = PQ.PerformColumns(Col, Output);
-        // Log.trace("5");
         if (Object.keys(query["OPTIONS"]).length === 2) {
             Output = PQ.SortbyNP(Output, Ord);
         }
-        // Log.trace("6");
+        if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
+        Output = PQ.PerformColumns(Col, Output);
         if (Output.length > 5000) {
             return Promise.reject(new ResultTooLargeError("ResultTooLargeError"));
         }

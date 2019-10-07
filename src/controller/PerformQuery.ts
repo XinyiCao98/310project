@@ -1,7 +1,8 @@
 import {createInterface} from "readline";
 import QueryTree from "./QueryTree";
 import Log from "../Util";
-import {InsightDataset} from "./IInsightFacade";
+import {InsightDataset, InsightError} from "./IInsightFacade";
+import {split} from "ts-node";
 
 export default class PerformQuery {
     public idStr: string;
@@ -10,12 +11,15 @@ export default class PerformQuery {
         this.idStr = id;
     }
 
-    public GetResult(courses: [], queryTree: QueryTree): object[] {
+    public GetResult(courses: [], queryTree: QueryTree): any {
         let result: object[] = [];
         if (queryTree.nodeType === "AND" ||
             queryTree.nodeType === "OR" ||
             queryTree.nodeType === "NOT") {
             let logicResult = this.PerformLogic(queryTree.nodeType, courses, queryTree);
+            if (logicResult === false) {
+                return false;
+            }
             result = logicResult;
             return result;
 
@@ -40,36 +44,36 @@ export default class PerformQuery {
             let value = queryTree.nodeValue;
             result = this.PerformLT(key, value, courses);
         }
-        return result;
-    }
+        return result; }
 
-    public PerformLogic(LP: string, courses: [], queryTree: QueryTree) {
+    public PerformLogic(LP: string, courses: [], queryTree: QueryTree): any {
         if (LP === "AND") {
             let children = queryTree.children;
             let m = children.length;
             let start = children[0];
             let i = 1;
             let initial = this.GetResult(courses, start);
+            if (initial === false ) { return false; }
             for (i; i < m; i++) {
                 let anotherT = children[i];
                 let anotherR = this.GetResult(courses, anotherT);
+                if (anotherR === false ) {return false; }
                 let UP = "courses_uuid";
                 let intersection = this.FindIntersection(initial, anotherR, UP);
-                // Log.trace(intersection.length);
                 initial = intersection;
             }
-
-            return initial;
-        }
+            return initial; }
         if (LP === "OR") {
             let children = queryTree.children;
             let m = children.length;
             let start = children[0];
             let i = 1;
             let initial = this.GetResult(courses, start);
+            if (initial === false ) {return false; }
             for (i; i < m; i++) {
                 let anotherT = children[i];
                 let anotherR = this.GetResult(courses, anotherT);
+                if (anotherR === false ) { return false; }
                 let UP = "courses_uuid";
                 let union = this.FindUnion(initial, anotherR, UP);
                 initial = union;
@@ -80,15 +84,16 @@ export default class PerformQuery {
             let children = queryTree.children;
             let start = children[0];
             let initial = this.GetResult(courses, start);
+            if (initial === false ) {  return false; }
             let negation = this.FindNegation(initial, courses);
-            return negation;
-        }
-    }
-
-    public PerformIS(key: string, value: string, courses: []): object[] {
+            return negation; } }
+    public PerformIS(key: string, value: string, courses: []): any {
         let m = courses.length;
         let i = 0;
         let result: object[] = [];
+        if (!this.checkID(key, this.idStr)) {
+            return false;
+        }
         for (i; i < m; i++) {
             let element = courses[i];
             let ev = String(element[key]);
@@ -110,14 +115,15 @@ export default class PerformQuery {
                 }
             } else if (ev === value) {
                 result.push(element);
-            }
-        }
-        return result;
-    }
+                // tslint:disable-next-line:align
+            } } return  result; }
 
-    public PerformEQ(key: string, value: number, courses: []): object[] {
+    public PerformEQ(key: string, value: number, courses: []): any {
         let m = courses.length;
         let i = 0;
+        if (!this.checkID(key, this.idStr)) {
+            return false;
+        }
         let result: object[] = [];
         for (i; i < m; i++) {
             let element = courses[i];
@@ -127,14 +133,15 @@ export default class PerformQuery {
             }
 
         }
-        return result;
+        return result; }
 
-    }
-
-    public PerformGT(key: string, value: number, courses: []): object[] {
+    public PerformGT(key: string, value: number, courses: []): any {
         let m = courses.length;
         let i = 0;
         let result: object[] = [];
+        if (!this.checkID(key, this.idStr)) {
+            return false;
+        }
         for (i; i < m; i++) {
             let element = courses[i];
             let ev = (element[key]);
@@ -147,10 +154,13 @@ export default class PerformQuery {
 
     }
 
-    public PerformLT(key: string, value: number, courses: []): object[] {
+    public PerformLT(key: string, value: number, courses: []): any {
         let m = courses.length;
         let i = 0;
         let result: object[] = [];
+        if (!this.checkID(key, this.idStr)) {
+            return false;
+        }
         for (i; i < m; i++) {
             let element = courses[i];
             let ev = (element[key]);
@@ -164,8 +174,12 @@ export default class PerformQuery {
     }
 
     // Select the properties based on the given  columns
-    public PerformColumns(selection: string[], Expected: object[]): object[] {
+    public PerformColumns(selection: string[], Expected: object[]): any {
         let n = Expected.length;
+        let m = selection.length;
+        for (let k: number = 0; k < m; k++) {
+            if (!this.checkID(selection[k], this.idStr)) { return false; }
+        }
         let i = 0;
         for (i; i < n; i++) {
             Expected[i] = this.Pick(Expected[i], selection);
@@ -189,9 +203,10 @@ export default class PerformQuery {
     }
 
     // Sort an array of objects by numerical properties
-    public SortbyNP(Expected: object[], Property: string): object[] {
+    public SortbyNP(Expected: object[], Property: string): any {
         let cfirst: { [key: string]: any };
         let csecond: { [key: string]: any };
+        if (! this.checkID(Property, this.idStr)) { return false; }
         Expected.sort((cone, ctwo) => {
             cfirst = cone;
             csecond = ctwo;
@@ -269,5 +284,13 @@ export default class PerformQuery {
             }
         }
         return negation;
+    }
+    public checkID (property: string, Id: string): boolean {
+        let propertyID = property.split("_")[0];
+        Log.trace(propertyID);
+        if (propertyID === Id) {
+            return true;
+        }
+        return false;
     }
 }
