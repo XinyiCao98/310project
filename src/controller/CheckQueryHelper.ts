@@ -137,7 +137,6 @@ export class CheckQueryHelper {
         let pre = Object.keys(ItemInComparator).toString().split("_")[0];
         let Key = Object.keys(ItemInComparator).toString().split("_")[1];
         let Values = Object.values(ItemInComparator)[0];
-        Log.trace(this.tempID);
         if (this.SProperties.indexOf(Key) < 0 || pre !== this.tempID) {
             return false;
         }

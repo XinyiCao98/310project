@@ -97,7 +97,6 @@ export default class InsightFacade implements IInsightFacade {
         for (const singleCourse of allJFile) {
             let sectionArray: any;
             try {
-                // Log.trace("111");
                 sectionArray = JSON.parse(singleCourse)["result"];
             } catch (e) {
                 continue;
@@ -178,7 +177,7 @@ export default class InsightFacade implements IInsightFacade {
         const datasets = new Datasets();
         datasets.getDatasets(target);
         const PQ = new PerformQuery(target);
-        let ObjectArray = JSON.parse(JSON.stringify(datasets.getData(target)));
+        let ObjectArray = datasets.getData(target);
         // Log.trace(ObjectArray);
         let filter = query["WHERE"];
         let selection = query["OPTIONS"];
