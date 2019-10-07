@@ -149,14 +149,11 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.reject(new InsightError("ID is whitespace or underscore."));
         }
         // check whether dataset ID is exists
-        // Log.trace("1");
         if (this.datasetID.indexOf(id) < 0) {
-            // Log.trace("2");
             // reject(new NotFoundError("ID is not existed."));
             return Promise.reject(new NotFoundError("ID is not existed."));
         }
         return new Promise((fulfill, reject) => {
-            // Log.trace("3");
             let idx = this.datasetID.indexOf(id);
             this.datasetID.splice(idx, 1);
             this.datasetMap.delete(id);
@@ -202,13 +199,13 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.resolve(Output);
         }
         Output = PQ.GetResult(ObjectArray, Qtree);
-        if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
+        // if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
         Output = PQ.PerformColumns(Col, Output);
-        if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
+        // if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
         if (Object.keys(query["OPTIONS"]).length === 2) {
             Output = PQ.SortbyNP(Output, Ord);
-        }
-        if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
+         }
+        // if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
         Output = PQ.PerformColumns(Col, Output);
         if (Output.length > 5000) {
             return Promise.reject(new ResultTooLargeError("ResultTooLargeError"));
