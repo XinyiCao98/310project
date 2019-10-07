@@ -19,11 +19,12 @@ import QueryTree from "./QueryTree";
 
 export default class InsightFacade implements IInsightFacade {
     private datasetID: string[] = [];
-    private datasetMap: Map<string, any[]> = new Map<string, any[]>();
-    private validSection: any[] = [];
+    private datasetMap: Map<string, any[]>;
+    // private validSection: any[] = [];
 
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
+        this.datasetMap = new Map<string, any[]>();
     }
 
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
@@ -35,11 +36,12 @@ export default class InsightFacade implements IInsightFacade {
                 reject(new InsightError(e));
             }
             let currZip = new JSZip();
+            let validSection: any[] = [];
             const promiseArray: Array<Promise<string>> = [];
             // unzip my current zip file
             const that = this;
             currZip.loadAsync(content, {base64: true}).then(function (zipInfo) {
-                currZip.folder("courses");
+                currZip.folder(id);
                 zipInfo.forEach(function (relativePath, file) {
                     try {
                         promiseArray.push(file.async("text"));
@@ -48,18 +50,25 @@ export default class InsightFacade implements IInsightFacade {
                     }
                 });
                 Promise.all(promiseArray).then(function (allJFile: any) {
-                    that.checkValidDataset(allJFile, id);
-                    if (that.validSection.length === 0) {
+                    that.checkValidDataset(allJFile, id, validSection);
+                    if (validSection.length === 0) {
                         reject(new InsightError("No valid section"));
                     } else {
-
-                        fs.writeFile("./data/" + id + ".json", JSON.stringify(that.validSection, null, " "),
+                        // Log.trace("ENTER ELSE CASE");
+                        fs.writeFile("./data/" + id + ".json", JSON.stringify(validSection, null, " "),
                             (e) => {
                                 if (e !== null) {
                                     reject(new InsightError("Error occurs when saving to data"));
                                 }
                             });
-                        that.datasetMap.set(id, that.validSection);
+                        // Log.trace("ENTER ELSE CASE1");
+                        Log.trace("id: " + id + " length: " + validSection.length + "!!");
+                        that.datasetMap.set(id, validSection);
+                        // Log.trace("ENTER ELSE CASE2");
+                        // Log.trace("courses length = " + that.datasetMap.get("courses").length);
+                        Log.trace("courses2 length = " + that.datasetMap.get("courses2").length);
+                        Log.trace(that.datasetMap.keys());
+                        // Log.trace("id:" + id + "length" + that.validSection.length + "!!");
                         that.datasetID.push(id);
                         fulfill(that.datasetID);
                     }
@@ -93,7 +102,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     // Check the details of whether a section has all features
-    public checkValidDataset(allJFile: any, id: string) {
+    public checkValidDataset(allJFile: any, id: string, validSection: any[]) {
         for (const singleCourse of allJFile) {
             let sectionArray: any;
             try {
@@ -128,7 +137,7 @@ export default class InsightFacade implements IInsightFacade {
                             [id + "_fail"]: fail, [id + "_audit"]: audit,
                             [id + "_uuid"]: uuid, [id + "_year"]: year
                         };
-                        this.validSection.push(validSec);
+                        validSection.push(validSec);
                     }
                 } catch {
                     // If an individual file is invalid for any reason, skip over it
@@ -169,11 +178,14 @@ export default class InsightFacade implements IInsightFacade {
     public performQuery(query: any): Promise<any[]> {
         const helper = new CheckQueryHelper();
         let Validornot = helper.CheckQuery(query);
-        let Output: any;
+        let Output: []; // before: any
         if (!Validornot) {
             return Promise.reject(new InsightError("Invalid Query"));
         }
         const target = this.getQueryID(query);
+        // Log.trace(this.datasetMap.get("courses").length + "before");
+        // Log.trace(this.datasetMap.get("courses2").length + "before");
+        // Log.trace(this.datasetMap.keys() + "before");
         const datasets = new Datasets(this.datasetMap);
         datasets.getDatasets(target);
         const PQ = new PerformQuery(target);
@@ -181,16 +193,17 @@ export default class InsightFacade implements IInsightFacade {
         if (ObjectArray === undefined) {
             return Promise.reject(new InsightError("Datasets not exists"));
         }
-        // Log.trace(ObjectArray);
         let filter = query["WHERE"];
         let selection = query["OPTIONS"];
         let QueryTR = new QueryTree();
         let Qtree = QueryTR.buildQT(filter, selection);
         let Col = Qtree.Columns;
         let Ord = Qtree.Order;
+        // Log.trace(target);
+        // Log.trace(ObjectArray.length);
         if (Object.keys(query["WHERE"]).length === 0 &&
             Object.keys(ObjectArray).length > 5000) {
-            return Promise.reject(new ResultTooLargeError("ResultTooLargeError"));
+            return Promise.reject(new ResultTooLargeError("ResultTooLargeError1"));
         }
         if (Object.keys(query["WHERE"]).length === 0 &&
             Object.keys(ObjectArray).length <= 5000) {
@@ -210,7 +223,7 @@ export default class InsightFacade implements IInsightFacade {
         // if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
         Output = PQ.PerformColumns(Col, Output);
         if (Output.length > 5000) {
-            return Promise.reject(new ResultTooLargeError("ResultTooLargeError"));
+            return Promise.reject(new ResultTooLargeError("ResultTooLargeError2"));
         }
         return Promise.resolve(Output);
     }
