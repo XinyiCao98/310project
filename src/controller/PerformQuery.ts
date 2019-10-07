@@ -58,7 +58,7 @@ export default class PerformQuery {
                 let anotherT = children[i];
                 let anotherR = this.GetResult(courses, anotherT);
                 if (anotherR === false ) {return false; }
-                let UP = "courses_uuid";
+                let UP = this.idStr + "_uuid";
                 let intersection = this.FindIntersection(initial, anotherR, UP);
                 initial = intersection;
             }
@@ -74,7 +74,7 @@ export default class PerformQuery {
                 let anotherT = children[i];
                 let anotherR = this.GetResult(courses, anotherT);
                 if (anotherR === false ) { return false; }
-                let UP = "courses_uuid";
+                let UP = this.idStr + "_uuid";
                 let union = this.FindUnion(initial, anotherR, UP);
                 initial = union;
             }
@@ -115,8 +115,8 @@ export default class PerformQuery {
                 }
             } else if (ev === value) {
                 result.push(element);
-                // tslint:disable-next-line:align
-            } } return  result; }
+            } }
+        return  result; }
 
     public PerformEQ(key: string, value: number, courses: []): any {
         let m = courses.length;
