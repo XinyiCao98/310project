@@ -40,7 +40,7 @@ export default class InsightFacade implements IInsightFacade {
             // unzip my current zip file
             const that = this;
             currZip.loadAsync(content, {base64: true}).then(function (zipInfo) {
-                currZip.folder(id); // folder name
+                currZip.folder("courses"); // folder name
                 zipInfo.forEach(function (relativePath, file) {
                     try {
                         promiseArray.push(file.async("text"));
@@ -93,7 +93,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     // Check the details of whether a section has all features
-    public checkValidDataset(allJFile: any, id: string) {
+    public checkValidDataset(allJFile: any, id: string): any[] {
         let validSection: any[] = [];
         for (const singleCourse of allJFile) {
             let sectionArray: any;
