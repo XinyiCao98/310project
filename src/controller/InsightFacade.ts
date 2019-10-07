@@ -1,6 +1,6 @@
 import Log from "../Util";
 import {
-    IInsightFacade, InsightCourses, InsightDataset,
+    IInsightFacade, InsightDataset,
     InsightDatasetKind, InsightError, NotFoundError, ResultTooLargeError
 } from "./IInsightFacade";
 import * as JSZip from "jszip";
@@ -48,7 +48,7 @@ export default class InsightFacade implements IInsightFacade {
                     }
                 });
                 Promise.all(promiseArray).then(function (allJFile: any) {
-                    that.checkValidDataset(allJFile);
+                    that.checkValidDataset(allJFile, id);
                     if (that.validSection.length === 0) {
                         reject(new InsightError("No valid section"));
                     } else {
@@ -93,7 +93,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     // Check the details of whether a section has all features
-    public checkValidDataset(allJFile: any) {
+    public checkValidDataset(allJFile: any, id: string) {
         for (const singleCourse of allJFile) {
             let sectionArray: any;
             try {
@@ -110,7 +110,7 @@ export default class InsightFacade implements IInsightFacade {
                         && typeof singleSection.Fail === "number" && typeof singleSection.Audit === "number"
                         && typeof singleSection.id === "number" && typeof singleSection.Year === "string") {
                         const dept = singleSection.Subject;
-                        const id = singleSection.Course;
+                        const cid = singleSection.Course;
                         const avg = singleSection.Avg;
                         const instructor = singleSection.Professor;
                         const title = singleSection.Title;
@@ -122,12 +122,12 @@ export default class InsightFacade implements IInsightFacade {
                         if (singleSection.Section === "overall") {
                             year = 1900;
                         }
-                        let validSec: InsightCourses = {
-                            courses_dept: dept, courses_id: id,
-                            courses_avg: avg, courses_instructor: instructor,
-                            courses_title: title, courses_pass: pass,
-                            courses_fail: fail, courses_audit: audit,
-                            courses_uuid: uuid, courses_year: year
+                        let validSec: {[k: string]: number|string} = {
+                            [id + "_dept"]: dept, [id + "_id"]: cid,
+                            [id + "_avg"]: avg, [id + "_instructor"]: instructor,
+                            [id + "_title"]: title, [id + "_pass"]: pass,
+                            [id + "_fail"]: fail, [id + "_audit"]: audit,
+                            [id + "_uuid"]: uuid, [id + "_year"]: year
                         };
                         this.validSection.push(validSec);
                     }
@@ -177,16 +177,18 @@ export default class InsightFacade implements IInsightFacade {
         if (!Validornot) {
             return Promise.reject(new InsightError("Invalid Query"));
         }
+        const target = this.getQueryID(query);
         const datasets = new Datasets();
-        datasets.getDatasets("courses");
-        let ObjectArray = JSON.parse(JSON.stringify(datasets.getData("courses")));
+        datasets.getDatasets(target);
+        const PQ = new PerformQuery(target);
+        let ObjectArray = JSON.parse(JSON.stringify(datasets.getData(target)));
+        // Log.trace(ObjectArray);
         let filter = query["WHERE"];
         let selection = query["OPTIONS"];
         let QueryTR = new QueryTree();
         let Qtree = QueryTR.buildQT(filter, selection);
         let Col = Qtree.Columns;
         let Ord = Qtree.Order;
-        const PQ = new PerformQuery();
         // Log.trace("1");
         if (Object.keys(query["WHERE"]).length === 0 &&
             Object.keys(ObjectArray).length > 5000) {
@@ -214,6 +216,12 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.reject(new ResultTooLargeError("ResultTooLargeError"));
         }
         return Promise.resolve(Output);
+    }
+
+    public getQueryID(query: any): string {
+        let uniqueID = query["OPTIONS"]["COLUMNS"][0].split("_")[0];
+        Log.trace(uniqueID);
+        return uniqueID;
     }
 
     public listDatasets(): Promise<InsightDataset[]> {

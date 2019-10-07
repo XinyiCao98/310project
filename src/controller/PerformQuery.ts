@@ -1,13 +1,13 @@
 import {createInterface} from "readline";
 import QueryTree from "./QueryTree";
 import Log from "../Util";
+import {InsightDataset} from "./IInsightFacade";
 
 export default class PerformQuery {
-    private properties: string[] = ["courses_dept", "courses_id", "courses_avg", "courses_title",
-        "courses_pass", "courses_fail", "courses_audit", "courses_uuid", "courses_year", "courses_instructor"];
+    public idStr: string;
 
-    constructor() {
-        //
+    constructor(id: string) {
+        this.idStr = id;
     }
 
     public GetResult(courses: [], queryTree: QueryTree): object[] {

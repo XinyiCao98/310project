@@ -2,11 +2,10 @@ import Log from "../Util";
 import QueryTree from "./QueryTree";
 
 export class CheckQueryHelper {
-    private properties: string[] = ["courses_dept", "courses_id", "courses_avg", "courses_title",
-        "courses_pass", "courses_fail", "courses_audit", "courses_uuid", "courses_year", "courses_instructor"];
-    private NProperties: string[] = ["courses_avg", "courses_pass", "courses_fail", "courses_audit", "courses_year"];
-    private SProperties: string[] = ["courses_dept", "courses_id",
-        "courses_instructor", "courses_title", "courses_uuid"];
+    private properties: string[] = ["dept", "id", "avg", "title",
+        "pass", "fail", "audit", "uuid", "year", "instructor"];
+    private NProperties: string[] = ["avg", "pass", "fail", "audit", "year"];
+    private SProperties: string[] = ["dept", "id", "instructor", "title", "uuid"];
 
     constructor() {
         //
@@ -22,7 +21,7 @@ export class CheckQueryHelper {
         }
         let where = query["WHERE"];
         let options = query["OPTIONS"];
-        // Log.trace(itemsInCom);
+        Log.trace(where);
         if (!this.checkWhere(where)) {
             return false;
         }
@@ -83,11 +82,12 @@ export class CheckQueryHelper {
     }
 
     // Check the properties from Column are in given information or not
-    public CheckCol(Col: string[]): boolean {
+    public CheckCol(Col: string[]): boolean { // TODO: 这个是修改好的
         let i: number = 0;
         if (Col.length > 0) {
             for (i; i < Col.length; i++) {
-                if (this.properties.indexOf(Col[i]) < 0) {
+                let val = Col[i].split("_")[1];
+                if (this.properties.indexOf(val) < 0) {
                     return false;
                 }
             }
@@ -108,7 +108,7 @@ export class CheckQueryHelper {
         if (!this.queryOrNot(ItemInComparator) || Object.keys(ItemInComparator).length !== 1) {
             return false;
         }
-        let Key = Object.keys(ItemInComparator).toString();
+        let Key = Object.keys(ItemInComparator).toString().split("_")[1];
         let Values = Object.values(ItemInComparator)[0];
 
         if (this.NProperties.indexOf(Key) < 0) {
@@ -124,7 +124,7 @@ export class CheckQueryHelper {
         if (!this.queryOrNot(ItemInComparator) || Object.keys(ItemInComparator).length !== 1) {
             return false;
         }
-        let Key = Object.keys(ItemInComparator).toString();
+        let Key = Object.keys(ItemInComparator).toString().split("_")[1];
         let Values = Object.values(ItemInComparator)[0];
         if (this.SProperties.indexOf(Key) < 0) {
             return false;
