@@ -218,7 +218,6 @@ export default class InsightFacade implements IInsightFacade {
 
     public getQueryID(query: any): string {
         let uniqueID = query["OPTIONS"]["COLUMNS"][0].split("_")[0];
-        Log.trace(uniqueID);
         return uniqueID;
     }
 

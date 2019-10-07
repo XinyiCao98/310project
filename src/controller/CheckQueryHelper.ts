@@ -6,6 +6,7 @@ export class CheckQueryHelper {
         "pass", "fail", "audit", "uuid", "year", "instructor"];
     private NProperties: string[] = ["avg", "pass", "fail", "audit", "year"];
     private SProperties: string[] = ["dept", "id", "instructor", "title", "uuid"];
+    private tempID: string;
 
     constructor() {
         //
@@ -19,9 +20,13 @@ export class CheckQueryHelper {
             Object.keys(query["OPTIONS"]).length === 0 || Object.keys(query["WHERE"]).length > 1) {
             return false;
         }
+        try {
+            this.tempID = (query["OPTIONS"]["COLUMNS"][0]).split("_")[0];
+        } catch (e) {
+            return false;
+        }
         let where = query["WHERE"];
         let options = query["OPTIONS"];
-        Log.trace(where);
         if (!this.checkWhere(where)) {
             return false;
         }
@@ -34,8 +39,11 @@ export class CheckQueryHelper {
             }
         } // every element inside columns are string
         let itemsInCOL: string[] = options["COLUMNS"]; // stuff inside columns
+        // Assume ID is correct
         for (const key of Object.keys(options)) { // check options has valid elements
             if (key === "COLUMNS") {
+                // this.tempID = (query["OPTIONS"]["COLUMNS"][0]).split("_")[0];
+                Log.trace(this.tempID);
                 if (!this.CheckCol(itemsInCOL)) {
                     return false;
                 }
@@ -86,10 +94,11 @@ export class CheckQueryHelper {
         let i: number = 0;
         if (Col.length > 0) {
             for (i; i < Col.length; i++) {
+                let pre = Col[i].split("_")[0];
                 let val = Col[i].split("_")[1];
-                if (this.properties.indexOf(val) < 0) {
+                if (this.properties.indexOf(val) < 0 || pre !== this.tempID) {
                     return false;
-                }
+                 }
             }
             return true;
         }
@@ -108,10 +117,11 @@ export class CheckQueryHelper {
         if (!this.queryOrNot(ItemInComparator) || Object.keys(ItemInComparator).length !== 1) {
             return false;
         }
+        let pre = Object.keys(ItemInComparator).toString().split("_")[0];
         let Key = Object.keys(ItemInComparator).toString().split("_")[1];
         let Values = Object.values(ItemInComparator)[0];
 
-        if (this.NProperties.indexOf(Key) < 0) {
+        if (this.NProperties.indexOf(Key) < 0 || pre !== this.tempID) {
             return false;
         }
         if (typeof Values !== "number") {
@@ -124,9 +134,11 @@ export class CheckQueryHelper {
         if (!this.queryOrNot(ItemInComparator) || Object.keys(ItemInComparator).length !== 1) {
             return false;
         }
+        let pre = Object.keys(ItemInComparator).toString().split("_")[0];
         let Key = Object.keys(ItemInComparator).toString().split("_")[1];
         let Values = Object.values(ItemInComparator)[0];
-        if (this.SProperties.indexOf(Key) < 0) {
+        Log.trace(this.tempID);
+        if (this.SProperties.indexOf(Key) < 0 || pre !== this.tempID) {
             return false;
         }
         if (typeof Values !== "string") {
