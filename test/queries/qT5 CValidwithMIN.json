@@ -1,0 +1,35 @@
+{"title": "test with Finding MIN FAIL",
+    "query": {
+        "WHERE": {
+                    "GT": {
+                        "courses_fail": 60
+                    }
+                }
+        ,
+        "OPTIONS": {
+            "COLUMNS": [
+                "minFail",
+                "courses_dept",
+                "courses_id"
+            ],
+            "ORDER": "minFail"
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_id",
+                "courses_dept"
+            ],
+            "APPLY": [
+                {
+                    "minFail": {
+                        "MIN": "courses_fail"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid":true,
+"result":[{"minFail":61,"courses_dept":"math","courses_id":"102"},{"minFail":61,"courses_dept":"econ","courses_id":"101"},{"minFail":61,"courses_dept":"math","courses_id":"103"},{"minFail":61,"courses_dept":"phys","courses_id":"102"},{"minFail":61,"courses_dept":"math","courses_id":"105"},{"minFail":62,"courses_dept":"math","courses_id":"221"},{"minFail":62,"courses_dept":"math","courses_id":"184"},{"minFail":62,"courses_dept":"chem","courses_id":"154"},{"minFail":62,"courses_dept":"phys","courses_id":"100"},{"minFail":62,"courses_dept":"math","courses_id":"100"},{"minFail":62,"courses_dept":"eosc","courses_id":"114"},{"minFail":63,"courses_dept":"psyc","courses_id":"218"},{"minFail":63,"courses_dept":"phys","courses_id":"170"},{"minFail":63,"courses_dept":"engl","courses_id":"112"},{"minFail":63,"courses_dept":"chem","courses_id":"123"},{"minFail":64,"courses_dept":"phys","courses_id":"157"},{"minFail":64,"courses_dept":"math","courses_id":"101"},{"minFail":64,"courses_dept":"apsc","courses_id":"160"},{"minFail":65,"courses_dept":"math","courses_id":"180"},{"minFail":65,"courses_dept":"busi","courses_id":"330"},{"minFail":66,"courses_dept":"biol","courses_id":"200"},{"minFail":66,"courses_dept":"psyc","courses_id":"101"},{"minFail":66,"courses_dept":"math","courses_id":"110"},{"minFail":67,"courses_dept":"math","courses_id":"215"},{"minFail":67,"courses_dept":"cpsc","courses_id":"110"},{"minFail":67,"courses_dept":"psyc","courses_id":"217"},{"minFail":67,"courses_dept":"comm","courses_id":"290"},{"minFail":67,"courses_dept":"chem","courses_id":"121"},{"minFail":68,"courses_dept":"math","courses_id":"255"},{"minFail":69,"courses_dept":"biol","courses_id":"112"},{"minFail":70,"courses_dept":"phil","courses_id":"120"},{"minFail":72,"courses_dept":"wrds","courses_id":"150"},{"minFail":73,"courses_dept":"eosc","courses_id":"118"},{"minFail":73,"courses_dept":"biol","courses_id":"121"},{"minFail":75,"courses_dept":"psyc","courses_id":"102"},{"minFail":75,"courses_dept":"chem","courses_id":"233"},{"minFail":76,"courses_dept":"cpsc","courses_id":"210"},{"minFail":77,"courses_dept":"math","courses_id":"152"},{"minFail":78,"courses_dept":"biol","courses_id":"335"},{"minFail":81,"courses_dept":"phys","courses_id":"158"},{"minFail":81,"courses_dept":"apsc","courses_id":"201"},{"minFail":82,"courses_dept":"math","courses_id":"104"},{"minFail":82,"courses_dept":"comm","courses_id":"293"},{"minFail":86,"courses_dept":"biol","courses_id":"201"},{"minFail":90,"courses_dept":"phys","courses_id":"101"},{"minFail":97,"courses_dept":"chem","courses_id":"205"},{"minFail":98,"courses_dept":"math","courses_id":"200"},
+    {"minFail":119,"courses_dept":"econ","courses_id":"102"}]}
+
+

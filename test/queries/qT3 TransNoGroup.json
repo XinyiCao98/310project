@@ -1,0 +1,36 @@
+
+{"title": "test with  Transformation missing Apply",
+    "query":{
+    "WHERE": {
+        "AND": [
+            {
+                "IS": {
+                    "rooms_furniture": "*Tables*"
+                }
+            },
+            {
+                "GT": {
+                    "rooms_seats": 300
+                }
+            }
+        ]
+    },
+    "OPTIONS": {
+        "COLUMNS": [
+            "rooms_shortname",
+            "maxSeats"
+        ],
+        "ORDER":"rooms_shortname"
+    },
+    "TRANSFORMATIONS": {
+        "APPLY": [{
+            "maxSeats": {
+                "MAX": "rooms_seats"
+            }
+        }]
+
+    }
+},
+    "isQueryValid": false,
+    "result": "InsightError"
+}

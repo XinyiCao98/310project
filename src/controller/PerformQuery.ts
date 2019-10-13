@@ -148,7 +148,6 @@ export default class PerformQuery {
             if (ev > value) {
                 result.push(element);
             }
-
         }
         return result;
 
@@ -170,7 +169,6 @@ export default class PerformQuery {
 
         }
         return result;
-
     }
 
     // Select the properties based on the given  columns
