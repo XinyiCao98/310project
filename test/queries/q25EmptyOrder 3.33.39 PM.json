@@ -1,0 +1,29 @@
+{
+    "title": "test order is empty",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept":"cpsc"
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg":92
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER": ""
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

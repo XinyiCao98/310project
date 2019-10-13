@@ -1,0 +1,38 @@
+{
+    "title": "test complex or case2",
+    "query": {
+        "WHERE": {
+            "OR": [
+                {
+                    "OR": [
+                        {
+                            "IS": {
+                                "courses_dept": "cpsC"
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_instructor": "poole, david"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "EQ": {
+                        "courses_avg": 99.9
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_instructor",
+                "courses_fail",
+                "courses_id"
+            ],
+            "ORDER": "courses_pass"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

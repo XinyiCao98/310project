@@ -1,0 +1,27 @@
+{
+    "title": "test order before column",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "EQ": []
+                },
+                {
+                    "GT": {
+                        "courses_pass": 300
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "ORDER": "courses_pass",
+            "COLUMNS": [
+                "courses_year",
+                "courses_title",
+                "courses_pass"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

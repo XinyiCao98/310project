@@ -1,0 +1,33 @@
+{
+    "title": "test courses_dept with wildcards at back",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept":"*"
+                    }
+                },
+                {
+                    "EQ": {
+                        "courses_avg":94.4
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_dept":"cell","courses_id":"505","courses_avg":94.4},
+        {"courses_dept":"cell","courses_id":"505","courses_avg":94.4},
+        {"courses_dept":"epse","courses_id":"449","courses_avg":94.4},
+        {"courses_dept":"epse","courses_id":"592","courses_avg":94.4}
+    ]
+}

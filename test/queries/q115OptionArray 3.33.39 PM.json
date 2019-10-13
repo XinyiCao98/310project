@@ -1,0 +1,22 @@
+{
+    "title": "test empty MComparator",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "GT": {
+                        "courses_avg": 80
+                    }
+                },
+                {
+                    "EQ": {
+                        "courses_fail": 10
+                    }
+                }
+            ]
+        },
+        "OPTIONS": []
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}
