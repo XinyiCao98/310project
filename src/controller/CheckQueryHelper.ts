@@ -5,6 +5,7 @@ import {CheckTransformationHelper} from "./CheckTransformationHelper";
 export class CheckQueryHelper {
     private properties: string[] = ["dept", "id", "avg", "title",
         "pass", "fail", "audit", "uuid", "year", "instructor"];
+
     private NProperties: string[] = ["avg", "pass", "fail", "audit", "year"];
     private SProperties: string[] = ["dept", "id", "instructor", "title", "uuid"];
     private tempID: string;
@@ -28,7 +29,8 @@ export class CheckQueryHelper {
             const TransHelper = new CheckTransformationHelper();
             let trans = query["TRANSFORMATIONS"];
             if (!TransHelper.checkTrans(trans, options)) {
-                return false; }
+                return false;
+            }
             return true;
         }
         try {
@@ -41,10 +43,13 @@ export class CheckQueryHelper {
         }
 
         if (!options.hasOwnProperty("COLUMNS") || !Array.isArray(options["COLUMNS"])) {
-            return false; } // columns exists plus it is an array
+            return false;
+} // columns exists plus it is an array
         for (const item of options["COLUMNS"]) {
             if (typeof item !== "string") {
-                return false; }} // every element inside columns are string
+                return false;
+}
+} // every element inside columns are string
         let itemsInCOL: string[] = options["COLUMNS"]; // stuff inside columns
         // Assume ID is correct
         for (const key of Object.keys(options)) { // check options has valid elements
@@ -60,7 +65,8 @@ export class CheckQueryHelper {
                 }
             } // delete one statement for D2
         }
-        return true; }
+        return true;
+}
 
     public checkWhere(where: any): boolean {
         if (Object.keys(where).length === 0) {

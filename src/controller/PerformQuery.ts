@@ -44,36 +44,41 @@ export default class PerformQuery {
             let value = queryTree.nodeValue;
             result = this.PerformLT(key, value, courses);
         }
-        return result; }
+        return result;
+     }
 
     public PerformLogic(LP: string, courses: [], queryTree: QueryTree): any {
         if (LP === "AND") {
             let children = queryTree.children;
-            let m = children.length;
             let start = children[0];
-            let i = 1;
             let initial = this.GetResult(courses, start);
-            if (initial === false ) { return false; }
-            for (i; i < m; i++) {
+            for (let i: number = 1; i < children.length; i++) {
                 let anotherT = children[i];
                 let anotherR = this.GetResult(courses, anotherT);
-                if (anotherR === false ) {return false; }
+                if (anotherR === false ) {
+                    return false;
+                }
                 let UP = this.idStr + "_uuid";
                 let intersection = this.FindIntersection(initial, anotherR, UP);
                 initial = intersection;
             }
-            return initial; }
+            return initial;
+}
         if (LP === "OR") {
             let children = queryTree.children;
             let m = children.length;
             let start = children[0];
             let i = 1;
             let initial = this.GetResult(courses, start);
-            if (initial === false ) {return false; }
+            if (initial === false ) {
+return false;
+}
             for (i; i < m; i++) {
                 let anotherT = children[i];
                 let anotherR = this.GetResult(courses, anotherT);
-                if (anotherR === false ) { return false; }
+                if (anotherR === false ) {
+ return false;
+}
                 let UP = this.idStr + "_uuid";
                 let union = this.FindUnion(initial, anotherR, UP);
                 initial = union;
@@ -84,9 +89,14 @@ export default class PerformQuery {
             let children = queryTree.children;
             let start = children[0];
             let initial = this.GetResult(courses, start);
-            if (initial === false ) {  return false; }
+            if (initial === false ) {
+  return false;
+}
             let negation = this.FindNegation(initial, courses);
-            return negation; } }
+            return negation;
+}
+}
+
     public PerformIS(key: string, value: string, courses: []): any {
         let m = courses.length;
         let i = 0;
@@ -115,8 +125,10 @@ export default class PerformQuery {
                 }
             } else if (ev === value) {
                 result.push(element);
-            } }
-        return  result; }
+            }
+}
+        return  result;
+}
 
     public PerformEQ(key: string, value: number, courses: []): any {
         let m = courses.length;
@@ -133,15 +145,13 @@ export default class PerformQuery {
             }
 
         }
-        return result; }
+        return result;
+}
 
     public PerformGT(key: string, value: number, courses: []): any {
         let m = courses.length;
         let i = 0;
         let result: object[] = [];
-        // if (!this.checkID(key, this.idStr)) {
-        //     return false;
-        // }
         for (i; i < m; i++) {
             let element = courses[i];
             let ev = (element[key]);
@@ -157,9 +167,6 @@ export default class PerformQuery {
         let m = courses.length;
         let i = 0;
         let result: object[] = [];
-        // if (!this.checkID(key, this.idStr)) {
-        //     return false;
-        // }
         for (i; i < m; i++) {
             let element = courses[i];
             let ev = (element[key]);
@@ -171,13 +178,9 @@ export default class PerformQuery {
         return result;
     }
 
-    // Select the properties based on the given  columns
     public PerformColumns(selection: string[], Expected: object[]): any {
         let n = Expected.length;
         let m = selection.length;
-        // for (let k: number = 0; k < m; k++) {
-        //     if (!this.checkID(selection[k], this.idStr)) { return false; }
-        // }
         let i = 0;
         for (i; i < n; i++) {
             Expected[i] = this.Pick(Expected[i], selection);
@@ -219,7 +222,6 @@ export default class PerformQuery {
         return Expected;
     }
 
-    // Find Intersection of two array of objects
     public FindIntersection(ArrayOne: object[], ArrayTwo: object[], UniqueProperty: string): object[] {
         let A: { [key: string]: any };
         let B: { [key: string]: any };
@@ -244,7 +246,6 @@ export default class PerformQuery {
 
     }
 
-    // Find Union of two array of objects
     public FindUnion(ArrayOne: object[], ArrayTwo: object[], UniqueProperty: string): object[] {
         let A: { [key: string]: any };
         let B: { [key: string]: any };
@@ -273,7 +274,6 @@ export default class PerformQuery {
 
     }
 
-    // Find Negation of two array of objects
     public FindNegation(ArrayOne: object[], courses: object[]): object[] {
         let negation: object[] = [];
         for (let item of courses) {
@@ -283,12 +283,4 @@ export default class PerformQuery {
         }
         return negation;
     }
-    // public checkID (property: string, Id: string): boolean {
-    //     let propertyID = property.split("_")[0];
-    //     Log.trace(propertyID);
-    //     if (propertyID === Id) {
-    //         return true;
-    //     }
-    //     return false;
-    // }
 }

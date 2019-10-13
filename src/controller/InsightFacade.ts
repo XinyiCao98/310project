@@ -119,9 +119,9 @@ export default class InsightFacade implements IInsightFacade {
                         const audit = singleSection.Audit;
                         const uuid = singleSection.id.toString(10);
                         let year = parseInt(singleSection.Year, 10);
-                        if (singleSection.Section === "overall") {
-                            year = 1900;
-                        }
+                        // if (singleSection.Section === "overall") {
+                        //                         //     year = 1900;
+                        //                          }//should be recovered
                         let validSec: {[k: string]: number|string} = {
                             [id + "_dept"]: dept, [id + "_id"]: cid,
                             [id + "_avg"]: avg, [id + "_instructor"]: instructor,
