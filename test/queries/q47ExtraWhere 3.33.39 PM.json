@@ -1,0 +1,23 @@
+{
+    "title": "test extra info in where",
+    "query": {
+        "WHERE": {
+            "EQ": {
+                "courses_avg": 90
+            },
+            "GT": {
+                "courses_year": 2014
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

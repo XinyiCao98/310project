@@ -1,0 +1,29 @@
+{
+    "title": "test logic missing component",
+    "query": {
+        "WHERE": {
+            "OR": [
+                {
+                    "EQ": {
+                        "courses_avg": 68.01
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_dept":"cogs","courses_avg":68.01},
+        {"courses_dept":"comm","courses_avg":68.01},
+        {"courses_dept":"econ","courses_avg":68.01},
+        {"courses_dept":"econ","courses_avg":68.01},
+        {"courses_dept":"phil","courses_avg":68.01}
+    ]
+}

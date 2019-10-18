@@ -1,0 +1,24 @@
+{
+    "title": "test with column is not array",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept":"adhe"
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg":92
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": "shelley"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

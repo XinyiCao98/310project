@@ -1,9 +1,11 @@
 import Log from "../Util";
 import QueryTree from "./QueryTree";
+import {CheckTransformationHelper} from "./CheckTransformationHelper";
 
 export class CheckQueryHelper {
     private properties: string[] = ["dept", "id", "avg", "title",
         "pass", "fail", "audit", "uuid", "year", "instructor"];
+
     private NProperties: string[] = ["avg", "pass", "fail", "audit", "year"];
     private SProperties: string[] = ["dept", "id", "instructor", "title", "uuid"];
     private tempID: string;
@@ -16,28 +18,38 @@ export class CheckQueryHelper {
         if (query === null || !this.queryOrNot(query) ||
             !query.hasOwnProperty("WHERE") || !query.hasOwnProperty("OPTIONS") ||
             !this.queryOrNot(query["WHERE"]) || !this.queryOrNot(query["OPTIONS"]) || // first layer has be queries
-            Object.keys(query).length !== 2 || Object.keys(query["OPTIONS"]).length > 2 ||
+            Object.keys(query).length < 2 || // edited for D2
+            Object.keys(query["OPTIONS"]).length > 3 || // edited for D2
             Object.keys(query["OPTIONS"]).length === 0 || Object.keys(query["WHERE"]).length > 1) {
             return false;
+        }
+        let where = query["WHERE"];
+        let options = query["OPTIONS"];
+        if (query.hasOwnProperty("TRANSFORMATIONS")) {
+            const TransHelper = new CheckTransformationHelper();
+            let trans = query["TRANSFORMATIONS"];
+            if (!TransHelper.checkTrans(trans, options)) {
+                return false;
+            }
+            return true;
         }
         try {
             this.tempID = (query["OPTIONS"]["COLUMNS"][0]).split("_")[0];
         } catch (e) {
             return false;
         }
-        let where = query["WHERE"];
-        let options = query["OPTIONS"];
         if (!this.checkWhere(where)) {
             return false;
         }
+
         if (!options.hasOwnProperty("COLUMNS") || !Array.isArray(options["COLUMNS"])) {
             return false;
-        } // columns exists plus it is an array
+} // columns exists plus it is an array
         for (const item of options["COLUMNS"]) {
             if (typeof item !== "string") {
                 return false;
-            }
-        } // every element inside columns are string
+}
+} // every element inside columns are string
         let itemsInCOL: string[] = options["COLUMNS"]; // stuff inside columns
         // Assume ID is correct
         for (const key of Object.keys(options)) { // check options has valid elements
@@ -51,13 +63,10 @@ export class CheckQueryHelper {
                 if (!this.CheckOrd(itemsInCOL, options["ORDER"])) {
                     return false;
                 }
-            } else {
-                return false; // if contains more than col/order, return false
-            }
+            } // delete one statement for D2
         }
-
         return true;
-    }
+}
 
     public checkWhere(where: any): boolean {
         if (Object.keys(where).length === 0) {

@@ -1,0 +1,43 @@
+{
+    "title": "test complex and",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "AND": [
+                        {
+                            "EQ": {
+                                "courses_avg": 90
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_dept": "c*"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "GT": {
+                        "courses_year": 2014
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_dept":"ccst","courses_id":"503","courses_avg":90},
+        {"courses_dept":"cell","courses_id":"504","courses_avg":90},
+        {"courses_dept":"civl","courses_id":"508","courses_avg":90},
+        {"courses_dept":"civl","courses_id":"540","courses_avg":90}
+    ]
+}

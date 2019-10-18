@@ -1,0 +1,48 @@
+{
+    "title": "test extra info in where",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "AND": [
+                        {
+                            "GT": {
+                                "courses_avg": 90
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_dept": "c*"
+                            }
+                        },{
+                            "IS": {
+                                "courses_dept": "*e"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "GT": {
+                        "courses_year": 2014
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result": [
+        {"courses_dept":"chbe","courses_id":"597","courses_avg":90.45},
+        {"courses_dept":"chbe","courses_id":"553","courses_avg":90.54},
+        {"courses_dept":"chbe","courses_id":"563","courses_avg":91.8},
+        {"courses_dept":"chbe","courses_id":"495","courses_avg":94.75},
+        {"courses_dept":"chbe","courses_id":"553","courses_avg":95.31}
+    ]
+}

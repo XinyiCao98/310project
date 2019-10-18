@@ -1,0 +1,33 @@
+{
+    "title": "test courses_dept with wildcards at front",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_uuid": "*10"
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg": 94
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_instructor",
+                "courses_uuid",
+                "courses_avg"
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_instructor":"mcquarrie, maureen","courses_uuid":"3210","courses_avg":94.84},
+        {"courses_instructor":"amaral, deborah;ford, laurie","courses_uuid":"76310","courses_avg":97},
+        {"courses_instructor":"","courses_uuid":"4010","courses_avg":94.67},
+        {"courses_instructor":"","courses_uuid":"510","courses_avg":95.43}
+    ]
+}

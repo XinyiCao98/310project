@@ -60,6 +60,7 @@ export default class QueryTree {
         QT.Order = ORDER;
         return QT;
     }
+
     public buildQTC (where: any): QueryTree {
         let start = Object.keys(where)[0];
         let QT = new QueryTree();
@@ -82,7 +83,8 @@ export default class QueryTree {
             for (let i: number = 0 ; i < m; i++) {
                 let Qt = new QueryTree();
                 let Qtree = Qt.buildQTC(where[start][i]);
-                QT.children.push(Qtree); }
+                QT.children.push(Qtree);
+            }
             return QT;
     }
         if (start === "NOT") {
@@ -92,4 +94,5 @@ export default class QueryTree {
             QT.children.push(C);
             return QT;
         }
-}}
+}
+}

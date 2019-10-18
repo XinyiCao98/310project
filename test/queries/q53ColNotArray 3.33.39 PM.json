@@ -1,0 +1,24 @@
+{
+    "title": "test with invalid column element",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept":"adhe"
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg":92
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": {}
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

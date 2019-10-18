@@ -1,0 +1,34 @@
+{"title": "Invalid test with Finding MIN FAIL",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "courses_fail": 60
+            }
+        }
+    ,
+        "OPTIONS": {
+            "COLUMNS": [
+                "minFail",
+                "courses_dept",
+                "courses_id",
+                "courses_audit"
+            ],
+            "ORDER": "minFail"
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_id",
+                "courses_dept"
+            ],
+            "APPLY": [
+                {
+                    "minFail": {
+                        "MIN": "courses_fail"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

@@ -1,0 +1,29 @@
+{"title": "test with  Transformation missing Apply",
+    "query":{
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept": "cpsc"
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg": 90
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+               "courses_id"]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

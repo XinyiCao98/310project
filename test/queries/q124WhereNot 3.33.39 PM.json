@@ -1,0 +1,37 @@
+{
+    "title": "SELECT dept, id, avg WHERE avg > 95 && dept == 'adhe' with no order",
+    "query": {
+        "WHERE": {
+            "NOT": {
+                "OR": [
+                    {
+                        "GT": {
+                            "courses_avg": 51
+                        }
+                    },
+                    {
+                        "LT": {
+                            "courses_avg": 50
+                        }
+                    }
+                ]
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_dept":"busi","courses_id":"441","courses_avg":50},
+        {"courses_dept":"chbe","courses_id":"474","courses_avg":50},
+        {"courses_dept":"frst","courses_id":"231","courses_avg":50.85},
+        {"courses_dept":"frst","courses_id":"231","courses_avg":51},
+        {"courses_dept":"math","courses_id":"184","courses_avg":50.13},
+        {"courses_dept":"psyc","courses_id":"315","courses_avg":50}
+    ]
+}
