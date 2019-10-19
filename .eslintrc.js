@@ -25,6 +25,12 @@ module.exports = {
             "rules": {
                 "no-console": "off"
             }
+        },
+        {
+            "files": ["src/controller/IInsightFacade.ts"],
+            "rules": {
+                "@typescript-eslint/interface-name-prefix": "off"
+            }
         }
     ],
     "rules": {
@@ -45,6 +51,7 @@ module.exports = {
         ],
         "@typescript-eslint/class-name-casing": "error",
         "@typescript-eslint/explicit-member-accessibility": ["error", {"overrides": {"constructors": "off"}}],
+        "@typescript-eslint/interface-name-prefix": ["error", {"prefixWithI": "always"}],
         "@typescript-eslint/consistent-type-assertions": "error",
         "@typescript-eslint/no-empty-interface": "error",
         "@typescript-eslint/no-explicit-any": "off",
@@ -60,6 +67,7 @@ module.exports = {
         "@typescript-eslint/prefer-namespace-keyword": "error",
         "@typescript-eslint/type-annotation-spacing": "error",
         "@typescript-eslint/unified-signatures": "error",
+        "arrow-body-style": ["error", "always"],
         "arrow-parens": ["error", "always"],
         "brace-style": ["error", "1tbs"],
         "complexity": "off",
@@ -88,7 +96,6 @@ module.exports = {
         "no-multiple-empty-lines": "error",
         "no-new-wrappers": "error",
         "no-throw-literal": "error",
-        "no-trailing-spaces": "error",
         "no-undef-init": "error",
         "no-unsafe-finally": "error",
         "no-unused-labels": "error",
@@ -98,7 +105,7 @@ module.exports = {
         "prefer-const": "off",
         "quote-props": ["error", "consistent-as-needed"],
         "radix": "error",
-        "space-before-function-paren": ["error", {"anonymous": "always", "named": "ignore", "asyncArrow": "always"}],
+        "space-before-function-paren": ["error", {"anonymous": "always", "named": "never", "asyncArrow": "always"}],
         "use-isnan": "error",
         "valid-typeof": "off",
         "@typescript-eslint/tslint/config": [
@@ -137,6 +144,7 @@ module.exports = {
                     ],
                     "no-reference-import": true,
                     "no-shadowed-variable": true,
+                    "no-trailing-whitespace": true,
                     "no-unused-expression": true,
                     "one-line": [
                         true,
