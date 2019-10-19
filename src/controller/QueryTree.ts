@@ -61,7 +61,7 @@ export default class QueryTree {
         return QT;
     }
 
-    public buildQTC (where: any): QueryTree {
+    public buildQTC(where: any): QueryTree {
         let start = Object.keys(where)[0];
         let QT = new QueryTree();
         if (start === "IS" ||

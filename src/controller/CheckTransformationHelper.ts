@@ -6,7 +6,7 @@ export class CheckTransformationHelper {
         //
     }
 
-   public checkTrans (trans: any, options: any): boolean {
+   public checkTrans(trans: any, options: any): boolean {
         if (Object.keys(trans).length !== 2 ||
             !trans.hasOwnProperty("APPLY") ||
             !trans.hasOwnProperty("GROUP")) {

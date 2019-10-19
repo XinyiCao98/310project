@@ -10,7 +10,7 @@ import * as DS from "./Datasets";
 import Datasets from "./Datasets";
 import PerformQuery from "./PerformQuery";
 import QueryTree from "./QueryTree";
-
+import RoomHelper from "./RoomHelper";
 /**
  * This is the main programmatic entry point for the project.
  * Method documentation is in IInsightFacade
@@ -20,6 +20,7 @@ import QueryTree from "./QueryTree";
 export default class InsightFacade implements IInsightFacade {
     private datasetID: string[] = [];
     private datasetMap: Map<string, any[]> = new Map<string, any[]>();
+
     // private validSection: any[] = [];
 
     constructor() {
@@ -29,15 +30,42 @@ export default class InsightFacade implements IInsightFacade {
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         // check whether dataset ID is in right format
         return new Promise((fulfill, reject) => {
-            let validSection: any[] = [];
+            let currZip = new JSZip();
             try {
                 this.checkInput(id, kind);
             } catch (e) {
                 reject(new InsightError(e));
             }
-            let currZip = new JSZip();
+            try {
+                switch (kind) {
+                    case "courses":
+                        this.addCourse(id, content, currZip)
+                            .then((response: string[]) => {
+                                return fulfill(response);
+                            }, (response: string[]) => {
+                                return reject(response);
+                            });
+                        break;
+                    case "rooms" :
+                        const roomHelper = new RoomHelper();
+                        roomHelper.addRoom(id, content, currZip)
+                            .then((response: string[]) => {
+                                return fulfill(response);
+                            }, (response: string[]) => {
+                                return reject(response);
+                            });
+                }
+            } catch (e) {
+                // check whether dataset ID is in correct InsightDatasetKind
+                throw new InsightError("ID is incorrect InsightDatasetKind.");
+            }
+        });
+    }
+
+    public addCourse(id: string, content: string, currZip: JSZip): Promise<string[]> {
+        return new Promise((fulfill, reject) => {
+            let validSection: any[] = [];
             const promiseArray: Array<Promise<string>> = [];
-            // unzip my current zip file
             const that = this;
             currZip.loadAsync(content, {base64: true}).then(function (zipInfo) {
                 currZip.folder("courses"); // folder name
@@ -53,12 +81,11 @@ export default class InsightFacade implements IInsightFacade {
                     if (validSection.length === 0) {
                         reject(new InsightError("No valid section"));
                     } else {
-                        fs.writeFile("./data/" + id + ".json", JSON.stringify(validSection, null, " "),
-                            (e) => {
-                                if (e !== null) {
-                                    reject(new InsightError("Error occurs when saving the data"));
-                                }
-                            });
+                        fs.writeFile("./data/" + id + ".json", JSON.stringify(validSection, null, " "), (e) => {
+                            if (e !== null) {
+                                reject(new InsightError("Error occurs when saving the data"));
+                            }
+                        });
                         that.datasetMap.set(id, validSection);
                         that.datasetID.push(id);
                         fulfill(that.datasetID);
@@ -86,10 +113,6 @@ export default class InsightFacade implements IInsightFacade {
         if (this.datasetID.indexOf(id) >= 0) {
             throw new InsightError("ID is already existed.");
         }
-        // check whether dataset ID is in correct InsightDatasetKind
-        if (kind !== InsightDatasetKind.Courses) {
-            throw new InsightError("ID is incorrect InsightDatasetKind.");
-        }
     }
 
     // Check the details of whether a section has all features
@@ -104,39 +127,39 @@ export default class InsightFacade implements IInsightFacade {
             }
             for (const singleSection of sectionArray) {
                 if (this.checkselection(singleSection)) {
-                try {
-                 {
-                        const dept = singleSection.Subject;
-                        const cid = singleSection.Course;
-                        const avg = singleSection.Avg;
-                        const instructor = singleSection.Professor;
-                        const title = singleSection.Title;
-                        const pass = singleSection.Pass;
-                        const fail = singleSection.Fail;
-                        const audit = singleSection.Audit;
-                        const uuid = singleSection.id.toString(10);
-                        let year = parseInt(singleSection.Year, 10);
-                        // if (singleSection.Section === "overall") {
-                        //                         //     year = 1900;
-                        //                          }//should be recovered
-                        let validSec: {[k: string]: number|string} = {
-                            [id + "_dept"]: dept, [id + "_id"]: cid,
-                            [id + "_avg"]: avg, [id + "_instructor"]: instructor,
-                            [id + "_title"]: title, [id + "_pass"]: pass,
-                            [id + "_fail"]: fail, [id + "_audit"]: audit,
-                            [id + "_uuid"]: uuid, [id + "_year"]: year
-                        };
-                        validSection.push(validSec);
+                    try {
+                        {
+                            const dept = singleSection.Subject;
+                            const cid = singleSection.Course;
+                            const avg = singleSection.Avg;
+                            const instructor = singleSection.Professor;
+                            const title = singleSection.Title;
+                            const pass = singleSection.Pass;
+                            const fail = singleSection.Fail;
+                            const audit = singleSection.Audit;
+                            const uuid = singleSection.id.toString(10);
+                            let year = parseInt(singleSection.Year, 10);
+                            // if (singleSection.Section === "overall") {
+                            //                         //     year = 1900;
+                            //                          }//should be recovered
+                            let validSec: { [k: string]: number | string } = {
+                                [id + "_dept"]: dept, [id + "_id"]: cid,
+                                [id + "_avg"]: avg, [id + "_instructor"]: instructor,
+                                [id + "_title"]: title, [id + "_pass"]: pass,
+                                [id + "_fail"]: fail, [id + "_audit"]: audit,
+                                [id + "_uuid"]: uuid, [id + "_year"]: year
+                            };
+                            validSection.push(validSec);
+                        }
+                    } catch {
+                        // If an individual file is invalid for any reason, skip over it
                     }
-                } catch {
-                    // If an individual file is invalid for any reason, skip over it
                 }
-            }
 
-    }
+            }
             return validSection;
-}
-}
+        }
+    }
 
     public removeDataset(id: string): Promise<string> {
         // check whether dataset ID is in right format
@@ -206,7 +229,7 @@ export default class InsightFacade implements IInsightFacade {
         Output = PQ.PerformColumns(Col, Output);
         if (Object.keys(query["OPTIONS"]).length === 2) {
             Output = PQ.SortbyNP(Output, Ord);
-         }
+        }
         // if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
         Output = PQ.PerformColumns(Col, Output);
         if (Output.length > 5000) {
@@ -230,7 +253,7 @@ export default class InsightFacade implements IInsightFacade {
         });
     }
 
-    public checkselection(singleSection: any ): boolean {
+    public checkselection(singleSection: any): boolean {
         if (typeof singleSection.Subject === "string" && typeof singleSection.Course === "string"
             && typeof singleSection.Avg === "number" && typeof singleSection.Professor === "string"
             && typeof singleSection.Title === "string" && typeof singleSection.Pass === "number"
