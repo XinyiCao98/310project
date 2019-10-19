@@ -103,12 +103,9 @@ export default class InsightFacade implements IInsightFacade {
                 continue;
             }
             for (const singleSection of sectionArray) {
+                if (this.checkselection(singleSection)) {
                 try {
-                    if (typeof singleSection.Subject === "string" && typeof singleSection.Course === "string"
-                        && typeof singleSection.Avg === "number" && typeof singleSection.Professor === "string"
-                        && typeof singleSection.Title === "string" && typeof singleSection.Pass === "number"
-                        && typeof singleSection.Fail === "number" && typeof singleSection.Audit === "number"
-                        && typeof singleSection.id === "number" && typeof singleSection.Year === "string") {
+                 {
                         const dept = singleSection.Subject;
                         const cid = singleSection.Course;
                         const avg = singleSection.Avg;
@@ -135,9 +132,11 @@ export default class InsightFacade implements IInsightFacade {
                     // If an individual file is invalid for any reason, skip over it
                 }
             }
-        }
-        return validSection;
+
     }
+            return validSection;
+}
+}
 
     public removeDataset(id: string): Promise<string> {
         // check whether dataset ID is in right format
@@ -229,5 +228,16 @@ export default class InsightFacade implements IInsightFacade {
             }
             fulfill(presentList);
         });
+    }
+
+    public checkselection(singleSection: any ): boolean {
+        if (typeof singleSection.Subject === "string" && typeof singleSection.Course === "string"
+            && typeof singleSection.Avg === "number" && typeof singleSection.Professor === "string"
+            && typeof singleSection.Title === "string" && typeof singleSection.Pass === "number"
+            && typeof singleSection.Fail === "number" && typeof singleSection.Audit === "number"
+            && typeof singleSection.id === "number" && typeof singleSection.Year === "string") {
+            return true;
+        }
+        return false;
     }
 }
