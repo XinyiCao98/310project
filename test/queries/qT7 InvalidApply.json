@@ -1,0 +1,33 @@
+{"title": "Invalid Query due to Apply",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "courses_fail": 60
+            }
+        }
+    ,
+        "OPTIONS": {
+            "COLUMNS": [
+                "minFail",
+                "courses_dept",
+                "courses_id"
+            ],
+            "ORDER": "minFail"
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_id",
+                "courses_dept"
+            ],
+            "APPLY": [
+                {
+                    "minFail": {
+                        "MIN": "courses_fal"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

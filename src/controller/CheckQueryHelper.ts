@@ -6,23 +6,29 @@ export class CheckQueryHelper {
     private properties: string[] = ["dept", "id", "avg", "title",
         "pass", "fail", "audit", "uuid", "year", "instructor"];
 
-    private NProperties: string[] = ["avg", "pass", "fail", "audit", "year"];
-    private SProperties: string[] = ["dept", "id", "instructor", "title", "uuid"];
+    private CNProperties: string[] = ["avg", "pass", "fail", "audit", "year"];
+    private CSProperties: string[] = ["dept", "id", "instructor", "title", "uuid"];
+    private RNProperties: string[] = ["lat", "lon", "seats"];
+    private RSProperties: string[] = ["fullname", "shortname",
+        "number", "name", "address", "type", "furniture", "href"];
+
+    private NProperties: string[] = ["avg", "pass", "fail", "audit", "year", "lat", "lon", "seats"];
+    private SProperties: string[] = ["dept", "id", "instructor", "title", "uuid", "fullname", "shortname",
+        "number", "name", "address", "type", "furniture", "href"];
+
+    private ValidKeyinQ: string[] = ["WHERE", "OPTIONS", "TRANSFORMATIONS"];
+
     private tempID: string;
 
     constructor() {
         //
     }
 
-    public CheckQuery(query: any): boolean { // check basic element exists
-        if (query === null || !this.queryOrNot(query) ||
-            !query.hasOwnProperty("WHERE") || !query.hasOwnProperty("OPTIONS") ||
-            !this.queryOrNot(query["WHERE"]) || !this.queryOrNot(query["OPTIONS"]) || // first layer has be queries
-            Object.keys(query).length < 2 || // edited for D2
-            Object.keys(query["OPTIONS"]).length > 3 || // edited for D2
-            Object.keys(query["OPTIONS"]).length === 0 || Object.keys(query["WHERE"]).length > 1) {
+    public CheckQuery(query: any): boolean {
+        if (!this.BasicCheck(query)) {
             return false;
         }
+        // check basic element exists
         let where = query["WHERE"];
         let options = query["OPTIONS"];
         if (query.hasOwnProperty("TRANSFORMATIONS")) {
@@ -48,14 +54,11 @@ export class CheckQueryHelper {
         for (const item of options["COLUMNS"]) {
             if (typeof item !== "string") {
                 return false;
-}
-} // every element inside columns are string
+            }
+        }
         let itemsInCOL: string[] = options["COLUMNS"]; // stuff inside columns
-        // Assume ID is correct
         for (const key of Object.keys(options)) { // check options has valid elements
             if (key === "COLUMNS") {
-                // this.tempID = (query["OPTIONS"]["COLUMNS"][0]).split("_")[0];
-                // Log.trace(this.tempID);
                 if (!this.CheckCol(itemsInCOL)) {
                     return false;
                 }
@@ -63,7 +66,9 @@ export class CheckQueryHelper {
                 if (!this.CheckOrd(itemsInCOL, options["ORDER"])) {
                     return false;
                 }
-            } // delete one statement for D2
+            } else {
+                return false;
+            }
         }
         return true;
 }
@@ -74,7 +79,6 @@ export class CheckQueryHelper {
         }
         let Comparator = Object.keys(where)[0];
         let itemsInCom = where[Comparator];
-        // Log.trace(itemsInCom);
         if (Comparator === "EQ" || Comparator === "GT" || Comparator === "LT") {
             return this.CheckCWL(itemsInCom);
         } else if (Comparator === "IS") {
@@ -184,6 +188,23 @@ export class CheckQueryHelper {
         } else {
             return this.checkWhere(ItemInComparator);
         }
+    }
+
+    public BasicCheck(query: any): boolean {
+        if (query === null || !this.queryOrNot(query) ||
+            !query.hasOwnProperty("WHERE") || !query.hasOwnProperty("OPTIONS") ||
+            !this.queryOrNot(query["WHERE"]) || !this.queryOrNot(query["OPTIONS"]) || // first layer has be queries
+            Object.keys(query).length < 2 ||  Object.keys(query["OPTIONS"]).length > 3 || // edited for D2
+            Object.keys(query["OPTIONS"]).length === 0 || Object.keys(query["WHERE"]).length > 1) {
+            return false;
+        }
+        let keys = Object.keys(query);
+        for (let key of keys) {
+            if (this.ValidKeyinQ.indexOf(key) < 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
