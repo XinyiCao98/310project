@@ -128,29 +128,24 @@ export default class InsightFacade implements IInsightFacade {
             for (const singleSection of sectionArray) {
                 if (this.checkselection(singleSection)) {
                     try {
-                        {
-                            const dept = singleSection.Subject;
-                            const cid = singleSection.Course;
-                            const avg = singleSection.Avg;
-                            const instructor = singleSection.Professor;
-                            const title = singleSection.Title;
-                            const pass = singleSection.Pass;
-                            const fail = singleSection.Fail;
-                            const audit = singleSection.Audit;
-                            const uuid = singleSection.id.toString(10);
-                            let year = parseInt(singleSection.Year, 10);
-                            // if (singleSection.Section === "overall") {
-                            //                         //     year = 1900;
-                            //                          }//should be recovered
-                            let validSec: { [k: string]: number | string } = {
+                        const dept = singleSection.Subject;
+                        const cid = singleSection.Course;
+                        const avg = singleSection.Avg;
+                        const instructor = singleSection.Professor;
+                        const title = singleSection.Title;
+                        const pass = singleSection.Pass;
+                        const fail = singleSection.Fail;
+                        const audit = singleSection.Audit;
+                        const uuid = singleSection.id.toString(10);
+                        const year = this.getYear(singleSection);
+                        let validSec: { [k: string]: number | string } = {
                                 [id + "_dept"]: dept, [id + "_id"]: cid,
                                 [id + "_avg"]: avg, [id + "_instructor"]: instructor,
                                 [id + "_title"]: title, [id + "_pass"]: pass,
                                 [id + "_fail"]: fail, [id + "_audit"]: audit,
                                 [id + "_uuid"]: uuid, [id + "_year"]: year
                             };
-                            validSection.push(validSec);
-                        }
+                        validSection.push(validSec);
                     } catch {
                         // If an individual file is invalid for any reason, skip over it
                     }
@@ -262,5 +257,13 @@ export default class InsightFacade implements IInsightFacade {
             return true;
         }
         return false;
+    }
+
+    public getYear(singleSection: any): number {
+        if (singleSection.Section === "overall") {
+            return 1900;
+        }
+        let output = parseInt(singleSection.Year, 10);
+        return output;
     }
 }
