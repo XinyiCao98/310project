@@ -78,6 +78,7 @@ export default class InsightFacade implements IInsightFacade {
                 });
                 Promise.all(promiseArray).then(function (allJFile: any) {
                     validSection = that.checkValidDataset(allJFile, id);
+                    Log.trace("ValidSection" + validSection);
                     if (validSection.length === 0) {
                         reject(new InsightError("No valid section"));
                     } else {
@@ -126,8 +127,8 @@ export default class InsightFacade implements IInsightFacade {
                 continue;
             }
             for (const singleSection of sectionArray) {
-                if (this.checkselection(singleSection)) {
-                    try {
+                try {
+                    if (this.checkselection(singleSection)) {
                         const dept = singleSection.Subject;
                         const cid = singleSection.Course;
                         const avg = singleSection.Avg;
@@ -139,21 +140,20 @@ export default class InsightFacade implements IInsightFacade {
                         const uuid = singleSection.id.toString(10);
                         const year = this.getYear(singleSection);
                         let validSec: { [k: string]: number | string } = {
-                                [id + "_dept"]: dept, [id + "_id"]: cid,
-                                [id + "_avg"]: avg, [id + "_instructor"]: instructor,
-                                [id + "_title"]: title, [id + "_pass"]: pass,
-                                [id + "_fail"]: fail, [id + "_audit"]: audit,
-                                [id + "_uuid"]: uuid, [id + "_year"]: year
-                            };
+                            [id + "_dept"]: dept, [id + "_id"]: cid,
+                            [id + "_avg"]: avg, [id + "_instructor"]: instructor,
+                            [id + "_title"]: title, [id + "_pass"]: pass,
+                            [id + "_fail"]: fail, [id + "_audit"]: audit,
+                            [id + "_uuid"]: uuid, [id + "_year"]: year
+                        };
                         validSection.push(validSec);
-                    } catch {
-                        // If an individual file is invalid for any reason, skip over it
                     }
+                } catch {
+                    // If an individual file is invalid for any reason, skip over it
                 }
-
             }
-            return validSection;
         }
+        return validSection;
     }
 
     public removeDataset(id: string): Promise<string> {
