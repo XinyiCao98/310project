@@ -1,7 +1,6 @@
 import {InsightError} from "./IInsightFacade";
 import * as JSZip from "jszip";
 import * as fs from "fs";
-import {rejects} from "assert";
 
 export default class RoomHelper {
 
