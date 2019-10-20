@@ -1,6 +1,13 @@
 import Log from "../Util";
+import {split} from "ts-node";
 
 export class CheckTransformationHelper {
+     private OperationNames: string[] = ["MAX", "MIN", "AVG" , "SUM", "COUNT"];
+     private NumericOperations: string[] = ["MAX", "MIN", "AVG", "SUM"];
+     private NumericProperties: string[] = ["pass", "fail", "audit", "year", "avg", "lat", "lon", "seats"];
+     private Properties: string[] = ["fullname", "shortname", "number", "name", "address", "lat", "lon",
+         "seats", "type", "furniture", "href", "dept", "id", "avg", "instructor", "title", "pass", "fail",
+         "audit", "uuid", "year"];
 
     constructor() {
         //
@@ -15,6 +22,10 @@ export class CheckTransformationHelper {
         if (!this.checkElement(trans, options)) {
         return false;
 }
+        let apply = trans["APPLY"];
+        if (!this.checkApply(apply)) {
+            return false;
+        }
         return true;
 }
 
@@ -28,7 +39,6 @@ export class CheckTransformationHelper {
         ! Array.isArray(Group)) {
            return false;
        }
-       let Apply = trans["APPLY"];  // should add a format check for Transformation
        let  EleInTrans = this.ObtainKeys(trans);
        let p = Object.keys(Col).length;
        for (let l: number = 0; l < p ; l++ ) {
@@ -57,5 +67,35 @@ export class CheckTransformationHelper {
          EleInT.push(Object.keys(A[k])[0]);
         }
         return EleInT;
+    }
+
+    // Check Elements inside Apply
+    public checkApply(apply: any): boolean {
+        if (!Array.isArray(apply)) {
+            return false;
+        }
+        for (let element of apply) {
+            let key = Object.keys(element);
+            let realkey = key[0];
+            if (typeof(realkey) !== "string") {
+                return false;
+             }
+            let value  = Object.values(element)[0];
+            let Operation = Object.keys(value)[0];
+            if (this.OperationNames.indexOf(Operation) < 0) {
+                return false;
+            }
+            let OperationObject = Object.values(value)[0];
+            let property = OperationObject.split("_")[1];
+            if (this.Properties.indexOf(property) < 0) {
+                return false;
+            }
+            if (this.NumericOperations.indexOf(Operation) > 0) {
+                if (this.NumericProperties.indexOf(property) < 0) {
+                    return false;
+                 }
+            }
+        }
+        return true;
     }
 }

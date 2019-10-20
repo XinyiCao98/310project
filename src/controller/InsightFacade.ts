@@ -188,7 +188,6 @@ export default class InsightFacade implements IInsightFacade {
     public performQuery(query: any): Promise<any[]> {
         const helper = new CheckQueryHelper();
         let validorNot = helper.CheckQuery(query);
-        Log.trace(validorNot);
         let Output: any;
         if (!validorNot) {
             return Promise.reject(new InsightError("Invalid Query"));
