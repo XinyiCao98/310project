@@ -48,7 +48,7 @@ export default class InsightFacade implements IInsightFacade {
                         break;
                     case "rooms" :
                         const roomHelper = new RoomHelper();
-                        roomHelper.addRoom(id, content, currZip)
+                        roomHelper.addRoom(id, content, currZip, this.datasetMap, this.datasetID)
                             .then((response: string[]) => {
                                 return fulfill(response);
                             }, (response: string[]) => {
