@@ -1,6 +1,7 @@
 import {InsightError} from "./IInsightFacade";
-import * as JSZip from "jszip";
 import * as fs from "fs";
+import Log from "../Util";
+import * as JSZip from "jszip";
 
 export default class RoomHelper {
 
@@ -11,53 +12,67 @@ export default class RoomHelper {
     public addRoom(id: string, content: string, currZip: JSZip, datasetMap: Map<string, any[]>,
                    datasetId: string[]): Promise<string[]> {
         return new Promise((fulfill, reject) => {
+            // Log.trace(currZip === null);
             let buildingMap: Map<string, any> = new Map<string, any>();
             let validRoom: any[] = [];
-            const promiseArray: Array<Promise<string>> = [];
+            let urlList: Array<Promise<string>> = [];
             const that = this;
             const parse5 = require("parse5");
-            currZip.loadAsync(content, {base64: true}).then(function (zip: any) {
-                zip.file("index.htm").async("text").then(async (htmFile: any) => {
-                    try {
-                        let indexTree = parse5.parse(htmFile);
-                        const buildingList = that.getInside(indexTree.childNodes);
-                        buildingMap = that.getBuildingInfo(buildingList); // TODO: 判空？
-                        for (let singleBuilding of buildingMap.values()) {
-                            await that.getGeoInfo(singleBuilding);
-                            const path = singleBuilding["buildingHref"].substring(2); // 取地址
-                            promiseArray.push(singleBuilding.file(path).async("text")); // TODO
-                        }
-                        Promise.all(promiseArray).then((ele: any) => {
-                            for (let source of ele) {
-                                try {
-                                    let eachBuilding = parse5.parse(source);
-                                    validRoom = that.getSpecificRoom(eachBuilding, buildingMap, id);
-                                    if (validRoom.length === 0) {
-                                        return reject(new InsightError("There is no valid room"));
-                                    } else {
-                                        fs.writeFile("./data/" + id + ".json",
-                                            JSON.stringify(validRoom, null, " "), (e) => {
-                                                if (e !== null) {
-                                                    reject(new InsightError("Error occurs when saving the room"));
-                                                }
-                                            });
-                                        datasetId.push(id);
-                                        datasetMap.set(id, validRoom);
-                                        fulfill(datasetId);
-                                    }
-                                } catch (e) {
-                                    return reject(new InsightError("Fail to write"));
-                                }
-                            }
+            currZip.loadAsync(content, {base64: true}).then(async function (zip: any) {
+                const idx = await zip.file("rooms/index.htm").async("text");
+                try {
+                    const indexTree = parse5.parse(idx);
+                    const buildingList = that.getInside(indexTree.childNodes);
+                    buildingMap = that.getBuildingInfo(buildingList); // TODO: 判空？
+                    for (let singleBuilding of buildingMap.values()) {
+                        // Log.trace(buildingMap.keys());
+                        await that.getGeoInfo(singleBuilding).catch(() => {
+                            // Log.trace("error when get geo");
                         });
-                    } catch (e) {
-                        return reject(new InsightError("ALl kinds of errors inside try"));
                     }
-                });
-            }).catch(function (e) {
+                    for (let build of buildingMap.values()) {
+                        const path = build["buildingHref"].substring(2); // 取地址
+                        if (zip.file(path) !== null) {
+                            urlList.push(zip.file(path).async("text")); // TODO
+                        }
+                    }
+                    // Log.trace(urlList.length);
+                    Promise.all(urlList).then((ele: any) => {
+                        for (let source of ele) {
+                            try {
+                                let eachBuilding = parse5.parse(source);
+                                validRoom = that.getSpecificRoom(eachBuilding, buildingMap, id);
+                                if (validRoom.length === 0) {
+                                    return reject(new InsightError("There is no valid room"));
+                                } else {
+                                    that.writeToDisk(validRoom, id);
+                                    datasetId.push(id);
+                                    datasetMap.set(id, validRoom);
+                                    fulfill(datasetId);
+                                }
+                            } catch (e) {
+                                return reject(new InsightError("Fail to write"));
+                            }
+                        }
+                    });
+                } catch (e) {
+                    return reject(new InsightError("ALl kinds of errors inside try"));
+                }
+            }).catch((e: any) => {
+                Log.trace(e);
                 reject(new InsightError("This is not a htm"));
             });
         });
+    }
+
+    public writeToDisk(validRoom: any, id: string): boolean {
+        fs.writeFile("./data/" + id + ".json",
+            JSON.stringify(validRoom, null, " "), (e) => {
+                if (e !== null) {
+                    return false;
+                }
+            });
+        return true;
     }
 
     public getSpecificRoom(eachBuilding: any, buildingMap: Map<string, any>, id: string): any[] {
@@ -153,59 +168,91 @@ export default class RoomHelper {
         let link = "http://cs310.students.cs.ubc.ca:11316/api/v1/project_team054/" + address;
         let http = require("http");
         return new Promise((fulfill, reject) => {
+            Log.trace("get in promise");
             http.get(link).then((response: any) => {
-                let afterParse: any = JSON.parse(response);
-                if (Object.keys(afterParse).includes("error")) {
-                    return reject(new InsightError("fail to get location"));
-                } else {
-                    buildingList["buildingLat"] = afterParse.lat;
-                    buildingList["buildingLon"] = afterParse.lon;
-                    return fulfill(buildingList);
-                }
+                Log.trace("get link");
+                response.setEncoding("utf8");
+                let result = "";
+                response.on("data", (chunk: any) => {
+                    result += chunk;
+                });
+                response.on("end", () => {
+                    try {
+                        let afterParse: any = JSON.parse(result);
+                        // Log.trace("PARSED DATA: " + parsedData);
+                        if (afterParse.hasOwnProperty("lat") && afterParse.hasOwnProperty("lon")) {
+                            buildingList["buildingLat"] = afterParse.lat;
+                            buildingList["buildingLon"] = afterParse.lon;
+                            fulfill(afterParse);
+                        } else if (afterParse.hasOwnProperty("error")) {
+                            return reject(new InsightError("no lat lon"));
+                        }
+                    } catch (e) {
+                        return reject("404");
+                    }
+                });
+                response.on("error", (e: any) => {
+                    Log.trace(`Got error: ${e.message}`);
+                });
             }).catch((error: any) => {
-                return reject("404");
+                return reject(new InsightError("fail to get info"));
             });
         });
     }
 
     public transAdr(address: string): string {
-        address.replace(" ", "%20");
-        return address;
+        // Log.trace("trans address before" + address);
+        address = address.split(" ").join("%20");
+        // address = address.replace(" ", "%20");
+        // Log.trace("trans address after" + address);
+        return address.trim();
     }
 
-    public getBuildingInfo(buildingNodes: any): any {
+    public getBuildingInfo(buildingNodes: any[]): any {
         let buildingMap: Map<string, any> = new Map<string, any>();
-        let buildingFull: string;
-        let buildingShort: string;
-        let buildingAdr: string;
-        let buildingHref: string;
-        let buildingLat: number;
-        let buildingLon: number;
-        for (let singleN of buildingNodes.childNodes) {
-            if (singleN.nodeName === "td" && singleN.attrs[0].name === "class") {
-                if (singleN.attrs[0].value === "views-field views-field-title") {
-                    if (singleN.childNodes[1].attrs[0].name === "href") {
+        if (buildingNodes === undefined || buildingNodes === null) {
+            return buildingMap;
+        }
+        for (let singleB of buildingNodes) {
+            if (singleB.nodeName !== "tr") {
+                // Log.trace("not tr 1");
+                continue;
+            }
+            // Log.trace("not tr 2");
+            let buildingFull: string;
+            let buildingShort: string;
+            let buildingAdr: string;
+            let buildingHref: string;
+            let buildingLat: number;
+            let buildingLon: number;
+            if (singleB.childNodes === undefined || singleB.childNodes === null) {
+                return buildingMap;
+            }
+            for (let singleN of singleB.childNodes) {
+                // Log.trace("step in for loop");
+                if (singleN.nodeName === "td" && singleN.attrs[0].name === "class") {
+                    // Log.trace("find td");
+                    if (singleN.attrs[0].value === "views-field views-field-title") {
                         buildingHref = singleN.childNodes[1].attrs[0].value;
+                        buildingFull = singleN.childNodes[1].childNodes[0].value.trim();
+                    } else if (singleN.attrs[0].value === "views-field views-field-field-building-code") {
+                        buildingShort = singleN.childNodes[0].value.trim();
+                    } else if (singleN.attrs[0].value === "views-field views-field-field-building-address") {
+                        buildingAdr = singleN.childNodes[0].value.trim();
                     }
-                    buildingFull = singleN.childNodes[1].childNodes[0].value.trim();
-                } else if (singleN.attrs[0].value === "views-field views-field-field-building-code") {
-                    buildingShort = singleN.childNodes[0].value.trim();
-                } else if (singleN.attrs[0].value === "views-field views-field-field-building-address") {
-                    buildingAdr = singleN.childNodes[0].value.trim();
                 }
             }
+            let buildingList: { [k: string]: number | string } = {
+                ["buildingFull"]: buildingFull,
+                ["buildingShort"]: buildingShort,
+                ["buildingAdr"]: buildingAdr,
+                ["buildingHref"]: buildingHref,
+                ["buildingLat"]: buildingLat,
+                ["buildingLon"]: buildingLon
+            };
+            buildingMap.set(buildingShort, buildingList);
+            return buildingMap;
         }
-        let buildingList: { [k: string]: number | string } = {
-            ["buildingFull"]: buildingFull,
-            ["buildingShort"]: buildingShort,
-            ["buildingAdr"]: buildingAdr,
-            ["buildingHref"]: buildingHref,
-            ["buildingLat"]: buildingLat,
-            ["buildingLon"]: buildingLon
-        };
-        buildingMap.set(buildingShort, buildingList);
-        return buildingMap;
-
     }
 
     public getInside(nodes: any[]): any[] {
@@ -217,8 +264,8 @@ export default class RoomHelper {
                 if (node.nodeName === "tbody") {
                     for (let child of node.childNodes) {
                         bodyObj.push(child);
-                        return bodyObj;
                     }
+                    return bodyObj;
                 } else {
                     bodyObj = this.getInside(node.childNodes);
                     if (bodyObj.length !== 0) {
@@ -226,6 +273,7 @@ export default class RoomHelper {
                     }
                 }
             }
+            return bodyObj;
         }
     }
 }

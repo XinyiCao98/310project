@@ -6,11 +6,12 @@ import {
 import * as JSZip from "jszip";
 import * as fs from "fs";
 import {CheckQueryHelper} from "./CheckQueryHelper";
-import * as DS from "./Datasets";
 import Datasets from "./Datasets";
 import PerformQuery from "./PerformQuery";
 import QueryTree from "./QueryTree";
 import RoomHelper from "./RoomHelper";
+import {type} from "os";
+
 /**
  * This is the main programmatic entry point for the project.
  * Method documentation is in IInsightFacade
@@ -30,21 +31,23 @@ export default class InsightFacade implements IInsightFacade {
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         // check whether dataset ID is in right format
         return new Promise((fulfill, reject) => {
-            let currZip = new JSZip();
-            try {
-                this.checkInput(id, kind);
-            } catch (e) {
-                reject(new InsightError(e));
-            }
-            try {
+                const currZip = require("jszip");
+                try {
+                    this.checkInput(id);
+                } catch (e) {
+                    reject(new InsightError(e));
+                }
+                if (!(fs.existsSync("./data/"))) {
+                    fs.mkdirSync("./data/");
+                }
+                Log.trace("enter addDataset");
                 switch (kind) {
                     case "courses":
-                        this.addCourse(id, content, currZip)
-                            .then((response: string[]) => {
-                                return fulfill(response);
-                            }, (response: string[]) => {
-                                return reject(response);
-                            });
+                        this.addCourse(id, content, currZip).then((response: string[]) => {
+                            return fulfill(response);
+                        }, (response: string[]) => {
+                            return reject(response);
+                        });
                         break;
                     case "rooms" :
                         const roomHelper = new RoomHelper();
@@ -55,11 +58,8 @@ export default class InsightFacade implements IInsightFacade {
                                 return reject(response);
                             });
                 }
-            } catch (e) {
-                // check whether dataset ID is in correct InsightDatasetKind
-                throw new InsightError("ID is incorrect InsightDatasetKind.");
             }
-        });
+        );
     }
 
     public addCourse(id: string, content: string, currZip: JSZip): Promise<string[]> {
@@ -78,7 +78,7 @@ export default class InsightFacade implements IInsightFacade {
                 });
                 Promise.all(promiseArray).then(function (allJFile: any) {
                     validSection = that.checkValidDataset(allJFile, id);
-                    Log.trace("ValidSection" + validSection);
+                    // Log.trace("ValidSection" + validSection);
                     if (validSection.length === 0) {
                         reject(new InsightError("No valid section"));
                     } else {
@@ -102,7 +102,7 @@ export default class InsightFacade implements IInsightFacade {
         });
     }
 
-    private checkInput(id: string, kind: InsightDatasetKind) {
+    private checkInput(id: string) {
         // check whether dataset ID is in right format
         if (!id || id.length === 0) {
             throw new InsightError("ID is empty or undefined.");

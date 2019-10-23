@@ -35,7 +35,8 @@ describe("InsightFacade Add/Remove Dataset", function () {
         brokenJSON: "./test/data/brokenJSON.zip",
         nestedFolder: "./test/data/nestedFolder.zip",
         removeButValid: "./test/data/removeButValid.zip",
-        smallvalid : "./test/data/smallvalid.zip"
+        smallvalid : "./test/data/smallvalid.zip",
+        rooms: "./test/data/rooms.zip",
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
@@ -79,7 +80,17 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect(result).to.deep.equal(expected);
 
         }).catch((err: any) => {
-            Log.error(err);
+            expect.fail(err, expected, "Should not have rejected");
+        });
+
+    });
+
+    it("Should add a valid dataset /room/", function () {
+        const id: string = "rooms";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms).then((result: string[]) => {
+            expect(result).to.deep.equal(expected);
+        }).catch((err: any) => {
             expect.fail(err, expected, "Should not have rejected");
         });
 
@@ -474,6 +485,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
 describe("InsightFacade PerformQuery", () => {
     const datasetsToQuery: { [id: string]: any } = {
         courses: {id: "courses", path: "./test/data/courses.zip", kind: InsightDatasetKind.Courses},
+        rooms: {id: "rooms", path: "./test/data/rooms.zip", kind: InsightDatasetKind.Rooms},
     };
     let insightFacade: InsightFacade = new InsightFacade();
     let testQueries: ITestQuery[] = [];
