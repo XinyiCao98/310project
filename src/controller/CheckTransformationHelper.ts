@@ -113,8 +113,8 @@ export class CheckTransformationHelper {
     // Take the names of the new elements created in APPLY
     public getNew(apply: any): string[] {
         let New: string[] = [];
-        let values = Object.values(apply);
-        for (let newP of values) {
+        let NewValues = Object.values(apply);
+        for (let newP of NewValues) {
             New.push(Object.keys(newP)[0]);
         }
         return New;
