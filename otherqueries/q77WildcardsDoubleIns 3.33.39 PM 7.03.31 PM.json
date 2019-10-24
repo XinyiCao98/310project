@@ -1,0 +1,39 @@
+{
+    "title": "test courses_dept with wildcards at front",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_instructor": "**"
+                    }
+                },
+                {
+                    "AND": [
+                        {
+                            "EQ": {
+                                "courses_avg": 94
+                            }
+                        },{
+                            "IS": {
+                                "courses_dept": "cpsc"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_instructor",
+                "courses_id",
+                "courses_avg"
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_instructor":"friedman, joel","courses_id":"501","courses_avg":94},
+        {"courses_instructor":"","courses_id":"501","courses_avg":94}
+    ]
+}

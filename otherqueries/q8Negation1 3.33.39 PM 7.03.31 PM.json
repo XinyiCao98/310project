@@ -1,0 +1,38 @@
+{
+    "title": "SELECT dept, id, avg WHERE avg >= 63 && avg < 63.1 ORDER BY avg, Negation with LT",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "NOT": {
+                        "LT": {
+                            "courses_avg": 63
+                        }
+                    }
+                },
+                {
+                    "LT": {
+                        "courses_avg": 63.01
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result": [
+        {"courses_dept":"biol","courses_id":"155","courses_avg":63},
+        {"courses_dept":"biol","courses_id":"155","courses_avg":63},
+        {"courses_dept":"busi","courses_id":"293","courses_avg":63},
+        {"courses_dept":"comm","courses_id":"292","courses_avg":63},
+        {"courses_dept":"fopr","courses_id":"262","courses_avg":63},
+        {"courses_dept":"lled","courses_id":"200","courses_avg":63}
+    ]
+}

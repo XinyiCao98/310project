@@ -1,0 +1,33 @@
+{
+    "title": "test courses_dept with wildcards at front",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_instructor": "cole*"
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg": 94
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_instructor",
+                "courses_id",
+                "courses_avg"
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_instructor":"cole, kenneth","courses_id":"421","courses_avg":98.08},
+        {"courses_instructor":"cole, kenneth","courses_id":"421","courses_avg":98.7},
+        {"courses_instructor":"cole, kenneth","courses_id":"421","courses_avg":97.29},
+        {"courses_instructor":"cole, kenneth","courses_id":"421","courses_avg":96.21}
+    ]
+}

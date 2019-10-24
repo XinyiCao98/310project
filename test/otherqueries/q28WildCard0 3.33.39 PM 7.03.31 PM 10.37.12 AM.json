@@ -1,0 +1,33 @@
+{
+    "title": "test wildcard case 0",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept": "ap*"
+                    }
+                },
+                {
+                    "EQ": {
+                        "courses_avg": 80
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_fail",
+                "courses_avg"
+            ],
+            "ORDER": "courses_fail"
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_dept":"apbi","courses_fail":0,"courses_avg":80},
+        {"courses_dept":"apsc","courses_fail":0,"courses_avg":80},
+        {"courses_dept":"apsc","courses_fail":1,"courses_avg":80}
+    ]
+}

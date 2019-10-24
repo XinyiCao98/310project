@@ -1,0 +1,49 @@
+{
+    "title": "test complex or case2",
+    "query": {
+        "WHERE": {
+            "OR": [
+                {
+                    "OR": [
+                        {
+                            "IS": {
+                                "courses_dept": "cpsC"
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_instructor": "poole, david"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "EQ": {
+                        "courses_avg": 99.9
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_instructor",
+                "courses_fail",
+                "courses_id"
+            ],
+            "ORDER": "courses_fail"
+        }
+    },
+    "isQueryValid": true,
+    "result": [
+        {"courses_instructor":"poole, david","courses_fail":0,"courses_id":"422"},
+        {"courses_instructor":"poole, david","courses_fail":0,"courses_id":"422"},
+        {"courses_instructor":"poole, david","courses_fail":0,"courses_id":"422"},
+        {"courses_instructor":"poole, david","courses_fail":0,"courses_id":"502"},
+        {"courses_instructor":"poole, david","courses_fail":0,"courses_id":"522"},
+        {"courses_instructor":"poole, david","courses_fail":0,"courses_id":"522"},
+        {"courses_instructor":"poole, david","courses_fail":0,"courses_id":"522"},
+        {"courses_instructor":"poole, david","courses_fail":0,"courses_id":"522"},
+        {"courses_instructor":"poole, david","courses_fail":2,"courses_id":"312"},
+        {"courses_instructor":"poole, david","courses_fail":6,"courses_id":"322"}
+    ]
+}

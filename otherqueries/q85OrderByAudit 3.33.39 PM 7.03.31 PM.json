@@ -1,0 +1,34 @@
+{
+    "title": "test courses_dept with wildcards at front",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept": "cps*"
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg": 94
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_year",
+                "courses_dept",
+                "courses_audit"
+            ],
+            "ORDER": "courses_audit"
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_year":2007,"courses_dept":"cpsc","courses_audit":0},
+        {"courses_year":1900,"courses_dept":"cpsc","courses_audit":0},
+        {"courses_year":2014,"courses_dept":"cpsc","courses_audit":0},
+        {"courses_year":1900,"courses_dept":"cpsc","courses_audit":0}
+    ]
+}
