@@ -64,7 +64,6 @@ export class CheckQueryHelper {
         if (query.hasOwnProperty("TRANSFORMATIONS")) {
             const TransHelper = new CheckTransformationHelper();
             let trans = query["TRANSFORMATIONS"];
-            Log.trace(TransHelper.checkTrans(trans, options, type));
             if (!TransHelper.checkTrans(trans, options, type)) {
                 return false;
             }

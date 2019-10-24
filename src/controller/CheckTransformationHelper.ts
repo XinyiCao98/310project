@@ -4,17 +4,9 @@ import {split} from "ts-node";
 export class CheckTransformationHelper {
      private OperationNames: string[] = ["MAX", "MIN", "AVG" , "SUM", "COUNT"];
      private NumericOperations: string[] = ["MAX", "MIN", "AVG", "SUM"];
-     private NumericProperties: string[] = ["pass", "fail", "audit", "year", "avg", "lat", "lon", "seats"];
-     private Properties: string[] = ["fullname", "shortname", "number", "name", "address", "lat", "lon",
-         "seats", "type", "furniture", "href", "dept", "id", "avg", "instructor", "title", "pass", "fail",
-         "audit", "uuid", "year"];
 
      private CNProperties: string[] = ["avg", "pass", "fail", "audit", "year"];
-     private CSProperties: string[] = ["dept", "id", "instructor", "title", "uuid"];
      private RNProperties: string[] = ["lat", "lon", "seats"];
-     private RSProperties: string[] = ["fullname", "shortname",
-        "number", "name", "address", "type", "furniture", "href"];
-
      private CProperties: string[] = ["avg", "pass", "fail", "audit", "year",
          "dept", "id", "instructor", "title", "uuid"];
 

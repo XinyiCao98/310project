@@ -204,10 +204,11 @@ return false;
     }
 
     // Sort an array of objects by numerical properties
-    public SortbyNP(Expected: object[], Property: string): any {
+    public SortbyNP(Expected: object[], Property: string| object): any {
         let cfirst: { [key: string]: any };
         let csecond: { [key: string]: any };
         // if (! this.checkID(Property, this.idStr)) { return false; }
+        if (typeof Property === "string") {
         Expected.sort((cone, ctwo) => {
             cfirst = cone;
             csecond = ctwo;
@@ -219,6 +220,7 @@ return false;
             }
             return 0;
         });
+}
         return Expected;
     }
 

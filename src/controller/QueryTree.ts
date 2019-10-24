@@ -6,7 +6,7 @@ export default class QueryTree {
     public nodeValue: any;
     public children: QueryTree[];
     public Columns: string[];
-    public Order: string;
+    public Order: string | object;
 
     constructor() {
         this.nodeType = null;
