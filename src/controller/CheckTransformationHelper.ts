@@ -9,11 +9,23 @@ export class CheckTransformationHelper {
          "seats", "type", "furniture", "href", "dept", "id", "avg", "instructor", "title", "pass", "fail",
          "audit", "uuid", "year"];
 
+     private CNProperties: string[] = ["avg", "pass", "fail", "audit", "year"];
+     private CSProperties: string[] = ["dept", "id", "instructor", "title", "uuid"];
+     private RNProperties: string[] = ["lat", "lon", "seats"];
+     private RSProperties: string[] = ["fullname", "shortname",
+        "number", "name", "address", "type", "furniture", "href"];
+
+     private CProperties: string[] = ["avg", "pass", "fail", "audit", "year",
+         "dept", "id", "instructor", "title", "uuid"];
+
+      private RProperties: string[] = ["lat", "lon", "seats", "fullname", "shortname",
+          "number", "name", "address", "type", "furniture", "href"];
+
     constructor() {
         //
     }
 
-   public checkTrans(trans: any, options: any): boolean {
+   public checkTrans(trans: any, options: any, Type: boolean): boolean {
         if (Object.keys(trans).length !== 2 ||
             !trans.hasOwnProperty("APPLY") ||
             !trans.hasOwnProperty("GROUP")) {
@@ -23,9 +35,10 @@ export class CheckTransformationHelper {
         return false;
 }
         let apply = trans["APPLY"];
-        if (!this.checkApply(apply)) {
+        if (!this.checkApply(apply, Type)) {
             return false;
         }
+        this.getNew(apply);
         return true;
 }
 
@@ -70,9 +83,15 @@ export class CheckTransformationHelper {
     }
 
     // Check Elements inside Apply
-    public checkApply(apply: any): boolean {
+    public checkApply(apply: any, Type: boolean): boolean {
         if (!Array.isArray(apply)) {
             return false;
+        }
+        let standardP = this.CProperties;
+        let standardNP = this.CNProperties;
+        if (Type === true) {
+            standardP = this.RProperties;
+            standardNP = this.RNProperties;
         }
         for (let element of apply) {
             let key = Object.keys(element);
@@ -87,15 +106,25 @@ export class CheckTransformationHelper {
             }
             let OperationObject = Object.values(value)[0];
             let property = OperationObject.split("_")[1];
-            if (this.Properties.indexOf(property) < 0) {
+            if (standardP.indexOf(property) < 0) {
                 return false;
             }
             if (this.NumericOperations.indexOf(Operation) > 0) {
-                if (this.NumericProperties.indexOf(property) < 0) {
+                if (standardNP.indexOf(property) < 0) {
                     return false;
                  }
             }
         }
         return true;
+    }
+
+    // Take the names of the new elements created in APPLY
+    public getNew(apply: any): string[] {
+        let New: string[] = [];
+        let values = Object.values(apply);
+        for (let newP of values) {
+            New.push(Object.keys(newP)[0]);
+        }
+        return New;
     }
 }

@@ -1,7 +1,0 @@
-{
-    "title": "test courses_dept with wildcards at front",
-    "query": {
-    },
-    "isQueryValid": false,
-    "result": "InsightError"
-}
