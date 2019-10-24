@@ -1,7 +1,11 @@
 import Log from "../Util";
 import {
-    IInsightFacade, InsightDataset,
-    InsightDatasetKind, InsightError, NotFoundError, ResultTooLargeError
+    IInsightFacade,
+    InsightDataset,
+    InsightDatasetKind,
+    InsightError,
+    NotFoundError,
+    ResultTooLargeError
 } from "./IInsightFacade";
 import * as JSZip from "jszip";
 import * as fs from "fs";
@@ -10,7 +14,6 @@ import Datasets from "./Datasets";
 import PerformQuery from "./PerformQuery";
 import QueryTree from "./QueryTree";
 import RoomHelper from "./RoomHelper";
-import {type} from "os";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -37,26 +40,23 @@ export default class InsightFacade implements IInsightFacade {
                 } catch (e) {
                     reject(new InsightError(e));
                 }
-                if (!(fs.existsSync("./data/"))) {
-                    fs.mkdirSync("./data/");
-                }
-                Log.trace("enter addDataset");
-                switch (kind) {
-                    case "courses":
-                        this.addCourse(id, content, currZip).then((response: string[]) => {
+                // Log.trace("enter addDataset");
+                if (kind === InsightDatasetKind.Courses) {
+                    this.addCourse(id, content, currZip).then((response: string[]) => {
+                        return fulfill(response);
+                    }, (response: string[]) => {
+                        return reject(response);
+                    });
+                } else if (kind === InsightDatasetKind.Rooms) {
+                    const roomHelper = new RoomHelper();
+                    roomHelper.addRoom(id, content, currZip, this.datasetMap, this.datasetID)
+                        .then((response: string[]) => {
                             return fulfill(response);
                         }, (response: string[]) => {
                             return reject(response);
                         });
-                        break;
-                    // case "rooms" :
-                    //     const roomHelper = new RoomHelper();
-                    //     roomHelper.addRoom(id, content, currZip, this.datasetMap, this.datasetID)
-                    //         .then((response: string[]) => {
-                    //             return fulfill(response);
-                    //         }, (response: string[]) => {
-                    //             return reject(response);
-                    //         });
+                } else {
+                    return new InsightError("Invalid kind");
                 }
             }
         );
@@ -66,6 +66,7 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise((fulfill, reject) => {
             let validSection: any[] = [];
             const promiseArray: Array<Promise<string>> = [];
+            // unzip my current zip file
             const that = this;
             currZip.loadAsync(content, {base64: true}).then(function (zipInfo) {
                 currZip.folder("courses"); // folder name
@@ -78,15 +79,15 @@ export default class InsightFacade implements IInsightFacade {
                 });
                 Promise.all(promiseArray).then(function (allJFile: any) {
                     validSection = that.checkValidDataset(allJFile, id);
-                    // Log.trace("ValidSection" + validSection);
                     if (validSection.length === 0) {
                         reject(new InsightError("No valid section"));
                     } else {
-                        fs.writeFile("./data/" + id + ".json", JSON.stringify(validSection, null, " "), (e) => {
-                            if (e !== null) {
-                                reject(new InsightError("Error occurs when saving the data"));
-                            }
-                        });
+                        fs.writeFile("./data/" + id + ".json", JSON.stringify(validSection, null, " "),
+                            (e) => {
+                                if (e !== null) {
+                                    reject(new InsightError("Error occurs when saving the data"));
+                                }
+                            });
                         that.datasetMap.set(id, validSection);
                         that.datasetID.push(id);
                         fulfill(that.datasetID);
@@ -147,6 +148,7 @@ export default class InsightFacade implements IInsightFacade {
                             [id + "_uuid"]: uuid, [id + "_year"]: year
                         };
                         validSection.push(validSec);
+                        Log.trace("add valid section successful");
                     }
                 } catch {
                     // If an individual file is invalid for any reason, skip over it

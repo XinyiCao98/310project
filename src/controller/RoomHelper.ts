@@ -12,47 +12,39 @@ export default class RoomHelper {
     public addRoom(id: string, content: string, currZip: JSZip, datasetMap: Map<string, any[]>,
                    datasetId: string[]): Promise<string[]> {
         return new Promise((fulfill, reject) => {
-            // Log.trace(currZip === null);
             let buildingMap: Map<string, any> = new Map<string, any>();
             let validRoom: any[] = [];
             let urlList: Array<Promise<string>> = [];
             const that = this;
             const parse5 = require("parse5");
             currZip.loadAsync(content, {base64: true}).then(async function (zip: any) {
-                const idx = await zip.file("rooms/index.htm").async("text");
+                const idx = await zip.folder("rooms").file("index.htm").async("text"); // folder("rooms").
                 try {
                     const indexTree = parse5.parse(idx);
                     const buildingList = that.getInside(indexTree.childNodes);
                     buildingMap = that.getBuildingInfo(buildingList); // TODO: 判空？
-                    for (let singleBuilding of buildingMap.values()) {
-                        // Log.trace(buildingMap.keys());
-                        await that.getGeoInfo(singleBuilding).catch(() => {
-                            // Log.trace("error when get geo");
-                        });
-                    }
+                    await that.waitGeo(buildingMap);
+                    Log.trace("buildingMap.values() length :" + buildingMap.values());
                     for (let build of buildingMap.values()) {
-                        const path = build["buildingHref"].substring(2); // 取地址
-                        if (zip.file(path) !== null) {
-                            urlList.push(zip.file(path).async("text")); // TODO
-                        }
+                        // Log.trace("2");
+                        let path = build["buildingHref"].substring(2); // 取地址
+                        urlList.push(zip.folder("rooms").file(path).async("text")); // TODO
+                        // Log.trace("1");
                     }
-                    // Log.trace(urlList.length);
+                    Log.trace("url length : " + urlList.length);
+                    // Log.trace(urlList[1]);
                     Promise.all(urlList).then((ele: any) => {
-                        for (let source of ele) {
-                            try {
-                                let eachBuilding = parse5.parse(source);
-                                validRoom = that.getSpecificRoom(eachBuilding, buildingMap, id);
-                                if (validRoom.length === 0) {
-                                    return reject(new InsightError("There is no valid room"));
-                                } else {
-                                    that.writeToDisk(validRoom, id);
-                                    datasetId.push(id);
-                                    datasetMap.set(id, validRoom);
-                                    fulfill(datasetId);
-                                }
-                            } catch (e) {
-                                return reject(new InsightError("Fail to write"));
-                            }
+                        validRoom = that.gatherValid(ele, buildingMap, id);
+                        if (validRoom.length === 0) {
+                            // Log.trace("11");
+                            return reject(new InsightError("There is no valid room"));
+                        } else {
+                            // Log.trace("111");
+                            that.writeToDisk(validRoom, id);
+                            // Log.trace("1111");
+                            datasetId.push(id);
+                            datasetMap.set(id, validRoom);
+                            fulfill(datasetId);
                         }
                     });
                 } catch (e) {
@@ -65,6 +57,88 @@ export default class RoomHelper {
         });
     }
 
+    public gatherValid(ele: any, buildingMap: Map<string, any>, id: string): any[] {
+        try {
+            const parse5 = require("parse5");
+            let validRoom: any[] = [];
+            for (let source of ele) {
+                let eachBuilding = parse5.parse(source);
+                let roomList = this.getInside(eachBuilding.childNodes);
+                if (roomList === null || roomList === undefined) {
+                    // Log.trace("room invalid");
+                    return roomList;
+                }
+                // Log.trace(roomList.length);
+                for (let roomNode of roomList) {
+                    // Log.trace("into getroom");
+                    if (roomNode.nodeName !== "tr"
+                        || roomNode.childNodes === undefined || roomNode.childNodes === null) {
+                        continue;
+                    }
+                    let childList = roomNode.childNodes;
+                    // Log.trace("before get room");
+                    let rooms = this.getRoomInfo(childList);
+                    // Log.trace("after get room : " + rooms);
+                    let href = rooms["roomHref"];
+                    // Log.trace(href);
+                    let l = href.lastIndexOf("/");
+                    // Log.trace("l is : " + l);
+                    let building;
+                    let bsName = rooms["roomHref"].substring(l + 1).split("-")[0];
+                    // Log.trace("before");
+                    if (buildingMap.has(bsName)) {
+                        building = buildingMap.get(bsName);
+                        rooms["roomName"] = bsName + "_" + rooms["roomNumber"];
+                    }
+                    // Log.trace("has building short name : " + rooms["roomName"]);
+                    // Log.trace("Has valid room or not : " + this.checkCondition(building, rooms, buildingMap, id));
+                    if (this.checkCondition(building, rooms, buildingMap, id) !== null) {
+                        // Log.trace("has valid room");
+                        validRoom.push(this.checkCondition(building, rooms, buildingMap, id));
+                    }
+                }
+            }
+            // Log.trace(validRoom.length);
+            return validRoom;
+        } catch (e) {
+            //
+        }
+    }
+
+    public checkCondition(building: any, rooms: any, buildingMap: Map<string, any>, id: string): any {
+        if (typeof building["buildingFull"] === "string" &&
+            typeof building["buildingShort"] === "string" &&
+            typeof building["buildingAdr"] === "string" &&
+            typeof building["buildingHref"] === "string" &&
+            typeof building["buildingLat"] === "number" &&
+            typeof building["buildingLon"] === "number" &&
+            typeof rooms["roomNumber"] === "string" && typeof rooms["roomName"] === "string" &&
+            typeof rooms["roomSeats"] === "string" && typeof rooms["roomType"] === "string" &&
+            typeof rooms["roomFurniture"] === "string" && typeof rooms["roomHref"] === "string") {
+            let validSingleRoom: { [k: string]: number | string } = {
+                [id + "_fullname"]: building["buildingFull"], [id + "_shortname"]: building["buildingShort"],
+                [id + "_number"]: rooms["roomNumber"], [id + "_name"]: rooms["roomName"],
+                [id + "_address"]: building["buildingAdr"], [id + "_lat"]: building["buildingLat"],
+                [id + "_lon"]: building["buildingLon"], [id + "_seats"]: parseInt(rooms["roomSeats"], 10),
+                [id + "_type"]: rooms["roomType"], [id + "_furniture"]: rooms["roomFurniture"],
+                [id + "_href"]: building["buildingHref"],
+            };
+            return validSingleRoom;
+        } else {
+            return null;
+        }
+    }
+
+    public async waitGeo(buildingMap: Map<string, any>) {
+        Log.trace("wait Geo");
+        for (let singleBuilding of buildingMap.values()) {
+            await this.getGeoInfo(singleBuilding).catch((e) => {
+                Log.trace("error:" + e);
+                Log.trace("error when get geo");
+            });
+        }
+    }
+
     public writeToDisk(validRoom: any, id: string): boolean {
         fs.writeFile("./data/" + id + ".json",
             JSON.stringify(validRoom, null, " "), (e) => {
@@ -73,58 +147,6 @@ export default class RoomHelper {
                 }
             });
         return true;
-    }
-
-    public getSpecificRoom(eachBuilding: any, buildingMap: Map<string, any>, id: string): any[] {
-        try {
-            const roomList = this.getInside(eachBuilding.childNodes);
-            if (roomList === null || roomList === undefined) {
-                return roomList;
-            }
-            let validRoom: any[] = [];
-            for (let roomNode of roomList) {
-                if (roomNode.nodeName === "tr"
-                    && roomNode.childNodes !== undefined && roomNode.childNodes !== null) {
-                    let childList = roomNode.childNodes;
-                    let rooms = this.getRoomInfo(childList);
-                    let l = rooms["roomHref"].lastIndexof("/");
-                    let building;
-                    let bsName = rooms["roomHref"].substring(l + 1).split("-")[0];
-                    if (buildingMap.has(bsName)) {
-                        building = buildingMap.get(bsName);
-                        rooms["roomName"] = bsName + "_" + rooms["roomNumber"];
-                    }
-                    if (typeof building["buildingFull"] === "string" &&
-                        typeof building["buildingShort"] === "string" &&
-                        typeof building["buildingAdr"] === "string" &&
-                        typeof building["buildingHref"] === "string" &&
-                        typeof building["buildingLat"] === "number" &&
-                        typeof building["buildingLon"] === "number" &&
-                        typeof rooms["roomNumber"] === "number" &&
-                        typeof rooms["roomName"] === "string" &&
-                        typeof rooms["roomSeats"] === "number" && typeof rooms["roomType"] === "string" &&
-                        typeof rooms["roomFurniture"] === "number" && typeof rooms["roomHref"] === "string") {
-                        let validSingleRoom: { [k: string]: number | string } = {
-                            [id + "_fullname"]: building["buildingFull"],
-                            [id + "_shortname"]: building["buildingShort"],
-                            [id + "_number"]: rooms["roomNumber"],
-                            [id + "_name"]: rooms["roomName"],
-                            [id + "_address"]: building["buildingAdr"],
-                            [id + "_lat"]: building["buildingLat"],
-                            [id + "_lon"]: building["buildingLon"],
-                            [id + "_seats"]: rooms["roomSeats"],
-                            [id + "_type"]: rooms["roomType"],
-                            [id + "_furniture"]: rooms["roomFurniture"],
-                            [id + "_href"]: building["buildingHref"],
-                        };
-                        validRoom.push(validSingleRoom);
-                    }
-                }
-            }
-            return validRoom;
-        } catch (e) {
-            //
-        }
     }
 
     public getRoomInfo(childList: any[]): any {
@@ -143,7 +165,7 @@ export default class RoomHelper {
                         roomHref = eachChild.childNodes[1].attrs[0].value;
                     }
                 } else if (value === "views-field views-field-field-room-capacity") {
-                    roomSeats = eachChild.childNodes[0].value.trim();
+                    roomSeats = eachChild.childNodes[0].value;
                 } else if (value === "views-field views-field-field-room-furniture") {
                     roomFurniture = eachChild.childNodes[0].value.trim();
                 } else if (value === "views-field views-field-field-room-type") {
@@ -162,28 +184,29 @@ export default class RoomHelper {
         return roomList;
     }
 
-    public getGeoInfo(buildingList: any): Promise<any> {
+    public async getGeoInfo(buildingList: any): Promise<any> {
         let address = buildingList["buildingAdr"];
         address = this.transAdr(address);
         let link = "http://cs310.students.cs.ubc.ca:11316/api/v1/project_team054/" + address;
+        // Log.trace(link);
         let http = require("http");
         return new Promise((fulfill, reject) => {
-            Log.trace("get in promise");
-            http.get(link).then((response: any) => {
-                Log.trace("get link");
+            http.get(link, (response: any) => {
                 response.setEncoding("utf8");
+                // Log.trace("get link");
                 let result = "";
-                response.on("data", (chunk: any) => {
+                response.on("data", function (chunk: any) {
                     result += chunk;
+                    // Log.trace("add chunk");
                 });
-                response.on("end", () => {
+                response.on("end", function () {
                     try {
-                        let afterParse: any = JSON.parse(result);
-                        // Log.trace("PARSED DATA: " + parsedData);
+                        const afterParse: any = JSON.parse(result);
                         if (afterParse.hasOwnProperty("lat") && afterParse.hasOwnProperty("lon")) {
+                            // Log.trace("LAT :" + afterParse.lat);
                             buildingList["buildingLat"] = afterParse.lat;
                             buildingList["buildingLon"] = afterParse.lon;
-                            fulfill(afterParse);
+                            return fulfill(buildingList);
                         } else if (afterParse.hasOwnProperty("error")) {
                             return reject(new InsightError("no lat lon"));
                         }
@@ -191,20 +214,15 @@ export default class RoomHelper {
                         return reject("404");
                     }
                 });
-                response.on("error", (e: any) => {
-                    Log.trace(`Got error: ${e.message}`);
+                response.on("error", function (e: any) {
+                    Log.trace("fail to encode");
                 });
-            }).catch((error: any) => {
-                return reject(new InsightError("fail to get info"));
             });
         });
     }
 
     public transAdr(address: string): string {
-        // Log.trace("trans address before" + address);
         address = address.split(" ").join("%20");
-        // address = address.replace(" ", "%20");
-        // Log.trace("trans address after" + address);
         return address.trim();
     }
 
@@ -251,8 +269,8 @@ export default class RoomHelper {
                 ["buildingLon"]: buildingLon
             };
             buildingMap.set(buildingShort, buildingList);
-            return buildingMap;
         }
+        return buildingMap;
     }
 
     public getInside(nodes: any[]): any[] {
