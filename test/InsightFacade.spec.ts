@@ -35,7 +35,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         brokenJSON: "./test/data/brokenJSON.zip",
         nestedFolder: "./test/data/nestedFolder.zip",
         removeButValid: "./test/data/removeButValid.zip",
-        smallvalid : "./test/data/smallvalid.zip",
+        smallvalid: "./test/data/smallvalid.zip",
         rooms: "./test/data/rooms.zip",
     };
     let datasets: { [id: string]: string } = {};
@@ -116,9 +116,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         let expected2: string[] = [id1, id2];
         return insightFacade.addDataset(id1, datasets[id1], InsightDatasetKind.Courses).then((result: string[]) => {
             expect(result).to.deep.equal(expected1);
-            insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses).
-
-            then((result2: string[]) => {
+            insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses).then((result2: string[]) => {
                 expect(result2).to.deep.equal(expected2);
             }).catch((err: any) => {
                 expect.fail(err, expected2, "Should not have rejected1");
@@ -132,6 +130,19 @@ describe("InsightFacade Add/Remove Dataset", function () {
         const id: string = "courses";
         let expected2: string[];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            return insightFacade.listDatasets();
+        }).then((result2: InsightDataset[]) => {
+            expect(result2[0].id).to.deep.equal(id);
+            expect(result2.length).to.deep.equal(1);
+        }).catch((error: any) => {
+            expect.fail(error, expected2, "Should not have rejected");
+        });
+    });
+
+    it("list dataset #0 with one valid room", function () {
+        const id: string = "rooms";
+        let expected2: string[];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms).then((result: string[]) => {
             return insightFacade.listDatasets();
         }).then((result2: InsightDataset[]) => {
             expect(result2[0].id).to.deep.equal(id);
@@ -164,6 +175,24 @@ describe("InsightFacade Add/Remove Dataset", function () {
             });
         });
     });
+
+    it("list dataset #2 with two valid dataset and one is room", function () {
+        const id: string = "courses";
+        const id2: string = "rooms";
+        let expected: string[];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            return insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Rooms).then((result2: string[]) => {
+                return insightFacade.listDatasets();
+            }).then((result3: InsightDataset[]) => {
+                expect(result3[0].id).to.deep.equal(id);
+                expect(result3[1].id).to.deep.equal(id2);
+                expect(result3.length).to.deep.equal(2);
+            }).catch((error: any) => {
+                expect.fail(error, expected, "Should not have rejected this");
+            });
+        });
+    });
+
     it("fail to add dataset with id underscore", function () {
         const id: string = "courses_";
         let expected: string[];
@@ -418,6 +447,24 @@ describe("InsightFacade Add/Remove Dataset", function () {
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             return insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses).
             then((result2: string[]) => {
+                return insightFacade.removeDataset(id).then((result3: string) => {
+                    return insightFacade.listDatasets();
+                }).then((result4: InsightDataset[]) => {
+                    expect(result4[0].id).to.deep.equal(id2);
+                    expect(result4.length).to.deep.equal(1);
+                }).catch((error: any) => {
+                    expect.fail(error, expected, "Should not have rejected this");
+                });
+            });
+        });
+    });
+
+    it("succeed to remove one valid dataset under courses and room", function () {
+        const id: string = "courses";
+        const id2: string = "rooms";
+        let expected: string[] = [id2];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            return insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Rooms).then((result2: string[]) => {
                 return insightFacade.removeDataset(id).then((result3: string) => {
                     return insightFacade.listDatasets();
                 }).then((result4: InsightDataset[]) => {

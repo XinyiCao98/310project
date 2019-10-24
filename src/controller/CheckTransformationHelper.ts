@@ -7,6 +7,7 @@ export class CheckTransformationHelper {
 
      private CNProperties: string[] = ["avg", "pass", "fail", "audit", "year"];
      private RNProperties: string[] = ["lat", "lon", "seats"];
+
      private CProperties: string[] = ["avg", "pass", "fail", "audit", "year",
          "dept", "id", "instructor", "title", "uuid"];
 
@@ -113,8 +114,8 @@ export class CheckTransformationHelper {
     // Take the names of the new elements created in APPLY
     public getNew(apply: any): string[] {
         let New: string[] = [];
-        let NewValues = Object.values(apply);
-        for (let newP of NewValues) {
+        let values = Object.values(apply);
+        for (let newP of values) {
             New.push(Object.keys(newP)[0]);
         }
         return New;

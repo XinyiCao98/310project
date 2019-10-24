@@ -24,6 +24,8 @@ import RoomHelper from "./RoomHelper";
 export default class InsightFacade implements IInsightFacade {
     private datasetID: string[] = [];
     private datasetMap: Map<string, any[]> = new Map<string, any[]>();
+    private allKindsMap: Map<string, any> = new Map<string, any>();
+    // private allKindsList: any [] = [];
 
     // private validSection: any[] = [];
 
@@ -43,6 +45,7 @@ export default class InsightFacade implements IInsightFacade {
                 // Log.trace("enter addDataset");
                 if (kind === InsightDatasetKind.Courses) {
                     this.addCourse(id, content, currZip).then((response: string[]) => {
+                        this.allKindsMap.set(id, kind);
                         return fulfill(response);
                     }, (response: string[]) => {
                         return reject(response);
@@ -51,6 +54,7 @@ export default class InsightFacade implements IInsightFacade {
                     const roomHelper = new RoomHelper();
                     roomHelper.addRoom(id, content, currZip, this.datasetMap, this.datasetID)
                         .then((response: string[]) => {
+                            this.allKindsMap.set(id, kind);
                             return fulfill(response);
                         }, (response: string[]) => {
                             return reject(response);
@@ -69,9 +73,10 @@ export default class InsightFacade implements IInsightFacade {
             // unzip my current zip file
             const that = this;
             currZip.loadAsync(content, {base64: true}).then(function (zipInfo) {
-                currZip.folder("courses"); // folder name
-                zipInfo.forEach(function (relativePath, file) {
+                // Log.trace("before get folder " + id);
+                zipInfo.folder("courses").forEach(function (relativePath, file) {
                     try {
+                        // Log.trace("async path");
                         promiseArray.push(file.async("text"));
                     } catch {
                         reject(new InsightError("File cannot be converted to text"));
@@ -148,7 +153,7 @@ export default class InsightFacade implements IInsightFacade {
                             [id + "_uuid"]: uuid, [id + "_year"]: year
                         };
                         validSection.push(validSec);
-                        Log.trace("add valid section successful");
+                        // Log.trace("add valid section successful");
                     }
                 } catch {
                     // If an individual file is invalid for any reason, skip over it
@@ -169,14 +174,19 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.reject(new InsightError("ID is whitespace or underscore."));
         }
         // check whether dataset ID is exists
-        if (this.datasetID.indexOf(id) < 0) {
+        if (!this.allKindsMap.has(id)) {
             // reject(new NotFoundError("ID is not existed."));
             return Promise.reject(new NotFoundError("ID is not existed."));
         }
         return new Promise((fulfill, reject) => {
             let idx = this.datasetID.indexOf(id);
-            this.datasetID.splice(idx, 1);
-            this.datasetMap.delete(id);
+            if (this.allKindsMap.get(id) === InsightDatasetKind.Courses) {
+                this.datasetMap.delete(id);
+                this.datasetID.splice(idx, 1);
+                this.datasetMap.delete(id);
+            } else {
+                this.datasetMap.delete(id);
+            }
             fs.unlink("./data/" + id + ".json", (e) => {
                 if (e !== null) {
                     reject(new InsightError("Unable to delete dataset"));
@@ -235,17 +245,18 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public getQueryID(query: any): string {
-        const CheckQH = new CheckQueryHelper();
-        let Filtred = CheckQH.ElementInColFiltered(query);
-        let uniqueID = Filtred[0].split("_")[0];
-        return uniqueID;
+      const CheckQhelper = new CheckQueryHelper();
+      let filtered = CheckQhelper.ElementInColFiltered(query);
+      let uniqueID = filtered[0].split("_")[0];
+      Log.trace(uniqueID);
+      return uniqueID;
     }
 
     public listDatasets(): Promise<InsightDataset[]> {
         return new Promise<InsightDataset[]>((fulfill, reject) => {
             let presentList: any[] = [];
             for (let id of this.datasetID) {
-                presentList.push({id, kind: InsightDatasetKind.Courses, numRows: this.datasetMap.get(id).length});
+                presentList.push({id, kind: this.allKindsMap.get(id), numRows: this.datasetMap.get(id).length});
             }
             fulfill(presentList);
         });

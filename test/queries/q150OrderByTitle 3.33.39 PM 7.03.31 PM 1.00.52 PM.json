@@ -1,0 +1,45 @@
+{
+    "title": "SELECT dept, id, avg WHERE avg == 95 && dept == 'adhe' ORDER BY avg",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept": "cpsc"
+                    }
+                },
+                {
+                    "LT": {
+                        "courses_avg": 65
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ],
+            "ORDER": "courses_title"
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_dept":"cpsc","courses_id":"513","courses_avg":64,
+            "courses_instructor":"mitchell, ian","courses_title":"intgrt sys desgn",
+            "courses_pass":3,"courses_fail":1,"courses_audit":0,"courses_uuid":"46774"},
+        {"courses_dept":"cpsc","courses_id":"513","courses_avg":64,"courses_instructor":"",
+            "courses_title":"intgrt sys desgn","courses_pass":3,"courses_fail":1,"courses_audit":0,
+            "courses_uuid":"46775"},
+        {"courses_dept":"cpsc","courses_id":"213","courses_avg":64.62,"courses_instructor":"munzner, tamara",
+            "courses_title":"intro comp sys","courses_pass":57,"courses_fail":14,"courses_audit":0,
+            "courses_uuid":"83409"}
+    ]
+}

@@ -23,7 +23,12 @@ export default class RoomHelper {
                     const indexTree = parse5.parse(idx);
                     const buildingList = that.getInside(indexTree.childNodes);
                     buildingMap = that.getBuildingInfo(buildingList); // TODO: 判空？
-                    await that.waitGeo(buildingMap);
+                    // await that.waitGeo(buildingMap);
+                    for (let singleBuilding of buildingMap.values()) {
+                        await that.getGeoInfo(singleBuilding).catch((e: any) => {
+                            return reject(new InsightError("Every room should have a geoLocation"));
+                        });
+                    }
                     Log.trace("buildingMap.values() length :" + buildingMap.values());
                     for (let build of buildingMap.values()) {
                         // Log.trace("2");
@@ -70,7 +75,7 @@ export default class RoomHelper {
                 }
                 // Log.trace(roomList.length);
                 for (let roomNode of roomList) {
-                    // Log.trace("into getroom");
+                    // Log.trace("into get room");
                     if (roomNode.nodeName !== "tr"
                         || roomNode.childNodes === undefined || roomNode.childNodes === null) {
                         continue;
@@ -126,16 +131,6 @@ export default class RoomHelper {
             return validSingleRoom;
         } else {
             return null;
-        }
-    }
-
-    public async waitGeo(buildingMap: Map<string, any>) {
-        Log.trace("wait Geo");
-        for (let singleBuilding of buildingMap.values()) {
-            await this.getGeoInfo(singleBuilding).catch((e) => {
-                Log.trace("error:" + e);
-                Log.trace("error when get geo");
-            });
         }
     }
 
