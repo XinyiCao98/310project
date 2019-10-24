@@ -49,14 +49,14 @@ export default class InsightFacade implements IInsightFacade {
                             return reject(response);
                         });
                         break;
-                    case "rooms" :
-                        const roomHelper = new RoomHelper();
-                        roomHelper.addRoom(id, content, currZip, this.datasetMap, this.datasetID)
-                            .then((response: string[]) => {
-                                return fulfill(response);
-                            }, (response: string[]) => {
-                                return reject(response);
-                            });
+                    // case "rooms" :
+                    //     const roomHelper = new RoomHelper();
+                    //     roomHelper.addRoom(id, content, currZip, this.datasetMap, this.datasetID)
+                    //         .then((response: string[]) => {
+                    //             return fulfill(response);
+                    //         }, (response: string[]) => {
+                    //             return reject(response);
+                    //         });
                 }
             }
         );
