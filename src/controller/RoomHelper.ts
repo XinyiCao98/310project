@@ -22,7 +22,7 @@ export default class RoomHelper {
                 try {
                     const indexTree = parse5.parse(idx);
                     const buildingList = that.getInside(indexTree.childNodes);
-                    buildingMap = that.getBuildingInfo(buildingList); // TODO: 判空？
+                    buildingMap = that.getBuildingInfo(buildingList);
                     // await that.waitGeo(buildingMap);
                     for (let singleBuilding of buildingMap.values()) {
                         await that.getGeoInfo(singleBuilding).catch((e: any) => {
@@ -33,7 +33,7 @@ export default class RoomHelper {
                     for (let build of buildingMap.values()) {
                         // Log.trace("2");
                         let path = build["buildingHref"].substring(2); // 取地址
-                        urlList.push(zip.folder("rooms").file(path).async("text")); // TODO
+                        urlList.push(zip.folder("rooms").file(path).async("text"));
                         // Log.trace("1");
                     }
                     Log.trace("url length : " + urlList.length);
@@ -145,12 +145,12 @@ export default class RoomHelper {
     }
 
     public getRoomInfo(childList: any[]): any {
-        let roomNumber: string;
-        let roomName: string;
-        let roomSeats: number;
-        let roomType: string;
-        let roomFurniture: string;
-        let roomHref: string;
+        let roomNumber: string = "";
+        let roomName: string = "";
+        let roomSeats: number = 0;
+        let roomType: string = "";
+        let roomFurniture: string = "";
+        let roomHref: string = "";
         for (let eachChild of childList) {
             if (eachChild.nodeName === "td" && eachChild.attrs[0].name === "class") {
                 let value = eachChild.attrs[0].value.trim();
@@ -206,7 +206,7 @@ export default class RoomHelper {
                             return reject(new InsightError("no lat lon"));
                         }
                     } catch (e) {
-                        return reject("404");
+                        return reject("not able to parse");
                     }
                 });
                 response.on("error", function (e: any) {
@@ -232,14 +232,14 @@ export default class RoomHelper {
                 continue;
             }
             // Log.trace("not tr 2");
-            let buildingFull: string;
-            let buildingShort: string;
-            let buildingAdr: string;
-            let buildingHref: string;
+            let buildingFull: string = "";
+            let buildingShort: string = "";
+            let buildingAdr: string = "";
+            let buildingHref: string = "";
             let buildingLat: number;
             let buildingLon: number;
             if (singleB.childNodes === undefined || singleB.childNodes === null) {
-                return buildingMap;
+                continue;
             }
             for (let singleN of singleB.childNodes) {
                 // Log.trace("step in for loop");
