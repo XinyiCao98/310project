@@ -41,6 +41,8 @@ describe("InsightFacade Add/Remove Dataset", function () {
         noValidRoom: "./test/data/noValidRoom.zip",
         pdfInRoom: "./test/data/pdfInRoom.zip",
         brokenHTM: "./test/data/brokenHTM.zip",
+        emptyHTM: "./test/data/emptyHTM.zip",
+        noRoomFolder: "./test/data/noRoomFolder.zip",
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
@@ -108,6 +110,16 @@ describe("InsightFacade Add/Remove Dataset", function () {
         });
     });
 
+    it("fail to add a room without room folder", function () {
+        const id: string = "noRoomFolder";
+        let expected: string[];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms).then((result: string[]) => {
+            expect.fail(result, expected, "Should have rejected");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(InsightError);
+        });
+    });
+
     it("fail add a valid dataset with incorrect kind 1", function () {
         const id: string = "courses";
         let expected: string[];
@@ -150,6 +162,16 @@ describe("InsightFacade Add/Remove Dataset", function () {
 
     it("fail add a valid dataset with invalid htm", function () {
         const id: string = "brokenHTM";
+        let expected: string[];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms).then((result: string[]) => {
+            expect.fail(result, expected, "Should have rejected");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(InsightError);
+        });
+    });
+
+    it("fail add a valid dataset with empty htm", function () {
+        const id: string = "emptyHTM";
         let expected: string[];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms).then((result: string[]) => {
             expect.fail(result, expected, "Should have rejected");
@@ -540,7 +562,8 @@ describe("InsightFacade Add/Remove Dataset", function () {
         const id2: string = "rooms";
         let expected: string[] = [id2];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
-            return insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Rooms).then((result2: string[]) => {
+            return insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Rooms).
+            then((result2: string[]) => {
                 return insightFacade.removeDataset(id).then((result3: string) => {
                     return insightFacade.listDatasets();
                 }).then((result4: InsightDataset[]) => {

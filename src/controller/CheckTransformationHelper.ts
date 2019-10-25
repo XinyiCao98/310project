@@ -2,57 +2,55 @@ import Log from "../Util";
 import {split} from "ts-node";
 
 export class CheckTransformationHelper {
-     private OperationNames: string[] = ["MAX", "MIN", "AVG" , "SUM", "COUNT"];
-     private NumericOperations: string[] = ["MAX", "MIN", "AVG", "SUM"];
+    private OperationNames: string[] = ["MAX", "MIN", "AVG", "SUM", "COUNT"];
+    private NumericOperations: string[] = ["MAX", "MIN", "AVG", "SUM"];
 
-     private CNProperties: string[] = ["avg", "pass", "fail", "audit", "year"];
-     private RNProperties: string[] = ["lat", "lon", "seats"];
+    private CNProperties: string[] = ["avg", "pass", "fail", "audit", "year"];
+    private RNProperties: string[] = ["lat", "lon", "seats"];
 
-     private CProperties: string[] = ["avg", "pass", "fail", "audit", "year",
-         "dept", "id", "instructor", "title", "uuid"];
+    private CProperties: string[] = ["avg", "pass", "fail", "audit", "year",
+        "dept", "id", "instructor", "title", "uuid"];
 
-      private RProperties: string[] = ["lat", "lon", "seats", "fullname", "shortname",
-          "number", "name", "address", "type", "furniture", "href"];
+    private RProperties: string[] = ["lat", "lon", "seats", "fullname", "shortname",
+        "number", "name", "address", "type", "furniture", "href"];
 
     constructor() {
         //
     }
 
-   public checkTrans(trans: any, options: any, Type: boolean): boolean {
-        if (Object.keys(trans).length !== 2 ||
-            !trans.hasOwnProperty("APPLY") ||
-            !trans.hasOwnProperty("GROUP")) {
+    public checkTrans(trans: any, options: any, Type: boolean): boolean {
+        if (!trans.hasOwnProperty("APPLY") || !trans.hasOwnProperty("GROUP")) {
             return false;
-}
+        }
         if (!this.checkElement(trans, options)) {
-        return false;
-}
+            return false;
+        }
         let apply = trans["APPLY"];
         if (!this.checkApply(apply, Type)) {
             return false;
         }
         this.getNew(apply);
         return true;
-}
+    }
 
-   public checkElement(trans: any, options: any): boolean {
-       let Col = options["COLUMNS"];
-       if (!options.hasOwnProperty("COLUMNS") || !Array.isArray(Col)) {
-           return false;
-}
-       let Group = trans["GROUP"];
-       if (typeof Group !== "string" &&
-        ! Array.isArray(Group)) {
-           return false;
-       }
-       let  EleInTrans = this.ObtainKeys(trans);
-       let p = Object.keys(Col).length;
-       for (let l: number = 0; l < p ; l++ ) {
-           if (!EleInTrans.includes(Col[l])) {
-               return false;
-           }
-       }
-       return true;
+    public checkElement(trans: any, options: any): boolean {
+        let Col = options["COLUMNS"];
+        if (!options.hasOwnProperty("COLUMNS") || !Array.isArray(Col)) {
+            return false;
+        }
+        let Group = trans["GROUP"];
+        if (typeof Group !== "string" &&
+            !Array.isArray(Group)) {
+            return false;
+        }
+        let EleInTrans = this.ObtainKeys(trans);
+        let p = Object.keys(Col).length;
+        for (let l: number = 0; l < p; l++) {
+            if (!EleInTrans.includes(Col[l])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // get all keys inside transformation
@@ -63,14 +61,14 @@ export class CheckTransformationHelper {
         let m = Object.keys(G).length;
         let n = Object.keys(A).length;
         if (typeof G === "string") {
-        EleInT.push(G);
+            EleInT.push(G);
         } else {
-            for (let i: number = 0; i < m ; i++ ) {
+            for (let i: number = 0; i < m; i++) {
                 EleInT.push(G[i]);
             }
         }
-        for (let k: number = 0; k < n ; k++) {
-         EleInT.push(Object.keys(A[k])[0]);
+        for (let k: number = 0; k < n; k++) {
+            EleInT.push(Object.keys(A[k])[0]);
         }
         return EleInT;
     }
@@ -89,10 +87,10 @@ export class CheckTransformationHelper {
         for (let element of apply) {
             let key = Object.keys(element);
             let realkey = key[0];
-            if (typeof(realkey) !== "string") {
+            if (typeof (realkey) !== "string") {
                 return false;
-             }
-            let value  = Object.values(element)[0];
+            }
+            let value = Object.values(element)[0];
             let Operation = Object.keys(value)[0];
             if (this.OperationNames.indexOf(Operation) < 0) {
                 return false;
@@ -105,7 +103,7 @@ export class CheckTransformationHelper {
             if (this.NumericOperations.indexOf(Operation) > 0) {
                 if (standardNP.indexOf(property) < 0) {
                     return false;
-                 }
+                }
             }
         }
         return true;

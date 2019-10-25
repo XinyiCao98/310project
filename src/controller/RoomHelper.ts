@@ -12,6 +12,9 @@ export default class RoomHelper {
     public addRoom(id: string, content: string, currZip: JSZip, datasetMap: Map<string, any[]>,
                    datasetId: string[]): Promise<string[]> {
         return new Promise((fulfill, reject) => {
+            // if (datasetId.indexOf(id) >= 0) {
+            //     throw new InsightError("ID is already existed.");
+            // }
             let buildingMap: Map<string, any> = new Map<string, any>();
             let validRoom: any[] = [];
             let urlList: Array<Promise<string>> = [];
@@ -26,7 +29,7 @@ export default class RoomHelper {
                     // await that.waitGeo(buildingMap);
                     for (let singleBuilding of buildingMap.values()) {
                         await that.getGeoInfo(singleBuilding).catch((e: any) => {
-                            return reject(new InsightError("Every room should have a geoLocation"));
+                            // return reject(new InsightError("Every room should have a geoLocation"));
                         });
                     }
                     Log.trace("buildingMap.values() length :" + buildingMap.values());
@@ -94,9 +97,9 @@ export default class RoomHelper {
                     if (buildingMap.has(bsName)) {
                         building = buildingMap.get(bsName);
                         rooms["roomName"] = bsName + "_" + rooms["roomNumber"];
+                    } else {
+                        continue;
                     }
-                    // Log.trace("has building short name : " + rooms["roomName"]);
-                    // Log.trace("Has valid room or not : " + this.checkCondition(building, rooms, buildingMap, id));
                     if (this.checkCondition(building, rooms, buildingMap, id) !== null) {
                         // Log.trace("has valid room");
                         validRoom.push(this.checkCondition(building, rooms, buildingMap, id));

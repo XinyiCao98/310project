@@ -62,6 +62,7 @@ export default class InsightFacade implements IInsightFacade {
                 } else {
                     return new InsightError("Invalid kind");
                 }
+                // Log.trace(this.datasetID);
             }
         );
     }
