@@ -7,7 +7,8 @@ export default class QueryTree {
     public children: QueryTree[];
     public Columns: string[];
     public Order: string | object;
-
+    public  Group: any;
+    public  Apply: any;
     constructor() {
         this.nodeType = null;
         this.nodeProperty = null;
@@ -15,14 +16,20 @@ export default class QueryTree {
         this.children = [];
         this.Columns = null;
         this.Order = null;
+        this.Group = null;
+        this.Apply = null;
     }
 
     // Build a Query Tree based on a Json File
-    public buildQT(where: any, options: any): QueryTree {
+    public buildQT(where: any, options: any, trans: any): QueryTree {
         let start = Object.keys(where)[0];
         let Col = options["COLUMNS"];
         let ORDER = options["ORDER"];
         let QT = new QueryTree();
+        if ( trans !== "NO TRANSFORMATIONS") {
+            QT.Group = trans["GROUP"];
+            QT.Apply = trans["APPLY"];
+        }
         QT.nodeType = start;
         if (start === "IS" ||
             start === "GT" ||

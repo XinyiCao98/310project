@@ -12,54 +12,48 @@ export default class RoomHelper {
     public addRoom(id: string, content: string, currZip: JSZip, datasetMap: Map<string, any[]>,
                    datasetId: string[]): Promise<string[]> {
         return new Promise((fulfill, reject) => {
-            // if (datasetId.indexOf(id) >= 0) {
-            //     throw new InsightError("ID is already existed.");
-            // }
             let buildingMap: Map<string, any> = new Map<string, any>();
             let validRoom: any[] = [];
             let urlList: Array<Promise<string>> = [];
             const that = this;
             const parse5 = require("parse5");
             currZip.loadAsync(content, {base64: true}).then(async function (zip: any) {
-                const idx = await zip.folder("rooms").file("index.htm").async("text"); // folder("rooms").
                 try {
+                    const idx = await zip.folder("rooms").file("index.htm").async("text");
                     const indexTree = parse5.parse(idx);
                     const buildingList = that.getInside(indexTree.childNodes);
-                    buildingMap = that.getBuildingInfo(buildingList);
+                    if (buildingList !== null && buildingList !== undefined) {
+                        buildingMap = that.getBuildingInfo(buildingList);
+                    }
                     // await that.waitGeo(buildingMap);
                     for (let singleBuilding of buildingMap.values()) {
                         await that.getGeoInfo(singleBuilding).catch((e: any) => {
                             // return reject(new InsightError("Every room should have a geoLocation"));
                         });
                     }
-                    Log.trace("buildingMap.values() length :" + buildingMap.values());
                     for (let build of buildingMap.values()) {
-                        // Log.trace("2");
                         let path = build["buildingHref"].substring(2); // 取地址
                         urlList.push(zip.folder("rooms").file(path).async("text"));
-                        // Log.trace("1");
                     }
-                    Log.trace("url length : " + urlList.length);
-                    // Log.trace(urlList[1]);
                     Promise.all(urlList).then((ele: any) => {
                         validRoom = that.gatherValid(ele, buildingMap, id);
                         if (validRoom.length === 0) {
-                            // Log.trace("11");
                             return reject(new InsightError("There is no valid room"));
                         } else {
-                            // Log.trace("111");
-                            that.writeToDisk(validRoom, id);
-                            // Log.trace("1111");
-                            datasetId.push(id);
-                            datasetMap.set(id, validRoom);
-                            fulfill(datasetId);
+                            try {
+                                that.writeToDisk(validRoom, id);
+                                datasetId.push(id);
+                                datasetMap.set(id, validRoom);
+                                fulfill(datasetId);
+                            } catch (e) {
+                                return reject(new InsightError("Fail to write to disk"));
+                            }
                         }
                     });
                 } catch (e) {
                     return reject(new InsightError("ALl kinds of errors inside try"));
                 }
             }).catch((e: any) => {
-                Log.trace(e);
                 reject(new InsightError("This is not a htm"));
             });
         });
@@ -73,40 +67,33 @@ export default class RoomHelper {
                 let eachBuilding = parse5.parse(source);
                 let roomList = this.getInside(eachBuilding.childNodes);
                 if (roomList === null || roomList === undefined) {
-                    // Log.trace("room invalid");
-                    return roomList;
+                    continue;
                 }
-                // Log.trace(roomList.length);
                 for (let roomNode of roomList) {
-                    // Log.trace("into get room");
+                    if (roomNode === null || roomNode === undefined) {
+                        continue;
+                    }
                     if (roomNode.nodeName !== "tr"
                         || roomNode.childNodes === undefined || roomNode.childNodes === null) {
                         continue;
                     }
                     let childList = roomNode.childNodes;
-                    // Log.trace("before get room");
                     let rooms = this.getRoomInfo(childList);
-                    // Log.trace("after get room : " + rooms);
                     let href = rooms["roomHref"];
-                    // Log.trace(href);
                     let l = href.lastIndexOf("/");
-                    // Log.trace("l is : " + l);
                     let building;
-                    let bsName = rooms["roomHref"].substring(l + 1).split("-")[0];
-                    // Log.trace("before");
+                    let bsName = href.substring(l + 1).split("-")[0];
                     if (buildingMap.has(bsName)) {
                         building = buildingMap.get(bsName);
-                        rooms["roomName"] = bsName + "_" + rooms["roomNumber"];
+                        rooms["roomName"] = building["buildingShort"] + "_" + rooms["roomNumber"];
                     } else {
                         continue;
                     }
                     if (this.checkCondition(building, rooms, buildingMap, id) !== null) {
-                        // Log.trace("has valid room");
                         validRoom.push(this.checkCondition(building, rooms, buildingMap, id));
                     }
                 }
             }
-            // Log.trace(validRoom.length);
             return validRoom;
         } catch (e) {
             //
@@ -123,13 +110,13 @@ export default class RoomHelper {
             building["buildingLon"] !== 0 &&
             typeof building["buildingLon"] === "number" &&
             typeof rooms["roomNumber"] === "string" && typeof rooms["roomName"] === "string" &&
-            typeof rooms["roomSeats"] === "string" && typeof rooms["roomType"] === "string" &&
+            typeof rooms["roomSeats"] === "number" && typeof rooms["roomType"] === "string" &&
             typeof rooms["roomFurniture"] === "string" && typeof rooms["roomHref"] === "string") {
             let validSingleRoom: { [k: string]: number | string } = {
                 [id + "_fullname"]: building["buildingFull"], [id + "_shortname"]: building["buildingShort"],
                 [id + "_number"]: rooms["roomNumber"], [id + "_name"]: rooms["roomName"],
                 [id + "_address"]: building["buildingAdr"], [id + "_lat"]: building["buildingLat"],
-                [id + "_lon"]: building["buildingLon"], [id + "_seats"]: parseInt(rooms["roomSeats"], 10),
+                [id + "_lon"]: building["buildingLon"], [id + "_seats"]: rooms["roomSeats"],
                 [id + "_type"]: rooms["roomType"], [id + "_furniture"]: rooms["roomFurniture"],
                 [id + "_href"]: building["buildingHref"],
             };
@@ -165,7 +152,7 @@ export default class RoomHelper {
                         roomHref = eachChild.childNodes[1].attrs[0].value;
                     }
                 } else if (value === "views-field views-field-field-room-capacity") {
-                    roomSeats = eachChild.childNodes[0].value;
+                    roomSeats = parseInt(eachChild.childNodes[0].value, 10);
                 } else if (value === "views-field views-field-field-room-furniture") {
                     roomFurniture = eachChild.childNodes[0].value.trim();
                 } else if (value === "views-field views-field-field-room-type") {
@@ -185,25 +172,21 @@ export default class RoomHelper {
     }
 
     public async getGeoInfo(buildingList: any): Promise<any> {
-        let address = buildingList["buildingAdr"];
-        address = this.transAdr(address);
-        let link = "http://cs310.students.cs.ubc.ca:11316/api/v1/project_team054/" + address;
-        // Log.trace(link);
-        let http = require("http");
         return new Promise((fulfill, reject) => {
+            let address = buildingList["buildingAdr"];
+            address = this.transAdr(address);
+            let link = "http://cs310.students.cs.ubc.ca:11316/api/v1/project_team054/" + address;
+            let http = require("http");
             http.get(link, (response: any) => {
                 response.setEncoding("utf8");
-                // Log.trace("get link");
                 let result = "";
                 response.on("data", function (chunk: any) {
                     result += chunk;
-                    // Log.trace("add chunk");
                 });
                 response.on("end", function () {
                     try {
                         const afterParse: any = JSON.parse(result);
                         if (afterParse.hasOwnProperty("lat") && afterParse.hasOwnProperty("lon")) {
-                            // Log.trace("LAT :" + afterParse.lat);
                             buildingList["buildingLat"] = afterParse.lat;
                             buildingList["buildingLon"] = afterParse.lon;
                             return fulfill(buildingList);
@@ -228,15 +211,13 @@ export default class RoomHelper {
 
     public getBuildingInfo(buildingNodes: any[]): any {
         let buildingMap: Map<string, any> = new Map<string, any>();
-        if (buildingNodes === undefined || buildingNodes === null) {
-            return buildingMap;
-        }
+        // if (buildingNodes === undefined || buildingNodes === null) {
+        //     return buildingMap;
+        // }
         for (let singleB of buildingNodes) {
             if (singleB.nodeName !== "tr") {
-                // Log.trace("not tr 1");
                 continue;
             }
-            // Log.trace("not tr 2");
             let buildingFull: string = "";
             let buildingShort: string = "";
             let buildingAdr: string = "";
@@ -247,9 +228,8 @@ export default class RoomHelper {
                 continue;
             }
             for (let singleN of singleB.childNodes) {
-                // Log.trace("step in for loop");
-                if (singleN.nodeName === "td" && singleN.attrs[0].name === "class") {
-                    // Log.trace("find td");
+                if (singleN.attrs !== null && singleN.attrs !== undefined &&
+                    singleN.nodeName === "td" && singleN.attrs[0].name === "class") {
                     if (singleN.attrs[0].value === "views-field views-field-title") {
                         buildingHref = singleN.childNodes[1].attrs[0].value;
                         buildingFull = singleN.childNodes[1].childNodes[0].value.trim();

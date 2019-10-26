@@ -1,0 +1,36 @@
+{"title": "test with Complex ORDER DOWN Without TRANS 2 keys",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept": "chin"
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg": 80
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id",
+                "courses_avg",
+                "courses_instructor"
+            ],
+            "ORDER": {
+                "keys": [
+                    "courses_id",
+                    "courses_avg"
+                ],
+                "dir": "DOWN"
+            }
+        }
+    },
+    "isQueryValid":true,
+"result":[{"courses_id":"463","courses_avg":81.6,"courses_instructor":""},{"courses_id":"463","courses_avg":81.6,"courses_instructor":""},{"courses_id":"431","courses_avg":80.08,"courses_instructor":"chiu-duke, josephine"},{"courses_id":"413","courses_avg":83.75,"courses_instructor":""},{"courses_id":"413","courses_avg":83.75,"courses_instructor":"bailey, c. d. alison"},{"courses_id":"411","courses_avg":86.13,"courses_instructor":""},{"courses_id":"411","courses_avg":86.13,"courses_instructor":"rea, christopher"},{"courses_id":"411","courses_avg":82.63,"courses_instructor":""},{"courses_id":"411","courses_avg":82.63,"courses_instructor":"bailey, c. d. alison"},{"courses_id":"323","courses_avg":82.95,"courses_instructor":"zheng, ming fang"},{"courses_id":"323","courses_avg":80.17,"courses_instructor":"lu, ming zhu"},{"courses_id":"321","courses_avg":82.9,"courses_instructor":"zheng, ming fang"},{"courses_id":"321","courses_avg":80.11,"courses_instructor":""},{"courses_id":"317","courses_avg":81,"courses_instructor":"cheng, maorong"},{"courses_id":"317","courses_avg":80.25,"courses_instructor":""},{"courses_id":"315","courses_avg":80.1,"courses_instructor":"cheng, maorong"},{"courses_id":"307","courses_avg":81.45,"courses_instructor":""},{"courses_id":"307","courses_avg":81.45,"courses_instructor":"li, duanduan"},{"courses_id":"307","courses_avg":80.33,"courses_instructor":""},{"courses_id":"307","courses_avg":80.33,"courses_instructor":"li, duanduan"},{"courses_id":"307","courses_avg":80.11,"courses_instructor":""},{"courses_id":"307","courses_avg":80.11,"courses_instructor":"li, duanduan"},{"courses_id":"305","courses_avg":81.91,"courses_instructor":""},{"courses_id":"305","courses_avg":81.91,"courses_instructor":"li, duanduan"},{"courses_id":"305","courses_avg":80.13,"courses_instructor":""},{"courses_id":"305","courses_avg":80.13,"courses_instructor":"li, duanduan"},{"courses_id":"303","courses_avg":82.17,"courses_instructor":""},{"courses_id":"303","courses_avg":82.17,"courses_instructor":"xia, wei"},{"courses_id":"303","courses_avg":80.5,"courses_instructor":""},{"courses_id":"303","courses_avg":80.5,"courses_instructor":"wu, xinxin"},{"courses_id":"301","courses_avg":81.5,"courses_instructor":""},{"courses_id":"301","courses_avg":81.5,"courses_instructor":"xia, wei"},{"courses_id":"218","courses_avg":84.5,"courses_instructor":""},{"courses_id":"218","courses_avg":84.5,"courses_instructor":""},{"courses_id":"218","courses_avg":84.2,"courses_instructor":"li, tianming"},{"courses_id":"218","courses_avg":84.2,"courses_instructor":""},{"courses_id":"218","courses_avg":82,"courses_instructor":""},{"courses_id":"218","courses_avg":82,"courses_instructor":"li, tianming"},{"courses_id":"217","courses_avg":82.33,"courses_instructor":"zheng, ming fang"},{"courses_id":"217","courses_avg":82.33,"courses_instructor":""},{"courses_id":"217","courses_avg":82.23,"courses_instructor":"zheng, ming fang"},{"courses_id":"217","courses_avg":82.23,"courses_instructor":""},{"courses_id":"215","courses_avg":81.35,"courses_instructor":""},{"courses_id":"215","courses_avg":81.35,"courses_instructor":""},{"courses_id":"214","courses_avg":80.53,"courses_instructor":""},{"courses_id":"214","courses_avg":80.53,"courses_instructor":"lu, ming zhu"},{"courses_id":"213","courses_avg":82.8,"courses_instructor":""},{"courses_id":"213","courses_avg":82.8,"courses_instructor":"zheng, ming fang"},{"courses_id":"213","courses_avg":82.69,"courses_instructor":"zheng, ming fang"},{"courses_id":"213","courses_avg":81.4,"courses_instructor":"zheng, ming fang"},{"courses_id":"211","courses_avg":81,"courses_instructor":"zheng, ming fang"},{"courses_id":"211","courses_avg":81,"courses_instructor":""},{"courses_id":"211","courses_avg":80.53,"courses_instructor":"zheng, ming fang"},{"courses_id":"211","courses_avg":80.19,"courses_instructor":""},{"courses_id":"211","courses_avg":80.19,"courses_instructor":""},{"courses_id":"208","courses_avg":80.5,"courses_instructor":""},{"courses_id":"208","courses_avg":80.5,"courses_instructor":"yang, liqiong"},{"courses_id":"204","courses_avg":80.56,"courses_instructor":""},{"courses_id":"204","courses_avg":80.56,"courses_instructor":""},{"courses_id":"117","courses_avg":82.22,"courses_instructor":"chen, hsueh ni"},{"courses_id":"115","courses_avg":83.83,"courses_instructor":"chen, hsueh ni"},{"courses_id":"103","courses_avg":82.58,"courses_instructor":"chen, hsueh ni"},{"courses_id":"103","courses_avg":80.96,"courses_instructor":"chen, hsueh ni"},{"courses_id":"103","courses_avg":80.82,"courses_instructor":"chen, hsueh ni"},{"courses_id":"103","courses_avg":80.67,"courses_instructor":"chen, hsueh ni"},{"courses_id":"103","courses_avg":80.11,"courses_instructor":"chen, hsueh ni"},{"courses_id":"101","courses_avg":84.24,"courses_instructor":"chen, hsueh ni"},
+    {"courses_id":"101","courses_avg":83.79,"courses_instructor":"chen, hsueh ni"}]}
+
+

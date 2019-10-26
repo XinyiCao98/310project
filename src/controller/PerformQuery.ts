@@ -3,7 +3,7 @@ import QueryTree from "./QueryTree";
 import Log from "../Util";
 import {InsightDataset, InsightError} from "./IInsightFacade";
 import {split} from "ts-node";
-
+import PerformOrderHelper from "./PerformOrderHelper";
 export default class PerformQuery {
     public idStr: string;
 
@@ -204,24 +204,25 @@ return false;
     }
 
     // Sort an array of objects by numerical properties
-    public SortbyNP(Expected: object[], Property: string| object): any {
-        let cfirst: { [key: string]: any };
-        let csecond: { [key: string]: any };
-        // if (! this.checkID(Property, this.idStr)) { return false; }
+    public Order(Expected: object[], Property: string| object): any {
+        const PQueryHelper = new PerformOrderHelper();
         if (typeof Property === "string") {
-        Expected.sort((cone, ctwo) => {
-            cfirst = cone;
-            csecond = ctwo;
-            if (cfirst[Property] > csecond[Property]) {
-                return 1;
-            }
-            if (cfirst[Property] < csecond [Property]) {
-                return -1;
-            }
-            return 0;
-        });
-}
-        return Expected;
+         return PQueryHelper.OrderByString(Expected, Property);
+
+     } else {
+          let keys: string[];
+          let dir: string;
+          let values = Object.values(Property);
+          if (typeof values[1] === "string") {
+              dir = values[1];
+              keys = values[0];
+          } else {
+              dir = values[0];
+              keys = values[1];
+          }
+          return PQueryHelper.OrderByObject(Expected, keys, dir);
+
+        }
     }
 
     public FindIntersection(ArrayOne: object[], ArrayTwo: object[], UniqueProperty: string): object[] {

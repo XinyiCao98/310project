@@ -14,6 +14,7 @@ import Datasets from "./Datasets";
 import PerformQuery from "./PerformQuery";
 import QueryTree from "./QueryTree";
 import RoomHelper from "./RoomHelper";
+import PerformTransHelper from "./PerformTransHelper";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -30,7 +31,7 @@ export default class InsightFacade implements IInsightFacade {
     // private validSection: any[] = [];
 
     constructor() {
-        Log.trace("InsightFacadeImpl::init()");
+        //
     }
 
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
@@ -42,7 +43,6 @@ export default class InsightFacade implements IInsightFacade {
                 } catch (e) {
                     reject(new InsightError(e));
                 }
-                // Log.trace("enter addDataset");
                 if (kind === InsightDatasetKind.Courses) {
                     this.addCourse(id, content, currZip).then((response: string[]) => {
                         this.allKindsMap.set(id, kind);
@@ -62,7 +62,6 @@ export default class InsightFacade implements IInsightFacade {
                 } else {
                     return new InsightError("Invalid kind");
                 }
-                // Log.trace(this.datasetID);
             }
         );
     }
@@ -74,10 +73,8 @@ export default class InsightFacade implements IInsightFacade {
             // unzip my current zip file
             const that = this;
             currZip.loadAsync(content, {base64: true}).then(function (zipInfo) {
-                // Log.trace("before get folder " + id);
                 zipInfo.folder("courses").forEach(function (relativePath, file) {
                     try {
-                        // Log.trace("async path");
                         promiseArray.push(file.async("text"));
                     } catch {
                         reject(new InsightError("File cannot be converted to text"));
@@ -99,11 +96,9 @@ export default class InsightFacade implements IInsightFacade {
                         fulfill(that.datasetID);
                     }
                 }).catch(function (e) {
-                    // Log.trace("Empty promise list");
                     reject(new InsightError("This is no item in promise list"));
                 });
             }).catch(function (e) {
-                // Log.trace("not zip");
                 reject(new InsightError("This is not a zip"));
             });
         });
@@ -154,7 +149,6 @@ export default class InsightFacade implements IInsightFacade {
                             [id + "_uuid"]: uuid, [id + "_year"]: year
                         };
                         validSection.push(validSec);
-                        // Log.trace("add valid section successful");
                     }
                 } catch {
                     // If an individual file is invalid for any reason, skip over it
@@ -200,6 +194,7 @@ export default class InsightFacade implements IInsightFacade {
 
     public performQuery(query: any): Promise<any[]> {
         const helper = new CheckQueryHelper();
+        const transHelp = new PerformTransHelper();
         let validorNot = helper.CheckQuery(query);
         let Output: any;
         if (!validorNot) {
@@ -213,32 +208,36 @@ export default class InsightFacade implements IInsightFacade {
         if (ObjectArray === undefined) {
             return Promise.reject(new InsightError("Datasets not exists"));
         }
-        // Log.trace(ObjectArray);
         let filter = query["WHERE"];
         let selection = query["OPTIONS"];
         let QueryTR = new QueryTree();
-        let Qtree = QueryTR.buildQT(filter, selection);
-        let Col = Qtree.Columns;
-        let Ord = Qtree.Order;
+        let trans = "NO TRANSFORMATIONS";
+        if (query.hasOwnProperty("TRANSFORMATIONS")) {
+            trans = query["TRANSFORMATIONS"];
+        }
+        let Qtree = QueryTR.buildQT(filter, selection, trans);
         if (Object.keys(query["WHERE"]).length === 0 &&
             Object.keys(ObjectArray).length > 5000) {
             return Promise.reject(new ResultTooLargeError("ResultTooLargeError"));
         }
         if (Object.keys(query["WHERE"]).length === 0 &&
             Object.keys(ObjectArray).length <= 5000) {
-            Output = PQ.PerformColumns(Col, ObjectArray);
+            Output = PQ.PerformColumns(Qtree.Columns, ObjectArray);
             if (Object.keys(query["OPTIONS"]).length === 2) {
-                Output = PQ.SortbyNP(Output, Ord);
+                Output = PQ.Order(Output, Qtree.Order);
             }
             return Promise.resolve(Output);
         }
         Output = PQ.GetResult(ObjectArray, Qtree);
-        Output = PQ.PerformColumns(Col, Output);
+        if (query.hasOwnProperty("TRANSFORMATIONS")) {
+            Output = transHelp.performTrans(Output, Qtree.Group, Qtree.Apply);
+        }
+        Output = PQ.PerformColumns(Qtree.Columns, Output);
         if (Object.keys(query["OPTIONS"]).length === 2) {
-            Output = PQ.SortbyNP(Output, Ord);
+            Output = PQ.Order(Output, Qtree.Order);
         }
         // if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
-        Output = PQ.PerformColumns(Col, Output);
+        Output = PQ.PerformColumns(Qtree.Columns, Output);
         if (Output.length > 5000) {
             return Promise.reject(new ResultTooLargeError("ResultTooLargeError"));
         }
@@ -249,7 +248,6 @@ export default class InsightFacade implements IInsightFacade {
       const CheckQhelper = new CheckQueryHelper();
       let filtered = CheckQhelper.ElementInColFiltered(query);
       let uniqueID = filtered[0].split("_")[0];
-      Log.trace(uniqueID);
       return uniqueID;
     }
 

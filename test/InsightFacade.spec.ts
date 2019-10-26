@@ -655,7 +655,6 @@ describe("InsightFacade PerformQuery", () => {
             const ds = datasetsToQuery[key];
             const data = fs.readFileSync(ds.path).toString("base64");
             loadDatasetPromises.push(insightFacade.addDataset(ds.id, data, ds.kind));
-            Log.trace("ADDING!!!!!!!!!!");
         }
         return Promise.all(loadDatasetPromises).catch((err) => {
             /* *IMPORTANT NOTE: This catch is to let this run even without the implemented addDataset,
