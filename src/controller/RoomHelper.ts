@@ -119,6 +119,8 @@ export default class RoomHelper {
             typeof building["buildingAdr"] === "string" &&
             typeof building["buildingHref"] === "string" &&
             typeof building["buildingLat"] === "number" &&
+            building["buildingLat"] !== 0 &&
+            building["buildingLon"] !== 0 &&
             typeof building["buildingLon"] === "number" &&
             typeof rooms["roomNumber"] === "string" && typeof rooms["roomName"] === "string" &&
             typeof rooms["roomSeats"] === "string" && typeof rooms["roomType"] === "string" &&
@@ -239,8 +241,8 @@ export default class RoomHelper {
             let buildingShort: string = "";
             let buildingAdr: string = "";
             let buildingHref: string = "";
-            let buildingLat: number;
-            let buildingLon: number;
+            let buildingLat: number = 0;
+            let buildingLon: number = 0;
             if (singleB.childNodes === undefined || singleB.childNodes === null) {
                 continue;
             }
