@@ -5,8 +5,6 @@
             "GT": {
                 "rooms_seats": 250
             }
-
-
         },
         "OPTIONS": {
             "COLUMNS": [
@@ -15,7 +13,9 @@
             ],
             "ORDER": {
                 "dir": "DOWN",
-                "keys": ["maxSeats"]
+                "keys": [
+                    "maxSeats"
+                ]
             }
         },
         "TRANSFORMATIONS": {
@@ -31,6 +31,59 @@
             ]
         }
     },
-    "isQueryValid":true,
-    "result":[{"maxSeats":503,"rooms_fullname":"Woodward (Instructional Resources Centre-IRC)"},{"maxSeats":442,"rooms_fullname":"Robert F. Osborne Centre"},{"maxSeats":426,"rooms_fullname":"Centre for Interactive  Research on Sustainability"},{"maxSeats":375,"rooms_fullname":"Hebb"},{"maxSeats":350,"rooms_fullname":"Earth Sciences Building"},{"maxSeats":350,"rooms_fullname":"Life Sciences Centre"},{"maxSeats":325,"rooms_fullname":"Wesbrook"},{"maxSeats":299,"rooms_fullname":"Student Recreation Centre"},{"maxSeats":280,"rooms_fullname":"Neville Scarfe"},{"maxSeats":275,"rooms_fullname":"Buchanan"},{"maxSeats":265,"rooms_fullname":"Chemistry"},{"maxSeats":260,"rooms_fullname":"Henry Angus"},
-        {"maxSeats":257,"rooms_fullname":"Hennings"}]}
+    "isQueryValid": true,
+    "result": [
+        {
+            "maxSeats": 503,
+            "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+        },
+        {
+            "maxSeats": 442,
+            "rooms_fullname": "Robert F. Osborne Centre"
+        },
+        {
+            "maxSeats": 426,
+            "rooms_fullname": "Centre for Interactive  Research on Sustainability"
+        },
+        {
+            "maxSeats": 375,
+            "rooms_fullname": "Hebb"
+        },
+        {
+            "maxSeats": 350,
+            "rooms_fullname": "Earth Sciences Building"
+        },
+        {
+            "maxSeats": 350,
+            "rooms_fullname": "Life Sciences Centre"
+        },
+        {
+            "maxSeats": 325,
+            "rooms_fullname": "Wesbrook"
+        },
+        {
+            "maxSeats": 299,
+            "rooms_fullname": "Student Recreation Centre"
+        },
+        {
+            "maxSeats": 280,
+            "rooms_fullname": "Neville Scarfe"
+        },
+        {
+            "maxSeats": 275,
+            "rooms_fullname": "Buchanan"
+        },
+        {
+            "maxSeats": 265,
+            "rooms_fullname": "Chemistry"
+        },
+        {
+            "maxSeats": 260,
+            "rooms_fullname": "Henry Angus"
+        },
+        {
+            "maxSeats": 257,
+            "rooms_fullname": "Hennings"
+        }
+    ]
+}

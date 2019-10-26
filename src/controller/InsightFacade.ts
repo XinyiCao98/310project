@@ -1,4 +1,3 @@
-import Log from "../Util";
 import {
     IInsightFacade,
     InsightDataset,
@@ -41,7 +40,7 @@ export default class InsightFacade implements IInsightFacade {
                 try {
                     this.checkInput(id);
                 } catch (e) {
-                    reject(new InsightError(e));
+                    return reject(new InsightError(e));
                 }
                 if (kind === InsightDatasetKind.Courses) {
                     this.addCourse(id, content, currZip).then((response: string[]) => {
@@ -60,7 +59,7 @@ export default class InsightFacade implements IInsightFacade {
                             return reject(response);
                         });
                 } else {
-                    return new InsightError("Invalid kind");
+                    return reject(new InsightError("Invalid kind"));
                 }
             }
         );
@@ -130,7 +129,7 @@ export default class InsightFacade implements IInsightFacade {
             }
             for (const singleSection of sectionArray) {
                 try {
-                    if (this.checkselection(singleSection)) {
+                    if (this.checkSelection(singleSection)) {
                         const dept = singleSection.Subject;
                         const cid = singleSection.Course;
                         const avg = singleSection.Avg;
@@ -195,9 +194,9 @@ export default class InsightFacade implements IInsightFacade {
     public performQuery(query: any): Promise<any[]> {
         const helper = new CheckQueryHelper();
         const transHelp = new PerformTransHelper();
-        let validorNot = helper.CheckQuery(query);
+        let validOrNot = helper.CheckQuery(query);
         let Output: any;
-        if (!validorNot) {
+        if (!validOrNot) {
             return Promise.reject(new InsightError("Invalid Query"));
         }
         const target = this.getQueryID(query);
@@ -245,10 +244,9 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public getQueryID(query: any): string {
-      const CheckQhelper = new CheckQueryHelper();
-      let filtered = CheckQhelper.ElementInColFiltered(query);
-      let uniqueID = filtered[0].split("_")[0];
-      return uniqueID;
+        const CheckQhelper = new CheckQueryHelper();
+        let filtered = CheckQhelper.ElementInColFiltered(query);
+        return filtered[0].split("_")[0];
     }
 
     public listDatasets(): Promise<InsightDataset[]> {
@@ -261,7 +259,7 @@ export default class InsightFacade implements IInsightFacade {
         });
     }
 
-    public checkselection(singleSection: any): boolean {
+    public checkSelection(singleSection: any): boolean {
         if (typeof singleSection.Subject === "string" && typeof singleSection.Course === "string"
             && typeof singleSection.Avg === "number" && typeof singleSection.Professor === "string"
             && typeof singleSection.Title === "string" && typeof singleSection.Pass === "number"
@@ -276,7 +274,6 @@ export default class InsightFacade implements IInsightFacade {
         if (singleSection.Section === "overall") {
             return 1900;
         }
-        let output = parseInt(singleSection.Year, 10);
-        return output;
+        return parseInt(singleSection.Year, 10);
     }
 }

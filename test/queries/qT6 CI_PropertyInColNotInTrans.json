@@ -1,11 +1,11 @@
-{"title": "Invalid test with Finding MIN FAIL",
+{
+    "title": "Invalid test with Finding MIN FAIL",
     "query": {
         "WHERE": {
             "GT": {
                 "courses_fail": 60
             }
-        }
-    ,
+        },
         "OPTIONS": {
             "COLUMNS": [
                 "minFail",

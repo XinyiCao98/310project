@@ -2,20 +2,51 @@
     "title": "seats>300",
     "query": {
         "WHERE": {
-                "GT":{
-                    "rooms_seats":300
-                }
-
+            "GT": {
+                "rooms_seats": 300
+            }
         },
         "OPTIONS": {
             "COLUMNS": [
                 "rooms_seats",
                 "rooms_fullname"
-
             ],
             "ORDER": "rooms_seats"
         }
     },
-    "isQueryValid":true,
-"result":[{"rooms_seats":325,"rooms_fullname":"Wesbrook"},{"rooms_seats":350,"rooms_fullname":"Earth Sciences Building"},{"rooms_seats":350,"rooms_fullname":"Life Sciences Centre"},{"rooms_seats":350,"rooms_fullname":"Life Sciences Centre"},{"rooms_seats":375,"rooms_fullname":"Hebb"},{"rooms_seats":426,"rooms_fullname":"Centre for Interactive  Research on Sustainability"},{"rooms_seats":442,"rooms_fullname":"Robert F. Osborne Centre"},
-    {"rooms_seats":503,"rooms_fullname":"Woodward (Instructional Resources Centre-IRC)"}]}
+    "isQueryValid": true,
+    "result": [
+        {
+            "rooms_seats": 325,
+            "rooms_fullname": "Wesbrook"
+        },
+        {
+            "rooms_seats": 350,
+            "rooms_fullname": "Earth Sciences Building"
+        },
+        {
+            "rooms_seats": 350,
+            "rooms_fullname": "Life Sciences Centre"
+        },
+        {
+            "rooms_seats": 350,
+            "rooms_fullname": "Life Sciences Centre"
+        },
+        {
+            "rooms_seats": 375,
+            "rooms_fullname": "Hebb"
+        },
+        {
+            "rooms_seats": 426,
+            "rooms_fullname": "Centre for Interactive  Research on Sustainability"
+        },
+        {
+            "rooms_seats": 442,
+            "rooms_fullname": "Robert F. Osborne Centre"
+        },
+        {
+            "rooms_seats": 503,
+            "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+        }
+    ]
+}

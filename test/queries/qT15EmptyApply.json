@@ -17,65 +17,48 @@
         },
         "OPTIONS": {
             "COLUMNS": [
-                "maxPass",
                 "courses_id"
-            ],
-            "ORDER": "maxPass"
+            ]
         },
         "TRANSFORMATIONS": {
             "GROUP": [
                 "courses_id"
             ],
             "APPLY": [
-                {
-                    "maxPass": {
-                        "MAX": "courses_pass"
-                    }
-                }
             ]
         }
     },
     "isQueryValid": true,
     "result": [
         {
-            "maxPass": 1,
-            "courses_id": "589"
-        },
-        {
-            "maxPass": 6,
-            "courses_id": "503"
-        },
-        {
-            "maxPass": 7,
-            "courses_id": "522"
-        },
-        {
-            "maxPass": 8,
-            "courses_id": "449"
-        },
-        {
-            "maxPass": 8,
-            "courses_id": "501"
-        },
-        {
-            "maxPass": 9,
-            "courses_id": "527"
-        },
-        {
-            "maxPass": 16,
             "courses_id": "445"
         },
         {
-            "maxPass": 19,
-            "courses_id": "507"
+            "courses_id": "449"
         },
         {
-            "maxPass": 22,
             "courses_id": "490"
         },
         {
-            "maxPass": 59,
+            "courses_id": "501"
+        },
+        {
+            "courses_id": "503"
+        },
+        {
+            "courses_id": "507"
+        },
+        {
+            "courses_id": "522"
+        },
+        {
+            "courses_id": "527"
+        },
+        {
             "courses_id": "540"
+        },
+        {
+            "courses_id": "589"
         }
     ]
 }

@@ -70,14 +70,12 @@ export class CheckQueryHelper {
         }
 
 // columns exists plus it is an array
-        if (! this.CheckOptions(options, type, filtered)) {
+        if (!this.CheckOptions(options, type, filtered)) {
             return false;
         }
-        if (!this.checkWhere(where, type)) {
-            return false;
-        }
-        return true;
-}
+        return this.checkWhere(where, type);
+
+    }
 
     public checkWhere(where: any, Type: boolean): boolean {
         if (Object.keys(where).length === 0) {
@@ -121,45 +119,42 @@ export class CheckQueryHelper {
                 let val = Filtered[i].split("_")[1];
                 if (standard.indexOf(val) < 0 || pre !== this.tempID) {
                     return false;
-                 }
+                }
             }
             return true;
         }
     }
 
     public CheckOrd(Col: string[], Ord: any): boolean { // Check if element inside order is valid
-        if (Col === null ) {
+        if (Col === null) {
             return false;
         }
         if (typeof Ord === "string") {
-            if (Col.indexOf(Ord) < 0) {
-                return false;
-            }
-            return true;
+            return Col.indexOf(Ord) >= 0;
         }
         if (typeof Ord === "object") {
-         if (Object.keys(Ord).length !== 2) {
-         return false;
-         }
-         let keyOne = Object.keys(Ord)[0];
-         let keyTwo = Object.keys(Ord)[1];
-         if (keyOne === keyTwo || this.keyInOrder.indexOf(keyOne) < 0 ||
-          this.keyInOrder.indexOf(keyTwo) < 0) {
-             return false;
-         }
-         let vOne = Ord["keys"];
-         let vTwo = Ord["dir"];
-         if (this.keyInDir.indexOf(vTwo) < 0 || vOne === null ||
-             typeof vOne !== "object" || Object.keys(vOne).length < 1) {
-             return false;
-         }
-         let OrderKeys: string[] = Object.values(vOne);
-         for (let KIO of OrderKeys) {
-             if (Col.indexOf(KIO) < 0) {
-                 return false;
-             }
-         }
-         return true;
+            if (Object.keys(Ord).length !== 2) {
+                return false;
+            }
+            let keyOne = Object.keys(Ord)[0];
+            let keyTwo = Object.keys(Ord)[1];
+            if (keyOne === keyTwo || this.keyInOrder.indexOf(keyOne) < 0 ||
+                this.keyInOrder.indexOf(keyTwo) < 0) {
+                return false;
+            }
+            let vOne = Ord["keys"];
+            let vTwo = Ord["dir"];
+            if (this.keyInDir.indexOf(vTwo) < 0 || vOne === null ||
+                typeof vOne !== "object" || Object.keys(vOne).length < 1) {
+                return false;
+            }
+            let OrderKeys: string[] = Object.values(vOne);
+            for (let KIO of OrderKeys) {
+                if (Col.indexOf(KIO) < 0) {
+                    return false;
+                }
+            }
+            return true;
         }
         return false;
     }
@@ -169,7 +164,7 @@ export class CheckQueryHelper {
         if (!this.queryOrNot(ItemInComparator) || Object.keys(ItemInComparator).length !== 1) {
             return false;
         }
-        let standardN =  this.CNProperties;
+        let standardN = this.CNProperties;
         if (Type === true) {
             standardN = this.RNProperties;
         }
@@ -238,7 +233,7 @@ export class CheckQueryHelper {
         if (query === null || !this.queryOrNot(query) ||
             !query.hasOwnProperty("WHERE") || !query.hasOwnProperty("OPTIONS") ||
             !this.queryOrNot(query["WHERE"]) || !this.queryOrNot(query["OPTIONS"]) || // first layer has be queries
-            Object.keys(query).length < 2 ||  Object.keys(query["OPTIONS"]).length > 3 || // edited for D2
+            Object.keys(query).length < 2 || Object.keys(query["OPTIONS"]).length > 3 || // edited for D2
             Object.keys(query["OPTIONS"]).length === 0 || Object.keys(query["WHERE"]).length > 1) {
             return false;
         }
@@ -257,17 +252,17 @@ export class CheckQueryHelper {
         let ElementsInCol = query["OPTIONS"]["COLUMNS"];
         const TransHelper = new CheckTransformationHelper();
         if (query.hasOwnProperty("TRANSFORMATIONS")) {
-        let trans = query["TRANSFORMATIONS"];
-        let NewElement = TransHelper.getNew(trans["APPLY"]);
-        for (let Eu of ElementsInCol) {
-            if (NewElement.indexOf(Eu) < 0) {
-                ECF.push(Eu);
+            let trans = query["TRANSFORMATIONS"];
+            let NewElement = TransHelper.getNew(trans["APPLY"]);
+            for (let Eu of ElementsInCol) {
+                if (NewElement.indexOf(Eu) < 0) {
+                    ECF.push(Eu);
+                }
             }
+            return ECF;
+        } else {
+            return ElementsInCol;
         }
-        return ECF;
-    } else {
-        return ElementsInCol;
-}
     }
 
     // Check the part in Columns is valid or NOT
@@ -278,7 +273,7 @@ export class CheckQueryHelper {
                 if (!this.CheckCol(Filtered, Type)) {
                     return false;
                 }
-            } else if (key === "ORDER" ) {
+            } else if (key === "ORDER") {
                 if (!this.CheckOrd(itemsInCOL, options["ORDER"])) {
                     return false;
                 }

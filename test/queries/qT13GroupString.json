@@ -1,32 +1,33 @@
 {
-    "title": "test with  Transformation missing Apply",
+    "title": "test with Finding MAX PASS",
     "query": {
         "WHERE": {
             "AND": [
                 {
                     "IS": {
-                        "rooms_furniture": "*Tables*"
+                        "courses_dept": "cpsc"
                     }
                 },
                 {
                     "GT": {
-                        "rooms_seats": 300
+                        "courses_avg": 90
                     }
                 }
             ]
         },
         "OPTIONS": {
             "COLUMNS": [
-                "rooms_shortname",
-                "maxSeats"
+                "maxPass",
+                "courses_id"
             ],
-            "ORDER": "rooms_shortname"
+            "ORDER": "maxPass"
         },
         "TRANSFORMATIONS": {
+            "GROUP": "courses_id",
             "APPLY": [
                 {
-                    "maxSeats": {
-                        "MAX": "rooms_seats"
+                    "maxPass": {
+                        "MAX": "courses_pass"
                     }
                 }
             ]

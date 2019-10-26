@@ -1,12 +1,20 @@
-{"title": "test with Complex ORDER DOWN with Invalid Key",
+{
+    "title": "test with Complex ORDER DOWN with Invalid Key",
     "query": {
         "WHERE": {
-
             "AND": [
-                {"IS": {
-                    "courses_dept": "eosc"
+                {
+                    "IS": {
+                        "courses_dept": "eosc"
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg": 90
+                    }
                 }
-                },{"GT": {"courses_avg": 90}}]},
+            ]
+        },
         "OPTIONS": {
             "COLUMNS": [
                 "courses_id",
@@ -14,11 +22,13 @@
                 "courses_avg"
             ],
             "ORDER": {
-                "keys":["courses_id","courses_pass"],
-                "dir":"DOWN"
+                "keys": [
+                    "courses_id",
+                    "courses_pass"
+                ],
+                "dir": "DOWN"
             }
         }
-
     },
     "isQueryValid": false,
     "result": "InsightError"

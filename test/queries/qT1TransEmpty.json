@@ -1,34 +1,35 @@
-{"title": "test with empty Transformation",
-   "query":{ "WHERE": {
-        "AND": [
-            {
-                "IS": {
-                    "rooms_furniture": "*Tables*"
+{
+    "title": "test with empty Transformation",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "rooms_furniture": "*Tables*"
+                    }
+                },
+                {
+                    "GT": {
+                        "rooms_seats": 300
+                    }
                 }
-            },
-            {
-                "GT": {
-                    "rooms_seats": 300
-                }
-            }
-        ]
-    },
-    "OPTIONS": {
-        "COLUMNS": [
-            "rooms_shortname",
-            "maxSeats"
-        ],
-        "ORDER": {
-            "dir": "DOWN",
-            "keys": [
-                "maxSeats"
             ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "rooms_shortname",
+                "maxSeats"
+            ],
+            "ORDER": {
+                "dir": "DOWN",
+                "keys": [
+                    "maxSeats"
+                ]
+            }
+        },
+        "TRANSFORMATIONS": {
         }
     },
-    "TRANSFORMATIONS": {
-
-    }
-},
     "isQueryValid": false,
     "result": "InsightError"
 }

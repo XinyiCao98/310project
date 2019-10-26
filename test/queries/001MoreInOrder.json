@@ -4,22 +4,22 @@
         "WHERE": {
             "AND": [
                 {
-                    "AND":[
+                    "AND": [
                         {
                             "GT": {
-                                "courses_avg":80
+                                "courses_avg": 80
                             }
                         },
                         {
                             "IS": {
-                                "courses_uuid":"1385"
+                                "courses_uuid": "1385"
                             }
                         }
                     ]
                 },
                 {
                     "EQ": {
-                        "courses_audit":0
+                        "courses_audit": 0
                     }
                 }
             ]

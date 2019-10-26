@@ -54,7 +54,7 @@ export default class RoomHelper {
                     return reject(new InsightError("ALl kinds of errors inside try"));
                 }
             }).catch((e: any) => {
-                reject(new InsightError("This is not a htm"));
+                return reject(new InsightError("This is not a htm"));
             });
         });
     }

@@ -4,6 +4,7 @@ import Log from "../Util";
 import {InsightDataset, InsightError} from "./IInsightFacade";
 import {split} from "ts-node";
 import PerformOrderHelper from "./PerformOrderHelper";
+
 export default class PerformQuery {
     public idStr: string;
 
@@ -45,7 +46,7 @@ export default class PerformQuery {
             result = this.PerformLT(key, value, courses);
         }
         return result;
-     }
+    }
 
     public PerformLogic(LP: string, courses: [], queryTree: QueryTree): any {
         if (LP === "AND") {
@@ -55,7 +56,7 @@ export default class PerformQuery {
             for (let i: number = 1; i < children.length; i++) {
                 let anotherT = children[i];
                 let anotherR = this.GetResult(courses, anotherT);
-                if (anotherR === false ) {
+                if (anotherR === false) {
                     return false;
                 }
                 let UP = this.idStr + "_uuid";
@@ -63,22 +64,22 @@ export default class PerformQuery {
                 initial = intersection;
             }
             return initial;
-}
+        }
         if (LP === "OR") {
             let children = queryTree.children;
             let m = children.length;
             let start = children[0];
             let i = 1;
             let initial = this.GetResult(courses, start);
-            if (initial === false ) {
-return false;
-}
+            if (initial === false) {
+                return false;
+            }
             for (i; i < m; i++) {
                 let anotherT = children[i];
                 let anotherR = this.GetResult(courses, anotherT);
-                if (anotherR === false ) {
- return false;
-}
+                if (anotherR === false) {
+                    return false;
+                }
                 let UP = this.idStr + "_uuid";
                 let union = this.FindUnion(initial, anotherR, UP);
                 initial = union;
@@ -89,13 +90,13 @@ return false;
             let children = queryTree.children;
             let start = children[0];
             let initial = this.GetResult(courses, start);
-            if (initial === false ) {
-  return false;
-}
+            if (initial === false) {
+                return false;
+            }
             let negation = this.FindNegation(initial, courses);
             return negation;
-}
-}
+        }
+    }
 
     public PerformIS(key: string, value: string, courses: []): any {
         let m = courses.length;
@@ -126,9 +127,9 @@ return false;
             } else if (ev === value) {
                 result.push(element);
             }
-}
-        return  result;
-}
+        }
+        return result;
+    }
 
     public PerformEQ(key: string, value: number, courses: []): any {
         let m = courses.length;
@@ -146,7 +147,7 @@ return false;
 
         }
         return result;
-}
+    }
 
     public PerformGT(key: string, value: number, courses: []): any {
         let m = courses.length;
@@ -204,23 +205,23 @@ return false;
     }
 
     // Sort an array of objects by numerical properties
-    public Order(Expected: object[], Property: string| object): any {
+    public Order(Expected: object[], Property: string | object): any {
         const PQueryHelper = new PerformOrderHelper();
         if (typeof Property === "string") {
-         return PQueryHelper.OrderByString(Expected, Property);
+            return PQueryHelper.OrderByString(Expected, Property);
 
-     } else {
-          let keys: string[];
-          let dir: string;
-          let values = Object.values(Property);
-          if (typeof values[1] === "string") {
-              dir = values[1];
-              keys = values[0];
-          } else {
-              dir = values[0];
-              keys = values[1];
-          }
-          return PQueryHelper.OrderByObject(Expected, keys, dir);
+        } else {
+            let keys: string[];
+            let dir: string;
+            let values = Object.values(Property);
+            if (typeof values[1] === "string") {
+                dir = values[1];
+                keys = values[0];
+            } else {
+                dir = values[0];
+                keys = values[1];
+            }
+            return PQueryHelper.OrderByObject(Expected, keys, dir);
 
         }
     }

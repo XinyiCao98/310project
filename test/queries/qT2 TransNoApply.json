@@ -1,5 +1,6 @@
-{"title": "test with  Transformation missing Apply",
-    "query":{
+{
+    "title": "test with  Transformation missing Apply",
+    "query": {
         "WHERE": {
             "AND": [
                 {
@@ -21,7 +22,8 @@
         },
         "TRANSFORMATIONS": {
             "GROUP": [
-               "courses_id"]
+                "courses_id"
+            ]
         }
     },
     "isQueryValid": false,

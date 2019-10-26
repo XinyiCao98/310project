@@ -1,14 +1,10 @@
 {
-"title": "Valid Query for Rooms",
+    "title": "Valid Query for Rooms",
     "query": {
         "WHERE": {
-
-
             "GT": {
                 "rooms_seats": 250
             }
-
-
         },
         "OPTIONS": {
             "COLUMNS": [
@@ -30,8 +26,61 @@
             ]
         }
     },
-    "isQueryValid":true,
-"result":[{"maxSeats":257,"rooms_fullname":"Hennings"},{"maxSeats":260,"rooms_fullname":"Henry Angus"},{"maxSeats":265,"rooms_fullname":"Chemistry"},{"maxSeats":275,"rooms_fullname":"Buchanan"},{"maxSeats":280,"rooms_fullname":"Neville Scarfe"},{"maxSeats":299,"rooms_fullname":"Student Recreation Centre"},{"maxSeats":325,"rooms_fullname":"Wesbrook"},{"maxSeats":350,"rooms_fullname":"Earth Sciences Building"},{"maxSeats":350,"rooms_fullname":"Life Sciences Centre"},{"maxSeats":375,"rooms_fullname":"Hebb"},{"maxSeats":426,"rooms_fullname":"Centre for Interactive  Research on Sustainability"},{"maxSeats":442,"rooms_fullname":"Robert F. Osborne Centre"},
-    {"maxSeats":503,"rooms_fullname":"Woodward (Instructional Resources Centre-IRC)"}]}
+    "isQueryValid": true,
+    "result": [
+        {
+            "maxSeats": 257,
+            "rooms_fullname": "Hennings"
+        },
+        {
+            "maxSeats": 260,
+            "rooms_fullname": "Henry Angus"
+        },
+        {
+            "maxSeats": 265,
+            "rooms_fullname": "Chemistry"
+        },
+        {
+            "maxSeats": 275,
+            "rooms_fullname": "Buchanan"
+        },
+        {
+            "maxSeats": 280,
+            "rooms_fullname": "Neville Scarfe"
+        },
+        {
+            "maxSeats": 299,
+            "rooms_fullname": "Student Recreation Centre"
+        },
+        {
+            "maxSeats": 325,
+            "rooms_fullname": "Wesbrook"
+        },
+        {
+            "maxSeats": 350,
+            "rooms_fullname": "Earth Sciences Building"
+        },
+        {
+            "maxSeats": 350,
+            "rooms_fullname": "Life Sciences Centre"
+        },
+        {
+            "maxSeats": 375,
+            "rooms_fullname": "Hebb"
+        },
+        {
+            "maxSeats": 426,
+            "rooms_fullname": "Centre for Interactive  Research on Sustainability"
+        },
+        {
+            "maxSeats": 442,
+            "rooms_fullname": "Robert F. Osborne Centre"
+        },
+        {
+            "maxSeats": 503,
+            "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+        }
+    ]
+}
 
 

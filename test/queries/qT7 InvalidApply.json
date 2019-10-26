@@ -1,11 +1,11 @@
-{"title": "Invalid Query due to Apply",
+{
+    "title": "Invalid Query due to Apply",
     "query": {
         "WHERE": {
             "GT": {
                 "courses_fail": 60
             }
-        }
-    ,
+        },
         "OPTIONS": {
             "COLUMNS": [
                 "minFail",
