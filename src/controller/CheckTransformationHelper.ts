@@ -22,11 +22,11 @@ export class CheckTransformationHelper {
         if (!trans.hasOwnProperty("APPLY") || !trans.hasOwnProperty("GROUP")) {
             return false;
         }
-        let apply = trans["APPLY"];
-        if (!this.checkApply(apply, Type)) {
+        if (!this.checkElement(trans, options)) {
             return false;
         }
-        if (!this.checkElement(trans, options)) {
+        let apply = trans["APPLY"];
+        if (!this.checkApply(apply, Type)) {
             return false;
         }
         this.getNew(apply);
@@ -39,7 +39,7 @@ export class CheckTransformationHelper {
             return false;
         }
         let Group = trans["GROUP"];
-        if (!Array.isArray(Group)) { // typeof Group !== "string" &&
+        if (!Array.isArray(Group)) {
             return false;
         }
         let EleInTrans = this.ObtainKeys(trans);
@@ -85,30 +85,32 @@ export class CheckTransformationHelper {
         }
         for (let element of apply) {
             let key = Object.keys(element);
+            let realkey = key[0];
             if (Object.keys(key).length !== 1) {
                 return false;
             }
-            let realKey = key[0];
-            if (typeof (realKey) !== "string") {
+            if (typeof (realkey) !== "string") {
                 return false;
             }
             let value = Object.values(element)[0];
-            let operation = Object.keys(value)[0];
-            if (Object.keys(operation).length !== 1) {
+            let Operation = Object.keys(value)[0];
+            let values = Object.values(element);
+            let allValues = values[0];
+            if (Object.keys(allValues).length !== 1) {
                 return false;
             }
-            if (this.OperationNames.indexOf(operation) < 0) {
+            if (this.OperationNames.indexOf(Operation) < 0) {
                 return false;
             }
-            let operationObject = Object.values(value)[0];
-            if (typeof operationObject !== "string") {
+            let OperationObject = Object.values(value)[0];
+            if (typeof OperationObject !== "string") {
                 return false;
             }
-            let property = operationObject.split("_")[1];
+            let property = OperationObject.split("_")[1];
             if (standardP.indexOf(property) < 0) {
                 return false;
             }
-            if (this.NumericOperations.indexOf(operation) > 0) {
+            if (this.NumericOperations.indexOf(Operation) > 0) {
                 if (standardNP.indexOf(property) < 0) {
                     return false;
                 }

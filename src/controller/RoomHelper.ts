@@ -127,13 +127,17 @@ export default class RoomHelper {
     }
 
     public writeToDisk(validRoom: any, id: string): boolean {
-        fs.writeFile("./data/" + id + ".json",
-            JSON.stringify(validRoom, null, " "), (e) => {
-                if (e !== null) {
-                    return false;
-                }
-            });
-        return true;
+        try {
+            fs.writeFile("./data/" + id + ".json",
+                JSON.stringify(validRoom, null, " "), (e) => {
+                    if (e !== null) {
+                        return false;
+                    }
+                });
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 
     public getRoomInfo(childList: any[]): any {
@@ -194,11 +198,13 @@ export default class RoomHelper {
                             return reject(new InsightError("no lat lon"));
                         }
                     } catch (e) {
-                        return reject("not able to parse");
+                        return reject(new InsightError("not able to parse"));
                     }
                 });
                 response.on("error", function (e: any) {
-                    Log.trace("fail to encode");
+                    return reject(new InsightError("has error"));
+                }).on("error", function (e: any) {
+                    return reject(new InsightError("has error"));
                 });
             });
         });
