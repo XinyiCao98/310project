@@ -29,8 +29,12 @@
             "APPLY": [
                 {
                     "maxPass": {
-                        "MAX": "courses_pass",
-                        "MIN": "rooms_seats"
+                        "MAX": "courses_pass"
+                    }
+                },
+                {
+                    "maxPass": {
+                        "MIN": "courses_pass"
                     }
                 }
             ]

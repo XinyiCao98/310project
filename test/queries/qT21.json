@@ -1,0 +1,42 @@
+{
+    "title": "test with Finding number of courses Year",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "courses_avg": 93
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "SumScores",
+                "AvgPass",
+                "courses_dept"
+            ],
+            "ORDER": {
+                "keys": [
+                    "courses_dept"
+                ],
+                "dir": "DOWN"
+            }
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_dept"
+            ],
+            "APPLY": [
+                {
+                    "SumScores": {
+                        "SUM": "courses_avg"
+                    }
+                },
+                {
+                    "AvgPass": {
+                        "AVG": "courses_pass"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

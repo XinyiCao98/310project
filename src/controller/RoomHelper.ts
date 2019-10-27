@@ -60,10 +60,10 @@ export default class RoomHelper {
     }
 
     public gatherValid(ele: any, buildingMap: Map<string, any>, id: string): any[] {
-        try {
-            const parse5 = require("parse5");
-            let validRoom: any[] = [];
-            for (let source of ele) {
+        let validRoom: any[] = [];
+        for (let source of ele) {
+            try {
+                const parse5 = require("parse5");
                 let eachBuilding = parse5.parse(source);
                 let roomList = this.getInside(eachBuilding.childNodes);
                 if (roomList === null || roomList === undefined) {
@@ -93,11 +93,12 @@ export default class RoomHelper {
                         validRoom.push(this.checkCondition(building, rooms, buildingMap, id));
                     }
                 }
+            } catch (e) {
+                //
             }
-            return validRoom;
-        } catch (e) {
-            //
         }
+        return validRoom;
+
     }
 
     public checkCondition(building: any, rooms: any, buildingMap: Map<string, any>, id: string): any {
@@ -193,7 +194,7 @@ export default class RoomHelper {
                         if (afterParse.hasOwnProperty("lat") && afterParse.hasOwnProperty("lon")) {
                             buildingList["buildingLat"] = afterParse.lat;
                             buildingList["buildingLon"] = afterParse.lon;
-                            return fulfill(buildingList);
+                            fulfill(afterParse);
                         } else if (afterParse.hasOwnProperty("error")) {
                             return reject(new InsightError("no lat lon"));
                         }
