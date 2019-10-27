@@ -22,11 +22,11 @@ export class CheckTransformationHelper {
         if (!trans.hasOwnProperty("APPLY") || !trans.hasOwnProperty("GROUP")) {
             return false;
         }
-        if (!this.checkElement(trans, options)) {
-            return false;
-        }
         let apply = trans["APPLY"];
         if (!this.checkApply(apply, Type)) {
+            return false;
+        }
+        if (!this.checkElement(trans, options)) {
             return false;
         }
         this.getNew(apply);
@@ -77,44 +77,34 @@ export class CheckTransformationHelper {
         if (!Array.isArray(apply)) {
             return false;
         }
+        // let DuplicateChecker: string[] = [];
+        let newE: string = null;
         let standardP = this.CProperties;
         let standardNP = this.CNProperties;
         if (Type === true) {
             standardP = this.RProperties;
             standardNP = this.RNProperties;
         }
+        let DuplicateChecker: string[] = [];
         for (let element of apply) {
             let key = Object.keys(element);
             let realkey = key[0];
+            if (realkey.includes("_")) {
+                return false;
+            }
+            if (!this.checkApplyInside(element , standardP, standardNP)) {
+                return false;
+            }
             if (Object.keys(key).length !== 1) {
                 return false;
             }
             if (typeof (realkey) !== "string") {
                 return false;
             }
-            let value = Object.values(element)[0];
-            let Operation = Object.keys(value)[0];
-            let values = Object.values(element);
-            let allValues = values[0];
-            if (Object.keys(allValues).length !== 1) {
-                return false;
-            }
-            if (this.OperationNames.indexOf(Operation) < 0) {
-                return false;
-            }
-            let OperationObject = Object.values(value)[0];
-            if (typeof OperationObject !== "string") {
-                return false;
-            }
-            let property = OperationObject.split("_")[1];
-            if (standardP.indexOf(property) < 0) {
-                return false;
-            }
-            if (this.NumericOperations.indexOf(Operation) > 0) {
-                if (standardNP.indexOf(property) < 0) {
-                    return false;
-                }
-            }
+            newE = Object.values(key)[0];
+            if (!this.CheckDuplicate(DuplicateChecker, newE)) {
+               return false;
+           }
         }
         return true;
     }
@@ -127,5 +117,41 @@ export class CheckTransformationHelper {
             New.push(Object.keys(newP)[0]);
         }
         return New;
+    }
+
+    public CheckDuplicate(Viewed: string[], New: string):  boolean {
+        if (Viewed.indexOf(New) < 0) {
+            Viewed.push(New);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public checkApplyInside(element: object, standardP: string[], standardNP: string[]): boolean {
+        let value = Object.values(element)[0];
+        let Operation = Object.keys(value)[0];
+        let values = Object.values(element);
+        let allValues = values[0];
+        if (Object.keys(allValues).length !== 1) {
+            return false;
+        }
+        if (this.OperationNames.indexOf(Operation) < 0) {
+            return false;
+        }
+        let OperationObject = Object.values(value)[0];
+        if (typeof OperationObject !== "string") {
+            return false;
+        }
+        let property = OperationObject.split("_")[1];
+        if (standardP.indexOf(property) < 0) {
+            return false;
+        }
+        if (this.NumericOperations.indexOf(Operation) >= 0) {
+            if (standardNP.indexOf(property) < 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }

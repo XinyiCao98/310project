@@ -8,12 +8,13 @@ import {
 } from "./IInsightFacade";
 import * as JSZip from "jszip";
 import * as fs from "fs";
-import {CheckQueryHelper} from "./CheckQueryHelper";
+import CheckQueryHelper from "./CheckQueryHelper";
 import Datasets from "./Datasets";
 import PerformQuery from "./PerformQuery";
 import QueryTree from "./QueryTree";
 import RoomHelper from "./RoomHelper";
 import PerformTransHelper from "./PerformTransHelper";
+import Log from "../Util";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -227,7 +228,7 @@ export default class InsightFacade implements IInsightFacade {
             }
             return Promise.resolve(Output);
         }
-        Output = PQ.GetResult(ObjectArray, Qtree);
+        Output = PQ.GetResult(ObjectArray, Qtree, query);
         if (query.hasOwnProperty("TRANSFORMATIONS")) {
             Output = transHelp.performTrans(Output, Qtree.Group, Qtree.Apply);
         }

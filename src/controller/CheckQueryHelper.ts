@@ -1,8 +1,7 @@
 import Log from "../Util";
-import QueryTree from "./QueryTree";
 import {CheckTransformationHelper} from "./CheckTransformationHelper";
 
-export class CheckQueryHelper {
+export  default class CheckQueryHelper {
     private properties: string[] = ["dept", "id", "avg", "title",
         "pass", "fail", "audit", "uuid", "year", "instructor", "lat", "lon", "seats", "fullname", "shortname",
         "number", "name", "address", "type", "furniture", "href"];
@@ -284,4 +283,16 @@ export class CheckQueryHelper {
         return true;
     }
 
+    public findUniqueP(query: any): string {
+        let ID = null;
+        let  filteredn = this.ElementInColFiltered(query);
+        let  FisrElement = filteredn[0];
+        let DeterminProperty =  FisrElement.split("_")[1];
+        if (this.CP.indexOf(DeterminProperty) < 0) {
+            ID = "_name";
+        } else {
+            ID = "_uuid";
+        }
+        return ID;
+    }
 }

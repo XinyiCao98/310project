@@ -231,7 +231,6 @@ export  default class PerformTransHelper {
         for (let k: number = 0; k < NumOfGroups ; k ++) {
             let group = Data[k];
             AA[k][Name] = this.AvgHelper(group, Property) ;
-            Log.trace(AA[k][Name]);
             output.push(AA[k]);
         }
         return output;

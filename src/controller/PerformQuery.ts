@@ -4,6 +4,7 @@ import Log from "../Util";
 import {InsightDataset, InsightError} from "./IInsightFacade";
 import {split} from "ts-node";
 import PerformOrderHelper from "./PerformOrderHelper";
+import CheckQueryHelper from "./CheckQueryHelper";
 
 export default class PerformQuery {
     public idStr: string;
@@ -12,12 +13,12 @@ export default class PerformQuery {
         this.idStr = id;
     }
 
-    public GetResult(courses: [], queryTree: QueryTree): any {
+    public GetResult(courses: [], queryTree: QueryTree, query: any): any {
         let result: object[] = [];
         if (queryTree.nodeType === "AND" ||
             queryTree.nodeType === "OR" ||
             queryTree.nodeType === "NOT") {
-            let logicResult = this.PerformLogic(queryTree.nodeType, courses, queryTree);
+            let logicResult = this.PerformLogic(queryTree.nodeType, courses, queryTree , query);
             if (logicResult === false) {
                 return false;
             }
@@ -48,19 +49,20 @@ export default class PerformQuery {
         return result;
     }
 
-    public PerformLogic(LP: string, courses: [], queryTree: QueryTree): any {
+    public PerformLogic(LP: string, courses: [], queryTree: QueryTree, query: any): any {
+        const CheckQH = new CheckQueryHelper();
+        let uniqueID = CheckQH.findUniqueP(query);
         if (LP === "AND") {
             let children = queryTree.children;
             let start = children[0];
-            let initial = this.GetResult(courses, start);
+            let initial = this.GetResult(courses, start , query);
             for (let i: number = 1; i < children.length; i++) {
                 let anotherT = children[i];
-                let anotherR = this.GetResult(courses, anotherT);
+                let anotherR = this.GetResult(courses, anotherT, query);
                 if (anotherR === false) {
                     return false;
                 }
-                let UP = this.idStr + "_uuid";
-                let intersection = this.FindIntersection(initial, anotherR, UP);
+                let intersection = this.FindIntersection(initial, anotherR, this.idStr + uniqueID);
                 initial = intersection;
             }
             return initial;
@@ -70,18 +72,17 @@ export default class PerformQuery {
             let m = children.length;
             let start = children[0];
             let i = 1;
-            let initial = this.GetResult(courses, start);
+            let initial = this.GetResult(courses, start , query);
             if (initial === false) {
                 return false;
             }
             for (i; i < m; i++) {
                 let anotherT = children[i];
-                let anotherR = this.GetResult(courses, anotherT);
+                let anotherR = this.GetResult(courses, anotherT, query);
                 if (anotherR === false) {
                     return false;
                 }
-                let UP = this.idStr + "_uuid";
-                let union = this.FindUnion(initial, anotherR, UP);
+                let union = this.FindUnion(initial, anotherR, this.idStr + uniqueID);
                 initial = union;
             }
             return initial;
@@ -89,7 +90,7 @@ export default class PerformQuery {
         if (LP === "NOT") {
             let children = queryTree.children;
             let start = children[0];
-            let initial = this.GetResult(courses, start);
+            let initial = this.GetResult(courses, start , query);
             if (initial === false) {
                 return false;
             }
@@ -98,15 +99,12 @@ export default class PerformQuery {
         }
     }
 
-    public PerformIS(key: string, value: string, courses: []): any {
-        let m = courses.length;
+    public PerformIS(key: string, value: string, Data: []): any {
+        let m = Data.length;
         let i = 0;
         let result: object[] = [];
-        // if (!this.checkID(key, this.idStr)) {
-        //     return false;
-        // }
         for (i; i < m; i++) {
-            let element = courses[i];
+            let element = Data[i];
             let ev = String(element[key]);
             if (value === "*" || value === "**") {
                 result.push(element);
@@ -287,4 +285,5 @@ export default class PerformQuery {
         }
         return negation;
     }
+
 }
