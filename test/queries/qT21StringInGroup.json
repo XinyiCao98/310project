@@ -21,7 +21,8 @@
         },
         "TRANSFORMATIONS": {
             "GROUP": [
-                "courses_dept"
+                "courses_dept",
+                123
             ],
             "APPLY": [
                 {

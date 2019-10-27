@@ -119,8 +119,9 @@ export default class RoomHelper {
                 [id + "_address"]: building["buildingAdr"], [id + "_lat"]: building["buildingLat"],
                 [id + "_lon"]: building["buildingLon"], [id + "_seats"]: rooms["roomSeats"],
                 [id + "_type"]: rooms["roomType"], [id + "_furniture"]: rooms["roomFurniture"],
-                [id + "_href"]: building["buildingHref"],
+                [id + "_href"]: rooms["roomHref"],
             };
+            // Log.trace(validSingleRoom["rooms_href"]);
             return validSingleRoom;
         } else {
             return null;
@@ -155,6 +156,7 @@ export default class RoomHelper {
                     roomNumber = eachChild.childNodes[1].childNodes[0].value.trim();
                     if (eachChild.childNodes[1].attrs[0].name === "href") {
                         roomHref = eachChild.childNodes[1].attrs[0].value;
+                        // Log.trace(roomHref);
                     }
                 } else if (value === "views-field views-field-field-room-capacity") {
                     roomSeats = parseInt(eachChild.childNodes[0].value, 10);

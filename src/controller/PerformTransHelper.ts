@@ -16,6 +16,7 @@ export  default class PerformTransHelper {
         for (let i: number = 0; i < n; i++) {
             let key = group[i];
             output = this.performGroup(output, key);
+            // Log.trace(output);
         }
         output = this.Division(output, group);
         output = this.PerformApply(apply, output);
@@ -41,10 +42,12 @@ export  default class PerformTransHelper {
         let data: {[key: number]: any};
         let m = keys.length;
         data = Grouped[0];
+        // Log.trace(Grouped);
         for (let j: number = 1; j < m ; j++) {
             data = Object.values(data)[0];
         }
         let sameType = [];
+        // Log.trace(typeof data);
         let n = Object.keys(data).length;
         sameType.push(data[0]);
         for (let i: number = 0; i < n - 1 ; i++) {

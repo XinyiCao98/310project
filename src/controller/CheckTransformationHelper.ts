@@ -39,7 +39,10 @@ export class CheckTransformationHelper {
             return false;
         }
         let Group = trans["GROUP"];
-        if (!Array.isArray(Group)) {
+        if (!Array.isArray(Group) || Object.keys(Group).length < 1) {
+            return false;
+        }
+        if (this.ObtainKeys(trans) === false) {
             return false;
         }
         let EleInTrans = this.ObtainKeys(trans);
@@ -53,17 +56,18 @@ export class CheckTransformationHelper {
     }
 
     // get all keys inside transformation
-    public ObtainKeys(trans: any): string[] {
+    public ObtainKeys(trans: any): any {
         let EleInT: string[] = [];
         let G = trans["GROUP"];
         let A = trans["APPLY"];
         let m = Object.keys(G).length;
         let n = Object.keys(A).length;
-        if (typeof G === "string") {
-            EleInT.push(G);
-        } else {
-            for (let i: number = 0; i < m; i++) {
+        // Log.trace(typeof G);
+        for (let i: number = 0; i < m; i++) {
+            if (typeof G[i] === "string") {
                 EleInT.push(G[i]);
+            } else {
+                return false;
             }
         }
         for (let k: number = 0; k < n; k++) {
@@ -92,9 +96,11 @@ export class CheckTransformationHelper {
             if (realkey.includes("_")) {
                 return false;
             }
+            Log.trace(realkey);
             if (!this.checkApplyInside(element , standardP, standardNP)) {
                 return false;
             }
+            // Log.trace(Object.keys(element));
             if (Object.keys(key).length !== 1) {
                 return false;
             }
@@ -128,7 +134,7 @@ export class CheckTransformationHelper {
         }
     }
 
-    public checkApplyInside(element: object, standardP: string[], standardNP: string[]): boolean {
+    public  checkApplyInside(element: object, standardP: string[], standardNP: string[]): boolean {
         let value = Object.values(element)[0];
         let Operation = Object.keys(value)[0];
         let values = Object.values(element);
@@ -140,7 +146,7 @@ export class CheckTransformationHelper {
             return false;
         }
         let OperationObject = Object.values(value)[0];
-        if (typeof OperationObject !== "string") {
+        if (typeof OperationObject !== "string") { // TODO:
             return false;
         }
         let property = OperationObject.split("_")[1];

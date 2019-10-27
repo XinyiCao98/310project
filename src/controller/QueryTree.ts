@@ -22,7 +22,7 @@ export default class QueryTree {
 
     // Build a Query Tree based on a Json File
     public buildQT(where: any, options: any, trans: any): QueryTree {
-        let start = Object.keys(where)[0];
+        let WhereChecker = Object.keys(where).length;
         let Col = options["COLUMNS"];
         let ORDER = options["ORDER"];
         let QT = new QueryTree();
@@ -30,6 +30,10 @@ export default class QueryTree {
             QT.Group = trans["GROUP"];
             QT.Apply = trans["APPLY"];
         }
+        if (WhereChecker === 0 ) {
+            QT.nodeType = "emptyWhere";
+        } else {
+        let start = Object.keys(where)[0];
         QT.nodeType = start;
         if (start === "IS" ||
             start === "GT" ||
@@ -63,6 +67,7 @@ export default class QueryTree {
         let C = Qt.buildQTC(where[start]);
         QT.children.push(C);
     }
+        }
         QT.Columns = Col;
         QT.Order = ORDER;
         return QT;
