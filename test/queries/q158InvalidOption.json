@@ -1,0 +1,29 @@
+{
+    "title": "test courses_dept with wildcards at front",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept": "cps*"
+                    }
+                },
+                {
+                    "LT": {
+                        "courses_avg": 65
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "shelley": [
+                "courses_year",
+                "courses_dept",
+                "courses_id"
+            ],
+            "ORDER": "courses_id"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}
