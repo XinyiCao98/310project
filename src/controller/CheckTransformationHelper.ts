@@ -100,6 +100,9 @@ export  default class CheckTransformationHelper {
         for (let element of apply) {
             let key = Object.keys(element);
             let realkey = key[0];
+            if (realkey.length === 0) {
+                return false;
+            }
             if (realkey.includes("_")) {
                 return false;
             }

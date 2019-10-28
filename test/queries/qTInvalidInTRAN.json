@@ -1,0 +1,32 @@
+{
+    "title": "Invalid test due to wrong property in APPLY",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "courses_avg": 80
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "minFail",
+                "courses_dept"
+            ],
+            "ORDER": "minFail"
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_dept"
+            ],
+            "APPLY": [
+                {
+                    "minFail": {
+                        "MIN": "courses_success"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}
+
