@@ -1,0 +1,30 @@
+{
+    "title": "Valid Test for empty Col after filtered",
+    "query": {
+    "WHERE": {
+        "GT": {
+            "courses_avg": 95
+        }
+    },
+    "OPTIONS": {
+        "COLUMNS": [
+            "countDept"
+        ]
+    },
+    "TRANSFORMATIONS": {
+        "GROUP": [
+            "courses_dept"
+        ],
+        "APPLY": [
+            {
+                "countDept": {
+                    "COUNT": "courses_dept"
+                }
+            }
+        ]
+    }},
+    "isQueryValid": true,
+"result":[{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},{"countDept":1},
+    {"countDept":1}]}
+
+
