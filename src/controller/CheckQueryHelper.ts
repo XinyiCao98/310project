@@ -1,5 +1,5 @@
 import Log from "../Util";
-import {CheckTransformationHelper} from "./CheckTransformationHelper";
+import CheckTransformationHelper from "./CheckTransformationHelper";
 
 export  default class CheckQueryHelper {
     private properties: string[] = ["dept", "id", "avg", "title",
@@ -27,10 +27,10 @@ export  default class CheckQueryHelper {
 
     // type refers to the datatype false for courses true for room
     public CheckQuery(query: any): boolean {
+        const TransHelper = new CheckTransformationHelper();
         if (!this.BasicCheck(query)) {
             return false;
         }
-        let where = query["WHERE"];
         let options = query["OPTIONS"];
         if (!options.hasOwnProperty("COLUMNS") || !Array.isArray(options["COLUMNS"])) {
             return false;
@@ -45,15 +45,16 @@ export  default class CheckQueryHelper {
             if (Object.keys(trans).length !== 2 || !trans.hasOwnProperty("APPLY") || !trans.hasOwnProperty("GROUP")) {
                 return false;
             }
+            // options = this.ElementInColFiltered(query);
         }
         let filtered = this.ElementInColFiltered(query);
-        try {
-            this.tempID = (filtered[0]).split("_")[0];
-        } catch (e) {
-            return false;
-        }
-        let determineType = (filtered[0]).split("_")[1];
         let type: boolean = false;
+        if (filtered.length === 0) {
+            this.tempID = TransHelper.GetIDSPECIALCASE(query);
+        } else {
+         this.tempID = filtered[0].split("_")[0];
+        }
+        let determineType = TransHelper.FindDeterminType(filtered, query);
         if (this.properties.indexOf(determineType) < 0) {
             return false;
         }
@@ -61,18 +62,16 @@ export  default class CheckQueryHelper {
             type = true;
         }
         if (query.hasOwnProperty("TRANSFORMATIONS")) {
-            const TransHelper = new CheckTransformationHelper();
+            TransHelper.getDataName(query);
             let trans = query["TRANSFORMATIONS"];
-            if (!TransHelper.checkTrans(trans, options, type)) {
+            if (!TransHelper.checkTrans(trans, options, type, query)) {
                 return false;
             }
         }
-
-// columns exists plus it is an array
         if (!this.CheckOptions(options, type, filtered)) {
             return false;
         }
-        return this.checkWhere(where, type);
+        return this.checkWhere(query["WHERE"], type);
 
     }
 
@@ -264,35 +263,26 @@ export  default class CheckQueryHelper {
         }
     }
 
-    // Check the part in Columns is valid or NOT
     public CheckOptions(options: any, Type: boolean, Filtered: string[]): boolean {
         let itemsInCOL = options["COLUMNS"];
         for (const key of Object.keys(options)) { // check options has valid elements
             if (key === "COLUMNS") {
+                if (Filtered.length > 0) {
                 if (!this.CheckCol(Filtered, Type)) {
                     return false;
+                }
                 }
             } else if (key === "ORDER") {
                 if (!this.CheckOrd(itemsInCOL, options["ORDER"])) {
                     return false;
                 }
             } else {
+                Log.trace("2");
                 return false;
             }
         }
         return true;
     }
 
-    public findUniqueP(query: any): string {
-        let ID = null;
-        let  filteredn = this.ElementInColFiltered(query);
-        let  FisrElement = filteredn[0];
-        let DeterminProperty =  FisrElement.split("_")[1];
-        if (this.CP.indexOf(DeterminProperty) < 0) {
-            ID = "_name";
-        } else {
-            ID = "_uuid";
-        }
-        return ID;
-    }
+
 }

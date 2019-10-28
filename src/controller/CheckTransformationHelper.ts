@@ -1,7 +1,8 @@
 import Log from "../Util";
 import {split} from "ts-node";
+import CheckQueryHelper from "./CheckQueryHelper";
 
-export class CheckTransformationHelper {
+export  default class CheckTransformationHelper {
     private OperationNames: string[] = ["MAX", "MIN", "AVG", "SUM", "COUNT"];
     private NumericOperations: string[] = ["MAX", "MIN", "AVG", "SUM"];
 
@@ -14,11 +15,13 @@ export class CheckTransformationHelper {
     private RProperties: string[] = ["lat", "lon", "seats", "fullname", "shortname",
         "number", "name", "address", "type", "furniture", "href"];
 
+    private CP: string[] = ["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"];
+
     constructor() {
         //
     }
 
-    public checkTrans(trans: any, options: any, Type: boolean): boolean {
+    public checkTrans(trans: any, options: any, Type: boolean, query: any): boolean {
         if (!trans.hasOwnProperty("APPLY") || !trans.hasOwnProperty("GROUP")) {
             return false;
         }
@@ -27,6 +30,11 @@ export class CheckTransformationHelper {
             return false;
         }
         if (!this.checkElement(trans, options)) {
+            return false;
+        }
+        let group = trans["GROUP"];
+        let DatasetName = this.getDataName(query );
+        if (! this.CheckDataSet(apply, group, DatasetName)) {
             return false;
         }
         this.getNew(apply);
@@ -62,7 +70,6 @@ export class CheckTransformationHelper {
         let A = trans["APPLY"];
         let m = Object.keys(G).length;
         let n = Object.keys(A).length;
-        // Log.trace(typeof G);
         for (let i: number = 0; i < m; i++) {
             if (typeof G[i] === "string") {
                 EleInT.push(G[i]);
@@ -96,11 +103,9 @@ export class CheckTransformationHelper {
             if (realkey.includes("_")) {
                 return false;
             }
-            Log.trace(realkey);
             if (!this.checkApplyInside(element , standardP, standardNP)) {
                 return false;
             }
-            // Log.trace(Object.keys(element));
             if (Object.keys(key).length !== 1) {
                 return false;
             }
@@ -160,4 +165,80 @@ export class CheckTransformationHelper {
         }
         return true;
     }
+
+    // Given an query find  the name of dataset based on the filtered elements
+    public getDataName(query: any): string {
+        const CheckQH = new CheckQueryHelper();
+        let filteredEs = CheckQH.ElementInColFiltered(query);
+        let Element = filteredEs[0];
+        if (filteredEs.length === 0) {
+            return this.GetIDSPECIALCASE(query);
+        } else {
+        let dataName = Element.split("_")[0];
+        return dataName;
+        }
+    }
+
+    public CheckDataSet(apply: any , group: any, DataSetName: string): boolean {
+        let Group: string[] = [];
+        let ElementsInApply: object[] = [];
+        let Operation: {[key: string]: string};
+        Group = group;
+        for ( let property of Group ) {
+            let dataN = property.split("_")[0];
+            if (dataN !== DataSetName) {
+                return false;
+            }
+        }
+        ElementsInApply = Object.values(apply);
+        for (let element of ElementsInApply) {
+            Operation = Object.values(element)[0];
+            let p = Object.values(Operation)[0];
+            let DSN = p.split("_")[0];
+            if (DSN !== DataSetName) {
+                return false;
+            }
+       }
+        return true;
+}
+
+   public GetIDSPECIALCASE(query: any): string {
+        let group: string[] = [];
+        group = query["TRANSFORMATIONS"]["GROUP"];
+        let pro = group[0];
+        let DSName = pro.split("_")[0];
+        return DSName;
+   }
+
+    public GetPropertySPECIALCASE(query: any): string {
+        let group: string[] = [];
+        group = query["TRANSFORMATIONS"]["GROUP"];
+        let pro = group[0];
+        let Property = pro.split("_")[1];
+        return Property;
+    }
+
+   public FindDeterminType( filtered: string[], querey: any): string {
+        let  DP: string;
+        if (filtered.length === 0) {
+            DP = this.GetPropertySPECIALCASE(querey);
+        } else {
+            DP = filtered[0].split("_")[1];
+        }
+        return DP;
+   }
+
+    public findUniqueP(query: any): string {
+        let ID = null;
+        const CQH = new CheckQueryHelper();
+        let  filteredn = CQH.ElementInColFiltered(query);
+        let DeterminProperty =  this.FindDeterminType(filteredn, query);
+        if (this.CP.indexOf(DeterminProperty) < 0) {
+            ID = "_name";
+        } else {
+            ID = "_uuid";
+        }
+        return ID;
+    }
+
 }

@@ -5,6 +5,7 @@ import {InsightDataset, InsightError} from "./IInsightFacade";
 import {split} from "ts-node";
 import PerformOrderHelper from "./PerformOrderHelper";
 import CheckQueryHelper from "./CheckQueryHelper";
+import CheckTransformationHelpe from "./CheckTransformationHelper";
 
 export default class PerformQuery {
     public idStr: string;
@@ -13,12 +14,15 @@ export default class PerformQuery {
         this.idStr = id;
     }
 
-    public GetResult(courses: [], queryTree: QueryTree, query: any): any {
+    public GetResult(data: [], queryTree: QueryTree, query: any): any {
         let result: object[] = [];
+        if (queryTree.nodeType === "emptyWhere") {
+            return data;
+        }
         if (queryTree.nodeType === "AND" ||
             queryTree.nodeType === "OR" ||
             queryTree.nodeType === "NOT") {
-            let logicResult = this.PerformLogic(queryTree.nodeType, courses, queryTree , query);
+            let logicResult = this.PerformLogic(queryTree.nodeType, data, queryTree , query);
             if (logicResult === false) {
                 return false;
             }
@@ -29,29 +33,30 @@ export default class PerformQuery {
         if (queryTree.nodeType === "IS") {
             let key = queryTree.nodeProperty;
             let value = queryTree.nodeValue;
-            result = this.PerformIS(key, value, courses);
+            result = this.PerformIS(key, value, data);
         }
         if (queryTree.nodeType === "EQ") {
             let key = queryTree.nodeProperty;
             let value = queryTree.nodeValue;
-            result = this.PerformEQ(key, value, courses);
+            result = this.PerformEQ(key, value, data);
         }
         if (queryTree.nodeType === "GT") {
             let key = queryTree.nodeProperty;
             let value = queryTree.nodeValue;
-            result = this.PerformGT(key, value, courses);
+            result = this.PerformGT(key, value, data);
         }
         if (queryTree.nodeType === "LT") {
             let key = queryTree.nodeProperty;
             let value = queryTree.nodeValue;
-            result = this.PerformLT(key, value, courses);
+            result = this.PerformLT(key, value, data);
         }
         return result;
     }
 
     public PerformLogic(LP: string, courses: [], queryTree: QueryTree, query: any): any {
         const CheckQH = new CheckQueryHelper();
-        let uniqueID = CheckQH.findUniqueP(query);
+        const CheckTH = new CheckTransformationHelpe();
+        let uniqueID = CheckTH.findUniqueP(query);
         if (LP === "AND") {
             let children = queryTree.children;
             let start = children[0];

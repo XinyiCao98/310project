@@ -217,10 +217,6 @@ export default class InsightFacade implements IInsightFacade {
         }
         let Qtree = QueryTR.buildQT(filter, selection, trans);
         if (Object.keys(query["WHERE"]).length === 0 &&
-            Object.keys(ObjectArray).length > 5000) {
-            return Promise.reject(new ResultTooLargeError("ResultTooLargeError"));
-        }
-        if (Object.keys(query["WHERE"]).length === 0 &&
             Object.keys(ObjectArray).length <= 5000) {
             Output = PQ.PerformColumns(Qtree.Columns, ObjectArray);
             if (Object.keys(query["OPTIONS"]).length === 2) {
@@ -236,7 +232,6 @@ export default class InsightFacade implements IInsightFacade {
         if (Object.keys(query["OPTIONS"]).length === 2) {
             Output = PQ.Order(Output, Qtree.Order);
         }
-        // if (Output === false) { return Promise.reject(new InsightError("wrong format")); }
         Output = PQ.PerformColumns(Qtree.Columns, Output);
         if (Output.length > 5000) {
             return Promise.reject(new ResultTooLargeError("ResultTooLargeError"));
@@ -247,7 +242,17 @@ export default class InsightFacade implements IInsightFacade {
     public getQueryID(query: any): string {
         const CheckQhelper = new CheckQueryHelper();
         let filtered = CheckQhelper.ElementInColFiltered(query);
-        return filtered[0].split("_")[0];
+        if (filtered.length > 0) {
+            Log.trace(filtered[0].split("_")[0]);
+            return filtered[0].split("_")[0];
+        } else {
+           let GROUP: string[] = [];
+           GROUP = query["TRANSFORMATIONS"]["GROUP"];
+           Log.trace(GROUP);
+           let property = GROUP[0];
+           Log.trace(property.split("_")[0]);
+           return property.split("_")[0];
+        }
     }
 
     public listDatasets(): Promise<InsightDataset[]> {

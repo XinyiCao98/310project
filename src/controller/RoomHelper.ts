@@ -121,7 +121,6 @@ export default class RoomHelper {
                 [id + "_type"]: rooms["roomType"], [id + "_furniture"]: rooms["roomFurniture"],
                 [id + "_href"]: rooms["roomHref"],
             };
-            // Log.trace(validSingleRoom["rooms_href"]);
             return validSingleRoom;
         } else {
             return null;
