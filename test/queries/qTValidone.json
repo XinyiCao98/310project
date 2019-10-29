@@ -1,0 +1,36 @@
+
+{
+    "title": "Valid Test for empty Col after filtered",
+    "query": {
+    "WHERE": {
+        "IS": {
+            "courses_instructor": "*elisa"
+        }
+    },
+    "OPTIONS": {
+        "COLUMNS": [
+            "courses_instructor",
+            "overallAvg"
+        ],
+        "ORDER": {
+            "dir": "DOWN",
+            "keys": [
+                "overallAvg"
+            ]
+        }
+    },
+    "TRANSFORMATIONS": {
+        "GROUP": [
+            "courses_instructor"
+        ],
+        "APPLY": [
+            {
+                "overallAvg": {
+                    "AVG": "courses_avg"
+                }
+            }
+        ]
+    }},
+    "isQueryValid": true,
+"result":[{"courses_instructor":"lewis, delisa","overallAvg":86.36},{"courses_instructor":"baniassad, elisa","overallAvg":78.67},{"courses_instructor":"segnini, elisa","overallAvg":76.46}]}
+

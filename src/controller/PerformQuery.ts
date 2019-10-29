@@ -39,7 +39,7 @@ export default class PerformQuery {
             let key = queryTree.nodeProperty;
             let value = queryTree.nodeValue;
             result = this.PerformEQ(key, value, data);
-        }
+}
         if (queryTree.nodeType === "GT") {
             let key = queryTree.nodeProperty;
             let value = queryTree.nodeValue;
@@ -106,9 +106,8 @@ export default class PerformQuery {
 
     public PerformIS(key: string, value: string, Data: []): any {
         let m = Data.length;
-        let i = 0;
         let result: object[] = [];
-        for (i; i < m; i++) {
+        for (let i: number = 0; i < m; i++) {
             let element = Data[i];
             let ev = String(element[key]);
             if (value === "*" || value === "**") {
@@ -136,15 +135,17 @@ export default class PerformQuery {
 
     public PerformEQ(key: string, value: number, courses: []): any {
         let m = courses.length;
-        let i = 0;
         // if (!this.checkID(key, this.idStr)) {
         //     return false;
         // }
         let result: object[] = [];
-        for (i; i < m; i++) {
+        for (let i: number = 0; i < m; i++) {
+            Log.trace(i);
             let element = courses[i];
             let ev = (element[key]);
             if (ev === value) {
+                Log.trace("HI");
+                Log.trace(element);
                 result.push(element);
             }
 
@@ -154,9 +155,8 @@ export default class PerformQuery {
 
     public PerformGT(key: string, value: number, courses: []): any {
         let m = courses.length;
-        let i = 0;
         let result: object[] = [];
-        for (i; i < m; i++) {
+        for (let i: number = 0; i < m; i++) {
             let element = courses[i];
             let ev = (element[key]);
             if (ev > value) {
@@ -169,9 +169,8 @@ export default class PerformQuery {
 
     public PerformLT(key: string, value: number, courses: []): any {
         let m = courses.length;
-        let i = 0;
         let result: object[] = [];
-        for (i; i < m; i++) {
+        for (let i: number = 0; i < m; i++) {
             let element = courses[i];
             let ev = (element[key]);
             if (ev < value) {
