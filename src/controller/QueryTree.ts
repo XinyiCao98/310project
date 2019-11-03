@@ -21,10 +21,11 @@ export default class QueryTree {
     }
 
     // Build a Query Tree based on a Json File
-    public buildQT(where: any, options: any, trans: any): QueryTree {
+    public buildQT(query: any, trans: any): QueryTree {
+        let where = query["WHERE"];
         let WhereChecker = Object.keys(where).length;
-        let Col = options["COLUMNS"];
-        let ORDER = options["ORDER"];
+        let Col = query["OPTIONS"]["COLUMNS"];
+        let ORDER = query["OPTIONS"]["ORDER"];
         let QT = new QueryTree();
         if ( trans !== "NO TRANSFORMATIONS") {
             QT.Group = trans["GROUP"];
@@ -39,9 +40,8 @@ export default class QueryTree {
             start === "GT" ||
             start === "LT" ||
             start === "EQ") {
-           let ItemsInside = where[start];
-           let Key = Object.keys(ItemsInside).toString();
-           let Value = Object.values(ItemsInside)[0];
+           let Key = Object.keys(where[start]).toString();
+           let Value = Object.values(where[start])[0];
            QT.nodeProperty = Key;
            QT.nodeValue    = Value;
            QT.Columns = Col;

@@ -6,7 +6,6 @@ import {split} from "ts-node";
 import PerformOrderHelper from "./PerformOrderHelper";
 import CheckQueryHelper from "./CheckQueryHelper";
 import CheckTransformationHelpe from "./CheckTransformationHelper";
-
 export default class PerformQuery {
     public idStr: string;
 
@@ -140,12 +139,9 @@ export default class PerformQuery {
         // }
         let result: object[] = [];
         for (let i: number = 0; i < m; i++) {
-            Log.trace(i);
             let element = courses[i];
             let ev = (element[key]);
             if (ev === value) {
-                Log.trace("HI");
-                Log.trace(element);
                 result.push(element);
             }
 

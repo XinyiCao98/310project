@@ -1,7 +1,7 @@
 import Log from "../Util";
 import CheckTransformationHelper from "./CheckTransformationHelper";
 
-export  default class CheckQueryHelper {
+export default class CheckQueryHelper {
     private properties: string[] = ["dept", "id", "avg", "title",
         "pass", "fail", "audit", "uuid", "year", "instructor", "lat", "lon", "seats", "fullname", "shortname",
         "number", "name", "address", "type", "furniture", "href"];
@@ -35,6 +35,9 @@ export  default class CheckQueryHelper {
         if (!options.hasOwnProperty("COLUMNS") || !Array.isArray(options["COLUMNS"])) {
             return false;
         }
+        if (Object.keys(options["COLUMNS"]).length === 0) {
+            return false;
+        }
         for (const item of options["COLUMNS"]) {
             if (typeof item !== "string") {
                 return false;
@@ -45,14 +48,13 @@ export  default class CheckQueryHelper {
             if (Object.keys(trans).length !== 2 || !trans.hasOwnProperty("APPLY") || !trans.hasOwnProperty("GROUP")) {
                 return false;
             }
-            // options = this.ElementInColFiltered(query);
         }
         let filtered = this.ElementInColFiltered(query);
         let type: boolean = false;
         if (filtered.length === 0) {
             this.tempID = TransHelper.GetIDSPECIALCASE(query);
         } else {
-         this.tempID = filtered[0].split("_")[0];
+            this.tempID = filtered[0].split("_")[0];
         }
         let determineType = TransHelper.FindDeterminType(filtered, query);
         if (this.properties.indexOf(determineType) < 0) {
@@ -170,10 +172,8 @@ export  default class CheckQueryHelper {
         let Key = Object.keys(ItemInComparator).toString().split("_")[1];
         let Values = Object.values(ItemInComparator)[0];
 
-        if (standardN.indexOf(Key) < 0 || pre !== this.tempID) {
-            return false;
-        }
-        if (typeof Values !== "number") {
+        if (standardN.indexOf(Key) < 0 || pre !== this.tempID ||
+            typeof Values !== "number") {
             return false;
         }
         return true;
@@ -268,16 +268,15 @@ export  default class CheckQueryHelper {
         for (const key of Object.keys(options)) { // check options has valid elements
             if (key === "COLUMNS") {
                 if (Filtered.length > 0) {
-                if (!this.CheckCol(Filtered, Type)) {
-                    return false;
-                }
+                    if (!this.CheckCol(Filtered, Type)) {
+                        return false;
+                    }
                 }
             } else if (key === "ORDER") {
                 if (!this.CheckOrd(itemsInCOL, options["ORDER"])) {
                     return false;
                 }
             } else {
-                Log.trace("2");
                 return false;
             }
         }

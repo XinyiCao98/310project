@@ -215,7 +215,7 @@ export default class InsightFacade implements IInsightFacade {
         if (query.hasOwnProperty("TRANSFORMATIONS")) {
             trans = query["TRANSFORMATIONS"];
         }
-        let Qtree = QueryTR.buildQT(filter, selection, trans);
+        let Qtree = QueryTR.buildQT(query, trans);
         if (Object.keys(query["WHERE"]).length === 0 &&
             Object.keys(ObjectArray).length <= 5000) {
             Output = PQ.PerformColumns(Qtree.Columns, ObjectArray);
@@ -243,14 +243,11 @@ export default class InsightFacade implements IInsightFacade {
         const CheckQhelper = new CheckQueryHelper();
         let filtered = CheckQhelper.ElementInColFiltered(query);
         if (filtered.length > 0) {
-            Log.trace(filtered[0].split("_")[0]);
             return filtered[0].split("_")[0];
         } else {
            let GROUP: string[] = [];
            GROUP = query["TRANSFORMATIONS"]["GROUP"];
-           Log.trace(GROUP);
            let property = GROUP[0];
-           Log.trace(property.split("_")[0]);
            return property.split("_")[0];
         }
     }
