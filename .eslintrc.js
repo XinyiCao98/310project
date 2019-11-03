@@ -51,7 +51,7 @@ module.exports = {
         ],
         "@typescript-eslint/class-name-casing": "error",
         "@typescript-eslint/explicit-member-accessibility": ["error", {"overrides": {"constructors": "off"}}],
-        "@typescript-eslint/interface-name-prefix": ["error", {"prefixWithI": "always"}],
+        // "@typescript-eslint/interface-name-prefix": ["error", {"prefixWithI": "always"}],
         "@typescript-eslint/consistent-type-assertions": "error",
         "@typescript-eslint/no-empty-interface": "error",
         "@typescript-eslint/no-explicit-any": "off",
