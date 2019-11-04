@@ -9,8 +9,8 @@ export default class RoomHelper {
         //
     }
 
-    public addRoom(id: string, content: string, currZip: JSZip, datasetMap: Map<string, any[]>,
-                   datasetId: string[]): Promise<string[]> {
+    public addRoom(id: string, content: string, currZip: JSZip,
+                   datasetMap: Map<string, any[]>, datasetID: string[]): Promise<string[]> {
         return new Promise((fulfill, reject) => {
             let buildingMap: Map<string, any> = new Map<string, any>();
             let validRoom: any[] = [];
@@ -42,9 +42,9 @@ export default class RoomHelper {
                         } else {
                             try {
                                 that.writeToDisk(validRoom, id);
-                                datasetId.push(id);
+                                datasetID.push(id);
                                 datasetMap.set(id, validRoom);
-                                fulfill(datasetId);
+                                fulfill(datasetID);
                             } catch (e) {
                                 return reject(new InsightError("Fail to write to disk"));
                             }

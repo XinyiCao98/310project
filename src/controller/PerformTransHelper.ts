@@ -2,8 +2,9 @@ import Log from "../Util";
 import Decimal from "decimal.js";
 
 export  default class PerformTransHelper {
+    // public datasetArray: [];
     constructor() {
-        //
+    //
     }
 
    public performTrans(Data: object[], Group: any, Apply: any): object[] {
