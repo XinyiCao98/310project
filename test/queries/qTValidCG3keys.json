@@ -1,0 +1,34 @@
+{
+    "title": "Valid Test for courses group by dept ,id,instructor",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "courses_avg": 98
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id",
+                "courses_dept",
+                "courses_instructor"
+            ],
+            "ORDER": {
+                "dir": "UP",
+                "keys": [
+                    "courses_id"
+                ]
+            }
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_id",
+                "courses_dept",
+                "courses_instructor"
+            ],
+            "APPLY": [
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_id":"300","courses_dept":"spph","courses_instructor":""},{"courses_id":"300","courses_dept":"spph","courses_instructor":"frank, erica"},{"courses_id":"421","courses_dept":"epse","courses_instructor":"cole, kenneth"},{"courses_id":"421","courses_dept":"epse","courses_instructor":""},{"courses_id":"449","courses_dept":"epse","courses_instructor":"grow, laura"},{"courses_id":"449","courses_dept":"epse","courses_instructor":""},{"courses_id":"509","courses_dept":"nurs","courses_instructor":"krist, jennifer"},{"courses_id":"509","courses_dept":"nurs","courses_instructor":"brew, nancy"},{"courses_id":"509","courses_dept":"nurs","courses_instructor":""},{"courses_id":"519","courses_dept":"epse","courses_instructor":"cannon, joanna"},{"courses_id":"519","courses_dept":"epse","courses_instructor":""},{"courses_id":"527","courses_dept":"math","courses_instructor":"gomez, jose"},{"courses_id":"527","courses_dept":"math","courses_instructor":""},{"courses_id":"541","courses_dept":"eece","courses_instructor":"coria, lino"},{"courses_id":"541","courses_dept":"eece","courses_instructor":""},{"courses_id":"574","courses_dept":"cnps","courses_instructor":"cox, daniel"},{"courses_id":"578","courses_dept":"nurs","courses_instructor":"burrows, marlene;harding, jillian;krist, jennifer;mccuaig, fairleth"},
+    {"courses_id":"578","courses_dept":"nurs","courses_instructor":""}]}

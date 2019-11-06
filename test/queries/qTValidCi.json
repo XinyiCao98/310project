@@ -1,0 +1,145 @@
+{
+    "title": "Valid Test for courses group by instructor",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_instructor": "*lisa*"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_instructor"
+            ],
+            "ORDER": {
+                "dir": "UP",
+                "keys": [
+                    "courses_instructor"
+                ]
+            }
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_instructor"
+            ],
+            "APPLY": [
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result": [
+        {
+            "courses_instructor": "adler-bock, marcy;avery, lisa ann"
+        },
+        {
+            "courses_instructor": "ahmad, rana;ormandy, elisabeth"
+        },
+        {
+            "courses_instructor": "avery, lisa ann"
+        },
+        {
+            "courses_instructor": "avery, lisa ann;ciocca, valter;rammage, linda"
+        },
+        {
+            "courses_instructor": "avery, lisa ann;rammage, linda"
+        },
+        {
+            "courses_instructor": "avery, lisa ann;rammage, linda;reynolds, cindy"
+        },
+        {
+            "courses_instructor": "avery, lisa ann;taylor, sandra lynn"
+        },
+        {
+            "courses_instructor": "avery, lisa ann;tba"
+        },
+        {
+            "courses_instructor": "baniassad, elisa"
+        },
+        {
+            "courses_instructor": "beley, lisa"
+        },
+        {
+            "courses_instructor": "beley, lisa;burnett, cathy;tba"
+        },
+        {
+            "courses_instructor": "beley, lisa;harrison, nicholas;holmes, jonathan"
+        },
+        {
+            "courses_instructor": "beley, lisa;harrison, nicholas;tba"
+        },
+        {
+            "courses_instructor": "brew, nancy;henczel, lisa"
+        },
+        {
+            "courses_instructor": "brocklebank, lisa"
+        },
+        {
+            "courses_instructor": "cooper, elisabeth"
+        },
+        {
+            "courses_instructor": "cooper, elisabeth;hikade, thomas"
+        },
+        {
+            "courses_instructor": "coulthard, lisa"
+        },
+        {
+            "courses_instructor": "coulthard, lisa;evans, christine"
+        },
+        {
+            "courses_instructor": "d'silva, reginald;williams, elisabeth"
+        },
+        {
+            "courses_instructor": "dillon, lisa"
+        },
+        {
+            "courses_instructor": "enns, lisa;mcfarlane, rae"
+        },
+        {
+            "courses_instructor": "fraser, david;ormandy, elisabeth"
+        },
+        {
+            "courses_instructor": "gordeliy, lisa"
+        },
+        {
+            "courses_instructor": "harrison, klisala"
+        },
+        {
+            "courses_instructor": "henczel, lisa"
+        },
+        {
+            "courses_instructor": "klenz, jennifer;mcdonnell, lisa"
+        },
+        {
+            "courses_instructor": "lewis, delisa"
+        },
+        {
+            "courses_instructor": "lewis, delisa ann"
+        },
+        {
+            "courses_instructor": "loutzenheiser, lisa"
+        },
+        {
+            "courses_instructor": "matthewson, lisa"
+        },
+        {
+            "courses_instructor": "mcdonnell, lisa"
+        },
+        {
+            "courses_instructor": "mcintosh, lisa"
+        },
+        {
+            "courses_instructor": "meyboom, annalisa"
+        },
+        {
+            "courses_instructor": "nathan, lisa"
+        },
+        {
+            "courses_instructor": "ormandy, elisabeth"
+        },
+        {
+            "courses_instructor": "segnini, elisa"
+        },
+        {
+            "courses_instructor": "sundstrom, lisa"
+        }
+    ]
+}

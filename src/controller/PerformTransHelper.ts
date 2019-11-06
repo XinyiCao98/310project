@@ -14,68 +14,70 @@ export  default class PerformTransHelper {
         group = Group;
         apply = Apply;
         let n = group.length;
-        for (let i: number = 0; i < n; i++) {
-            let key = group[i];
-            output = this.performGroup(output, key);
-        }
-        output = this.Division(output, group);
+        output = this.performGroup(Data, group);
         output = this.PerformApply(apply, output);
         return output;
    }
 
+   public performGroup(Data: object[], Keys: string[]): object[] {
+        let output: object[];
+        let n = Keys.length;
+        let initialKey = Keys[0];
+        output = this.performFirstGroup(Data, initialKey);
+        if (n === 1) {
+        return output;
+        } else {
+            output = this.performRestKeys(output, Keys);
+            return output;
+        }
+   }
+
+   public performRestKeys(Data: object[], Keys: string[]): object[] {
+        let m: number;
+        let n = Keys.length;
+        let currentKey: string;
+        let output: object[] = [];
+        let storage: object[];
+        let DataInProcess: object[] = [];
+        for (let i: number = 1; i < n; i++) {
+            currentKey = Keys[i];
+            m = Data.length;
+            for (let j: number = 0; j <  m; j++) {
+                 DataInProcess = Object.values(Data[j]);
+                 storage = this.performFirstGroup(DataInProcess, currentKey);
+                 output = this.loadElements(output, storage);
+                 DataInProcess = [];
+            }
+            Data = output;
+            output = [];
+        }
+        return Data;
+}
+
+public loadElements(output: any[], add: object[]) {
+        let m = add.length;
+        for (let i: number = 0 ; i < m ; i++ ) {
+            output.push(add[0]);
+            add.splice(0, 1);
+        }
+        return output;
+}
+
    // Group an array of objects based on a given Key
-    public performGroup(Data: object[], Key: string ): object[] {
+    public performFirstGroup(Data: object[], Key: string ): object[] {
         let grouped: object[] = [];
+        let o: {[key: string]: any};
         grouped = Data.reduce(function (r, a) {
             let key = Key;
-            r[key] = r[key] || [];
-            r[key].push(a);
+            o = a;
+            r[o[key]] = r[o[key]] || [];
+            r[o[key]].push(o);
             return r;
         }, Object.create(null));
         let result = Object.values(grouped);
         return result;
    }
 
-   // Divided the the array of objects into some arrays based on their features given
-    public Division(Grouped: object[], keys: string[]): object[] {
-        let Divided: object[] = [];
-        let data: {[key: number]: any};
-        let m = keys.length;
-        data = Grouped[0];
-        for (let j: number = 1; j < m ; j++) {
-            data = Object.values(data)[0];
-        }
-        let sameType = [];
-        let n = Object.keys(data).length;
-        sameType.push(data[0]);
-        for (let i: number = 0; i < n - 1 ; i++) {
-            let next = i + 1;
-            if (this.Same(data[i], data[next], keys)) {
-                sameType.push(data[next]);
-            } else {
-                Divided.push(sameType);
-                sameType = [];
-                sameType.push(data[next]);
-            }
-        }
-        Divided.push(sameType);
-        return Divided;
-    }
-
-    // Determine Two objects have the same properties or not
-    public Same( One: object, Two: object, keys: string[]): boolean  {
-        let Object1: { [key: string]: any };
-        let Object2: {[key: string]: any};
-        Object1 = One;
-        Object2 = Two;
-        for ( let key of keys) {
-            if (Object1[key] !== Object2[key]) {
-                return false;
-            }
-        }
-        return true;
-
-    }
 
     // Perform the part inside APPLY clause
     public PerformApply(apply: object[] , Data: object[]): object[] {
