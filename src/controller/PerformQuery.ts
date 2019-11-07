@@ -53,7 +53,6 @@ export default class PerformQuery {
     }
 
     public PerformLogic(LP: string, courses: [], queryTree: QueryTree, query: any): any {
-        const CheckQH = new CheckQueryHelper();
         const CheckTH = new CheckTransformationHelpe();
         let uniqueID = CheckTH.findUniqueP(query);
         if (LP === "AND") {

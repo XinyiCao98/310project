@@ -128,8 +128,6 @@ export default class InsightFacade implements IInsightFacade {
         if (ObjectArray === undefined) {
             return Promise.reject(new InsightError("Datasets not exists"));
         }
-        let filter = query["WHERE"];
-        let selection = query["OPTIONS"];
         let QueryTR = new QueryTree();
         let trans = "NO TRANSFORMATIONS";
         if (query.hasOwnProperty("TRANSFORMATIONS")) {

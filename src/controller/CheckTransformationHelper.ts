@@ -1,8 +1,7 @@
-import Log from "../Util";
-import {split} from "ts-node";
 import CheckQueryHelper from "./CheckQueryHelper";
+import Log from "../Util";
 
-export  default class CheckTransformationHelper {
+export default class CheckTransformationHelper {
     private OperationNames: string[] = ["MAX", "MIN", "AVG", "SUM", "COUNT"];
     private NumericOperations: string[] = ["MAX", "MIN", "AVG", "SUM"];
 
@@ -33,8 +32,9 @@ export  default class CheckTransformationHelper {
             return false;
         }
         let group = trans["GROUP"];
-        let DatasetName = this.getDataName(query );
-        if (! this.CheckDataSet(apply, group, DatasetName)) {
+        let DatasetName = this.getDataName(query);
+        Log.trace(DatasetName);
+        if (!this.CheckDataSet(apply, group, DatasetName)) {
             return false;
         }
         this.getNew(apply);
@@ -71,7 +71,7 @@ export  default class CheckTransformationHelper {
         let m = Object.keys(G).length;
         let n = Object.keys(A).length;
         for (let i: number = 0; i < m; i++) {
-            if (typeof G[i] === "string") {
+            if (typeof G[i] === "string") { // && this.RProperties.includes(G[i].split("_")[1])
                 EleInT.push(G[i]);
             } else {
                 return false;
@@ -92,9 +92,11 @@ export  default class CheckTransformationHelper {
         let newE: string = null;
         let standardP = this.CProperties;
         let standardNP = this.CNProperties;
+        let flag = "courses";
         if (Type === true) {
             standardP = this.RProperties;
             standardNP = this.RNProperties;
+            flag = "rooms";
         }
         let DuplicateChecker: string[] = [];
         for (let element of apply) {
@@ -106,7 +108,7 @@ export  default class CheckTransformationHelper {
             if (realkey.includes("_")) {
                 return false;
             }
-            if (!this.checkApplyInside(element , standardP, standardNP)) {
+            if (!this.checkApplyInside(element, standardP, standardNP, flag)) {
                 return false;
             }
             if (Object.keys(key).length !== 1) {
@@ -117,8 +119,8 @@ export  default class CheckTransformationHelper {
             }
             newE = Object.values(key)[0];
             if (!this.CheckDuplicate(DuplicateChecker, newE)) {
-               return false;
-           }
+                return false;
+            }
         }
         return true;
     }
@@ -133,7 +135,7 @@ export  default class CheckTransformationHelper {
         return New;
     }
 
-    public CheckDuplicate(Viewed: string[], New: string):  boolean {
+    public CheckDuplicate(Viewed: string[], New: string): boolean {
         if (Viewed.indexOf(New) < 0) {
             Viewed.push(New);
             return true;
@@ -142,7 +144,7 @@ export  default class CheckTransformationHelper {
         }
     }
 
-    public  checkApplyInside(element: object, standardP: string[], standardNP: string[]): boolean {
+    public checkApplyInside(element: object, standardP: string[], standardNP: string[], flag: string): boolean {
         let value = Object.values(element)[0];
         let Operation = Object.keys(value)[0];
         let values = Object.values(element);
@@ -155,6 +157,10 @@ export  default class CheckTransformationHelper {
         }
         let OperationObject = Object.values(value)[0];
         if (typeof OperationObject !== "string") { // TODO:
+            return false;
+        }
+        let prefix = OperationObject.split("_")[0];
+        if (prefix !== flag) {
             return false;
         }
         let property = OperationObject.split("_")[1];
@@ -177,23 +183,25 @@ export  default class CheckTransformationHelper {
         if (filteredEs.length === 0) {
             return this.GetIDSPECIALCASE(query);
         } else {
-        let dataName = Element.split("_")[0];
-        return dataName;
+            let dataName = Element.split("_")[0];
+            return dataName;
         }
     }
 
-    public CheckDataSet(apply: any , group: any, DataSetName: string): boolean {
-        let Group: string[] = [];
-        let ElementsInApply: object[] = [];
-        let Operation: {[key: string]: string};
-        Group = group;
-        for ( let property of Group ) {
+    public CheckDataSet(apply: any, group: any, DataSetName: string): boolean {
+        let Operation: { [key: string]: string };
+        for (let property of group) {
+            Log.trace([property]);
             let dataN = property.split("_")[0];
+            let value = property.split("_")[1];
             if (dataN !== DataSetName) {
                 return false;
             }
+            if (!this.CProperties.includes(value) && !this.RProperties.includes(value)) {
+                return false;
+            }
         }
-        ElementsInApply = Object.values(apply);
+        let ElementsInApply = Object.values(apply);
         for (let element of ElementsInApply) {
             Operation = Object.values(element)[0];
             let p = Object.values(Operation)[0];
@@ -201,17 +209,16 @@ export  default class CheckTransformationHelper {
             if (DSN !== DataSetName) {
                 return false;
             }
-       }
+        }
         return true;
-}
+    }
 
-   public GetIDSPECIALCASE(query: any): string {
-        let group: string[] = [];
-        group = query["TRANSFORMATIONS"]["GROUP"];
+    public GetIDSPECIALCASE(query: any): string {
+        let group = query["TRANSFORMATIONS"]["GROUP"];
         let pro = group[0];
-        let DSName = pro.split("_")[0];
-        return DSName;
-   }
+        // Log.trace(DSName);
+        return pro.split("_")[0];
+    }
 
     public GetPropertySPECIALCASE(query: any): string {
         let group: string[] = [];
@@ -221,21 +228,21 @@ export  default class CheckTransformationHelper {
         return Property;
     }
 
-   public FindDeterminType( filtered: string[], querey: any): string {
-        let  DP: string;
+    public FindDeterminType(filtered: string[], querey: any): string {
+        let DP: string;
         if (filtered.length === 0) {
             DP = this.GetPropertySPECIALCASE(querey);
         } else {
             DP = filtered[0].split("_")[1];
         }
         return DP;
-   }
+    }
 
     public findUniqueP(query: any): string {
         let ID = null;
         const CQH = new CheckQueryHelper();
-        let  filteredn = CQH.ElementInColFiltered(query);
-        let DeterminProperty =  this.FindDeterminType(filteredn, query);
+        let filteredn = CQH.ElementInColFiltered(query);
+        let DeterminProperty = this.FindDeterminType(filteredn, query);
         if (this.CP.indexOf(DeterminProperty) < 0) {
             ID = "_name";
         } else {

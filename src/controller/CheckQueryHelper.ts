@@ -61,7 +61,9 @@ export default class CheckQueryHelper {
             return false;
         }
         if (this.RP.indexOf(determineType) > 0) {
-            type = true;
+            if (this.tempID === "rooms") {
+                type = true;
+            }
         }
         if (query.hasOwnProperty("TRANSFORMATIONS")) {
             TransHelper.getDataName(query);
@@ -74,7 +76,6 @@ export default class CheckQueryHelper {
             return false;
         }
         return this.checkWhere(query["WHERE"], type);
-
     }
 
     public checkWhere(where: any, Type: boolean): boolean {
@@ -109,15 +110,20 @@ export default class CheckQueryHelper {
     // Check the properties from Column are in given information or not
     public CheckCol(Filtered: string[], Type: boolean): boolean {
         let standard = this.CP;
+        let flag = 0;
         if (Type === true) {
             standard = this.RP;
+            flag = 1;
         }
         let i: number = 0;
         if (Filtered.length > 0) {
             for (i; i < Filtered.length; i++) {
                 let pre = Filtered[i].split("_")[0];
                 let val = Filtered[i].split("_")[1];
-                if (standard.indexOf(val) < 0 || pre !== this.tempID) {
+                if (standard.indexOf(val) < 0) {
+                    if (flag === 1 && pre !== "rooms") {
+                        return false;
+                    }
                     return false;
                 }
             }

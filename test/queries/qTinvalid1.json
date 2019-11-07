@@ -1,0 +1,17 @@
+{
+    "title": "incorrect title",
+    "query":{
+        "WHERE": {
+            "GT": {
+                "rooms_avg": 90
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "rooms_avg"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}
