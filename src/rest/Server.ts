@@ -5,6 +5,8 @@
 import fs = require("fs");
 import restify = require("restify");
 import Log from "../Util";
+import InsightFacade from "../controller/InsightFacade";
+import {InsightError, NotFoundError} from "../controller/IInsightFacade";
 
 /**
  * This configures the REST endpoints for the server.
@@ -13,6 +15,7 @@ export default class Server {
 
     private port: number;
     private rest: restify.Server;
+    private static inFa: any = new InsightFacade();
 
     constructor(port: number) {
         Log.info("Server::<init>( " + port + " )");
@@ -64,6 +67,9 @@ export default class Server {
                 that.rest.get("/echo/:msg", Server.echo);
 
                 // NOTE: your endpoints should go here
+                that.rest.put("/dataset/:id/:kind", Server.putData);
+                that.rest.del("/dataset/:id/", Server.delData);
+                that.rest.post("/query", Server.postQuery); // TODO: !!
 
                 // This must be the last endpoint!
                 that.rest.get("/.*", Server.getStatic);
@@ -129,5 +135,45 @@ export default class Server {
             return next();
         });
     }
+
+    private static postQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
+        let query = req.params;
+        Log.trace("::postQuery::");
+        Server.inFa.performQuery(query).then((response: any[]) => {
+            res.json(200, {result: response});
+        }).catch((error: any) => {
+            res.json(400, {error: error.message});
+        });
+        return next();
+    }
+
+    private static putData(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace("::putData::");
+        let id = req.params.id;
+        let content = new Buffer(req.params.body).toString("base64");
+        let kind = req.params.kind;
+        Server.inFa.addDataset(id, content, kind).then((response: any[]) => {
+            res.json(200, {result: response});
+        }).catch((error: any) => {
+            res.json(400, {error: error.message});
+        });
+        return next();
+    }
+
+    private static delData(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace("::delData::");
+        let id = req.params.id;
+        Server.inFa.removeDataset(id).then((response: any) => {
+            res.json(200, {result: response});
+        }).catch((error: any) => {
+            if (error instanceof NotFoundError) {
+                res.json(404, {error: error.message});
+            } else if (error instanceof InsightError) {
+                res.json(400, {error: error.message});
+            }
+        });
+        return next();
+    }
+
 
 }
