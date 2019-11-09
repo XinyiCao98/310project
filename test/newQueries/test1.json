@@ -1,0 +1,24 @@
+{
+    "WHERE": {
+        "AND": [
+            {
+                "IS": {
+                    "courses_dept": "cps*"
+                }
+            },
+            {
+                "GT": {
+                    "courses_avg": 94
+                }
+            }
+        ]
+    },
+    "OPTIONS": {
+        "COLUMNS": [
+            "courses_year",
+            "courses_dept",
+            "courses_uuid"
+        ],
+        "ORDER": "courses_uuid"
+    }
+}

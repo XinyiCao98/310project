@@ -140,8 +140,11 @@ export default class Server {
         let query = req.params;
         Log.trace("::postQuery::");
         Server.inFa.performQuery(query).then((response: any[]) => {
+            Log.trace("success!!!");
             res.json(200, {result: response});
+            // Log.trace(response);
         }).catch((error: any) => {
+            Log.trace("fail!!!");
             res.json(400, {error: error.message});
         });
         return next();
@@ -150,7 +153,9 @@ export default class Server {
     private static putData(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("::putData::");
         let id = req.params.id;
-        let content = new Buffer(req.params.body).toString("base64");
+        // Log.trace("before content");
+        let content = req.body.toString("base64");
+        // Log.trace("after content");
         let kind = req.params.kind;
         Server.inFa.addDataset(id, content, kind).then((response: any[]) => {
             res.json(200, {result: response});
@@ -164,11 +169,16 @@ export default class Server {
         Log.trace("::delData::");
         let id = req.params.id;
         Server.inFa.removeDataset(id).then((response: any) => {
+            Log.trace("success!!!");
             res.json(200, {result: response});
         }).catch((error: any) => {
+            Log.trace("fail!!!");
             if (error instanceof NotFoundError) {
+                Log.trace("not found error!!!");
                 res.json(404, {error: error.message});
-            } else if (error instanceof InsightError) {
+            }
+            if (error instanceof InsightError) {
+                Log.trace("insight error!!!");
                 res.json(400, {error: error.message});
             }
         });

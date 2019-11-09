@@ -101,6 +101,7 @@ export default class InsightFacade implements IInsightFacade {
             let idx = this.datasetID.indexOf(id);
             this.datasetMap.delete(id);
             this.datasetID.splice(idx, 1);
+            this.allKindsMap.delete(id);
             fs.unlink("./data/" + id + ".json", (e) => {
                 if (e !== null) {
                     reject(new InsightError("Unable to delete dataset"));

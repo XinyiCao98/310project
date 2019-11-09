@@ -6,6 +6,7 @@ import chaiHttp = require("chai-http");
 import Response = ChaiHttp.Response;
 import {expect} from "chai";
 import Log from "../src/Util";
+import * as fs from "fs";
 
 describe("Facade D3", function () {
 
@@ -13,53 +14,6 @@ describe("Facade D3", function () {
     let server: Server = null;
     let SERVER_URL = "http://localhost:4321";
     this.timeout(10000);
-
-    const validQuery: any = {
-        WHERE: {
-            AND: [
-                {
-                    NOT: {
-                        OR: [
-                            {
-                                LT: {
-                                    courses_avg: 63
-                                }
-                            },
-                            {
-                                GT: {
-                                    courses_avg: 70
-                                }
-                            }
-                        ]
-                    }
-                },
-                {
-                    LT: {
-                        courses_avg: 63.01
-                    }
-                }
-            ]
-        },
-        OPTIONS: {
-            COLUMN: [
-                "courses_dept",
-                "courses_id",
-                "courses_avg"
-            ],
-            ORDER: "courses_avg"
-        }
-    };
-
-    const invalidQuery = {
-        OPTIONS: {
-            COLUMNS: [
-                "courses_dept",
-                "courses_id",
-                "courses_avg"
-            ],
-            ORDER: "courses_avg"
-        }
-    };
 
     chai.use(chaiHttp);
 
@@ -111,8 +65,10 @@ describe("Facade D3", function () {
         try {
             return chai.request(SERVER_URL)
                 .put("/dataset/courses/courses")
-                .set("body", "./test/data/courses.zip")
+                .send(fs.readFileSync("./test/data/courses.zip"))
+                .set("Content-Type", "application/x-zip-compressed")
                 .then(function (res: any) {
+                    Log.trace("inside test");
                     expect(res.status).to.deep.equal(200);
                     expect(res.body.result).to.deep.equal(["courses"]);
                 })
@@ -126,21 +82,14 @@ describe("Facade D3", function () {
 
     it("test valid query", function () {
         try {
-            let out = [
-                {courses_dept: "biol", courses_id: "155", courses_avg: 63},
-                {courses_dept: "biol", courses_id: "155", courses_avg: 63},
-                {courses_dept: "busi", courses_id: "293", courses_avg: 63},
-                {courses_dept: "comm", courses_id: "292", courses_avg: 63},
-                {courses_dept: "fopr", courses_id: "262", courses_avg: 63},
-                {courses_dept: "lled", courses_id: "200", courses_avg: 63}
-            ];
+            let query = JSON.parse(fs.readFileSync("./test/newQueries/test1.json", "utf8"));
             return chai.request(SERVER_URL)
-                .put("/validQuery")
-                .send(validQuery)
-                .then(function (res: Response) {
+                .post("/query")
+                .send(query)
+                .then(function (res: any) {
                     // some logging here please!
+                    Log.trace("inside test valid query");
                     expect(res.status).to.be.equal(200);
-                    expect(res.body).to.be.equal({result: out});
                 })
                 .catch(function (err) {
                     // some logging here please!
@@ -153,9 +102,10 @@ describe("Facade D3", function () {
 
     it("test invalid query", function () {
         try {
+            let query = JSON.parse(fs.readFileSync("./test/newQueries/test2.json", "utf8"));
             return chai.request(SERVER_URL)
-                .put("/invalidQuery")
-                .send(invalidQuery)
+                .post("/query")
+                .send(query)
                 .then(function (res: Response) {
                     // some logging here please!
                     expect.fail();
@@ -169,5 +119,38 @@ describe("Facade D3", function () {
         }
     });
 
+    it("test delete dataset", function () {
+        try {
+            return chai.request(SERVER_URL)
+                .del("/dataset/courses")
+                .then(function (res: Response) {
+                    // some logging here please!
+                    expect(res.status).to.deep.equal(200);
+                })
+                .catch(function (err) {
+                    // some logging here please!
+                    expect.fail();
+                });
+        } catch (err) {
+            Log.trace("fail to test delete dataset : " + err);
+        }
+    });
+
+    it("fail to delete dataset that already delete", function () {
+        try {
+            return chai.request(SERVER_URL)
+                .del("/dataset/courses")
+                .then(function (res: Response) {
+                    // some logging here please!
+                    expect.fail();
+                })
+                .catch(function (err) {
+                    // some logging here please!
+                    expect(err.status).to.deep.equal(404);
+                });
+        } catch (err) {
+            Log.trace("fail to test unsuccessful delete dataset : " + err);
+        }
+    });
     // The other endpoints work similarly. You should be able to find all instructions at the chai-http documentation
 });
