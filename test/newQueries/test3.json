@@ -1,0 +1,35 @@
+{
+    "WHERE": {
+        "AND": [
+            {
+                "IS": {
+                    "courses_dept": "cpsc"
+                }
+            },
+            {
+                "GT": {
+                    "courses_avg": 90
+                }
+            }
+        ]
+    },
+    "OPTIONS": {
+        "COLUMNS": [
+            "maxPass",
+            "courses_id"
+        ],
+        "ORDER": "maxPass"
+    },
+    "TRANSFORMATIONS": {
+        "GROUP": [
+            "courses_id"
+        ],
+        "APPLY": [
+            {
+                "maxPass": {
+                    "MAX": "courses_pass"
+                }
+            }
+        ]
+    }
+}

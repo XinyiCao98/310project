@@ -80,7 +80,7 @@ describe("Facade D3", function () {
         }
     });
 
-    it("test valid query", function () {
+    it("test valid query for courses", function () {
         try {
             let query = JSON.parse(fs.readFileSync("./test/newQueries/test1.json", "utf8"));
             return chai.request(SERVER_URL)
@@ -89,6 +89,41 @@ describe("Facade D3", function () {
                 .then(function (res: any) {
                     // some logging here please!
                     Log.trace("inside test valid query");
+                    expect(res.status).to.be.equal(200);
+                })
+                .catch(function (err) {
+                    // some logging here please!
+                    expect.fail();
+                });
+        } catch (err) {
+            Log.trace("fail to test valid query : " + err);
+        }
+    });
+
+    it("test get dataset", function () {
+        try {
+            return chai.request(SERVER_URL)
+                .get("/datasets")
+                .then(function (res: any) {
+                    Log.trace("inside test");
+                    expect(res.status).to.deep.equal(200);
+                })
+                .catch(function (err) {
+                    expect.fail();
+                });
+        } catch (err) {
+            Log.trace("add dataset unsuccessful");
+        }
+    });
+
+    it("test valid query for rooms", function () {
+        try {
+            let query = JSON.parse(fs.readFileSync("./test/newQueries/test3.json", "utf8"));
+            return chai.request(SERVER_URL)
+                .post("/query")
+                .send(query)
+                .then(function (res: any) {
+                    // some logging here please!
                     expect(res.status).to.be.equal(200);
                 })
                 .catch(function (err) {
@@ -136,6 +171,25 @@ describe("Facade D3", function () {
         }
     });
 
+    it("not able to perform when dataset is delete", function () {
+        try {
+            let query = JSON.parse(fs.readFileSync("./test/newQueries/test2.json", "utf8"));
+            return chai.request(SERVER_URL)
+                .post("/query")
+                .send(query)
+                .then(function (res: Response) {
+                    // some logging here please!
+                    expect.fail();
+                })
+                .catch(function (err) {
+                    // some logging here please!
+                    expect(err.status).to.deep.equal(400);
+                });
+        } catch (err) {
+            Log.trace("fail to test query without dataset : " + err);
+        }
+    });
+
     it("fail to delete dataset that already delete", function () {
         try {
             return chai.request(SERVER_URL)
@@ -147,6 +201,23 @@ describe("Facade D3", function () {
                 .catch(function (err) {
                     // some logging here please!
                     expect(err.status).to.deep.equal(404);
+                });
+        } catch (err) {
+            Log.trace("fail to test unsuccessful delete dataset : " + err);
+        }
+    });
+
+    it("fail to delete dataset with wrong format", function () {
+        try {
+            return chai.request(SERVER_URL)
+                .del("/dataset/")
+                .then(function (res: Response) {
+                    // some logging here please!
+                    expect.fail();
+                })
+                .catch(function (err) {
+                    // some logging here please!
+                    expect(err.status).to.deep.equal(400);
                 });
         } catch (err) {
             Log.trace("fail to test unsuccessful delete dataset : " + err);

@@ -195,6 +195,12 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public getData(DataId: string): any {
+        if (! this.datasetMap.has(DataId)) {
+            const value = fs.readFileSync("./data/" + DataId + ".json", "utf8");
+            const data = JSON.parse(value);
+            this.datasetID.push(DataId);
+            this.datasetMap.set(DataId, data);
+        }
         return this.datasetMap.get(DataId);
     }
 }
