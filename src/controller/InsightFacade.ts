@@ -93,7 +93,8 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.reject(new InsightError("ID is whitespace or underscore."));
         }
         // check whether dataset ID is exists
-        if (!this.allKindsMap.has(id)) {
+        // const exist: boolean = fs.existsSync("./data/" + id);
+        if (!this.datasetMap.has(id)) {
             // reject(new NotFoundError("ID is not existed."));
             return Promise.reject(new NotFoundError("ID is not existed."));
         }
@@ -121,7 +122,9 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.reject(new InsightError("Invalid Query"));
         }
         const target = this.getQueryID(query);
-        this.getDatasets(target);
+        if (!this.getDatasets(target)) {
+            return Promise.reject(new InsightError("Write to disk error"));
+        }
         const PQ = new PerformQuery(target);
         let ObjectArray = JSON.parse(JSON.stringify(this.getData(target)));
         const transHelp = new PerformTransHelper();
@@ -181,26 +184,27 @@ export default class InsightFacade implements IInsightFacade {
         });
     }
 
-    public getDatasets(DataId: string) {
-        if (!this.datasetMap.has(DataId)) {
-            // dataset not exists in map
-            const Data = fs.readFileSync("./data/" + DataId + ".json", "utf8");
-            try {
+    public getDatasets(DataId: string): boolean {
+        try {
+            if (!this.datasetMap.has(DataId)) {
+                // dataset not exists in map
+                const Data = fs.readFileSync("./data/" + DataId + ".json", "utf8");
                 this.datasetID.push(DataId);
                 this.datasetMap.set(DataId, JSON.parse(Data));
-            } catch (err) {
-                this.datasetMap = new Map<string, object[]>();
+                // try {
+                //     this.datasetID.push(DataId);
+                //     this.datasetMap.set(DataId, JSON.parse(Data));
+                // } catch (err) {
+                //     this.datasetMap = new Map<string, object[]>();
+                // }
             }
+            return true;
+        } catch (e) {
+            return false;
         }
     }
 
     public getData(DataId: string): any {
-        if (! this.datasetMap.has(DataId)) {
-            const value = fs.readFileSync("./data/" + DataId + ".json", "utf8");
-            const data = JSON.parse(value);
-            this.datasetID.push(DataId);
-            this.datasetMap.set(DataId, data);
-        }
         return this.datasetMap.get(DataId);
     }
 }
