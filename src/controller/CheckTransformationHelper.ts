@@ -15,6 +15,9 @@ export default class CheckTransformationHelper {
         "number", "name", "address", "type", "furniture", "href"];
 
     private CP: string[] = ["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"];
+    private properties: string[] = ["dept", "id", "avg", "title",
+        "pass", "fail", "audit", "uuid", "year", "instructor", "lat", "lon", "seats", "fullname", "shortname",
+        "number", "name", "address", "type", "furniture", "href"];
 
     constructor() {
         //
@@ -33,7 +36,6 @@ export default class CheckTransformationHelper {
         }
         let group = trans["GROUP"];
         let DatasetName = this.getDataName(query);
-        Log.trace(DatasetName);
         if (!this.CheckDataSet(apply, group, DatasetName)) {
             return false;
         }
@@ -249,6 +251,19 @@ export default class CheckTransformationHelper {
             ID = "_uuid";
         }
         return ID;
+    }
+
+    public checkDP(determineType: string, TempId: string ): boolean {
+        if (this.properties.indexOf(determineType) < 0) {
+            return  false;
+        }
+        if (TempId === "courses" && this.RProperties.indexOf(determineType) >= 0) {
+            return false;
+        }
+        if (TempId === "rooms" && this.CProperties.indexOf(determineType) >= 0) {
+            return false;
+        }
+        return true;
     }
 
 }

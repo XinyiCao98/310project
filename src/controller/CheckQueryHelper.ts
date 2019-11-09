@@ -2,9 +2,6 @@ import Log from "../Util";
 import CheckTransformationHelper from "./CheckTransformationHelper";
 
 export default class CheckQueryHelper {
-    private properties: string[] = ["dept", "id", "avg", "title",
-        "pass", "fail", "audit", "uuid", "year", "instructor", "lat", "lon", "seats", "fullname", "shortname",
-        "number", "name", "address", "type", "furniture", "href"];
 
     private CNProperties: string[] = ["avg", "pass", "fail", "audit", "year"];
     private CSProperties: string[] = ["dept", "id", "instructor", "title", "uuid"];
@@ -57,7 +54,7 @@ export default class CheckQueryHelper {
             this.tempID = filtered[0].split("_")[0];
         }
         let determineType = TransHelper.FindDeterminType(filtered, query);
-        if (this.properties.indexOf(determineType) < 0) {
+        if (!TransHelper.checkDP(determineType, this.tempID)) {
             return false;
         }
         if (this.RP.indexOf(determineType) > 0) {
