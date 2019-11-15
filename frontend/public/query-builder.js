@@ -10,41 +10,134 @@ CampusExplorer.buildQuery = function () {
     //Find Data Type
     let header = document.getElementsByClassName("nav-item tab active")[0];
     let dataType = header.attributes[1].nodeValue;
-
+    let CP = ["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"];
+    let RP = ["lat", "lon", "seats", "fullname", "shortname",
+        "number", "name", "address", "type", "furniture", "href"];
+    let RNProperties = ["lat", "lon", "seats"];
+    let CNProperties = ["avg", "pass", "fail", "audit", "year"];
+    let standard = [];
+    let standardN = [];
+    if (dataType == "courses") {
+        standard = CP;
+        standardN = CNProperties;
+    } else {
+        standard = RP;
+        standardN = RNProperties;
+    }
     //Find Where
     let conditionsFrame = document.getElementsByClassName("form-group conditions")[0];
-    let conditions   = conditionsFrame.getElementsByClassName("conditions-container")[0];
-    let filters    = conditions.getElementsByClassName("control-group condition");
-    let firstFilter = filters[0];
+    let conditions = conditionsFrame.getElementsByClassName("conditions-container")[0];
+    let filters = conditions.getElementsByClassName("control-group condition");
+    let propertiesInCond = [];
+    let operationsInCond = [];
+    let hasNOT = [];
+    let inputsInCond = [];
     //read conditions
-    let applyProperty = firstFilter.getElementsByClassName("control fields")[0];
-    let getOptions = applyProperty.getElementsByTagName("select")[0];
+    let applyProperty, getOptions, selected, modifiedS;
     // selected is a string indicates the property applied in each conditions eg. avg/dept
-    let selected = getOptions.options[getOptions.selectedIndex].value;
 
-    let applyOperator = firstFilter.getElementsByClassName("control operators")[0];
-    let operators = applyOperator.getElementsByTagName("select")[0];
+    let applyOperator, operators, operation;
     // operation is a string indicates the operation applied in each condition eg.EQ GT
-    let operation = operators.options[operators.selectedIndex].value;
 
-    let applyInput = firstFilter.getElementsByClassName("control term")[0];
-    let inputTag = applyInput.getElementsByTagName("input")[0];
+    let applyInput, inputTag, typed;
     // typed is a string entered manually
-    let typed = inputTag["value"];
 
-    //Find Columns
-     let col = document.getElementsByClassName("control-group")[2];
-     let colProperties = col.getElementsByClassName("control field");
-     let  input = colProperties[0].getElementsByTagName("input") ;
-     let columns = [];
-     for (let colProperty of colProperties){
-        input  = colProperty.getElementsByTagName("input")[0];
-        if(input.getAttributeNames().length > 4){
-           columns.push(input.attributes[2].nodeValue);
+    let notCondition, inputNot, inputNotL;
+    for (let filter of filters) {
+        applyProperty = filter.getElementsByClassName("control fields")[0];
+        getOptions = applyProperty.getElementsByTagName("select")[0];
+        selected = getOptions.options[getOptions.selectedIndex].value;
+        modifiedS = dataType + "_" + selected;
+        propertiesInCond.push(modifiedS);
+
+        applyOperator = filter.getElementsByClassName("control operators")[0];
+        operators = applyOperator.getElementsByTagName("select")[0];
+        operation = operators.options[operators.selectedIndex].value;
+        operationsInCond.push(operation);
+
+        applyInput = filter.getElementsByClassName("control term")[0];
+        inputTag = applyInput.getElementsByTagName("input")[0];
+        typed = inputTag["value"];
+        if (standardN.indexOf(selected) >= 0) {
+            typed = Number(typed);
         }
-     }
+        inputsInCond.push(typed);
 
-     // query["WHERE"]= typed; for testing
+        notCondition = filter.getElementsByClassName("control not")[0];
+        inputNot = notCondition.getElementsByTagName("input")[0];
+        inputNotL = inputNot.attributes.length;
+        hasNOT.push(inputNotL === 2);
+    }
+    // processing the arrays we get from where
+    let allConditions = [];
+    let propertyAndInput = new Object();
+    let addOperation = new Object();
+    let addNOT = new Object();
+    let withConnector = new Object();
+    let i = 0;
+    for (i; i < inputsInCond.length; i++) {
+        propertyAndInput[propertiesInCond[i]] = inputsInCond[i];
+        addOperation[operationsInCond[i]] = propertyAndInput;
+        if (hasNOT[i]) {
+            addNOT["NOT"] = addOperation;
+            allConditions.push(addNOT);
+        } else {
+            allConditions.push(addOperation);
+        }
+        addNOT = new Object();
+        addOperation = new Object();
+        propertyAndInput = new Object();
+    }
+    if (allConditions.length === 0) {
+        query["WHERE"] = {};
+    }
+    let connections = document.getElementsByClassName("control-group condition-type")[0];
+    let allConnections = connections.getElementsByClassName("control");
+    let inputInConnection, connector;;
+    for(let eachConnection of allConnections) {
+        inputInConnection = eachConnection.getElementsByTagName("input")[0];
+        if(inputInConnection.attributes.length === 5){
+            connector = inputInConnection["value"];
+        }
+    }
+    if(connector === "all"){
+        connector = "AND";
+    }
+    if(connector === "any"){
+        connector = "OR";
+    }
+    if(connector === "none"){
+        connector = "NOT";
+    }
+    if (allConditions.length === 1 && connector !== "NOT") {
+        query["WHERE"] = allConditions[0];
+    }else{
+        withConnector[connector] = allConditions;
+        query["WHERE"] = withConnector;
+    }
+    query["OPTIONS"] = connector;
+
+
+    //Find Columns 有问题 看QUERY2
+    let col = document.getElementsByClassName("control-group")[2];
+    let colProperties = col.getElementsByClassName("control field");
+    let input;
+    let columns = [];
+    for (let colProperty of colProperties) {
+        input = colProperty.getElementsByTagName("input")[0];
+        if (input.getAttributeNames().length > 4) {
+            columns.push(input.attributes[2].nodeValue);
+        }
+    }
+    // add dataset name in front of columns property
+    let j = 0;
+    for (let column of columns) {
+        if (standard.indexOf(column) >= 0) {
+            let newName = dataType + "_" + column;
+            columns[j] = newName;
+        }
+        j++;
+    }
     return query;
 
 
