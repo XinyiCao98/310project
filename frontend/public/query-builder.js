@@ -68,6 +68,7 @@ CampusExplorer.buildQuery = function () {
         inputNotL = inputNot.attributes.length;
         hasNOT.push(inputNotL === 2);
     }
+
     // processing the arrays we get from where
     let allConditions = [];
     let propertyAndInput = new Object();
@@ -115,31 +116,72 @@ CampusExplorer.buildQuery = function () {
         withConnector[connector] = allConditions;
         query["WHERE"] = withConnector;
     }
-    query["OPTIONS"] = connector;
 
 
-    //Find Columns 有问题 看QUERY2
-    let col = document.getElementsByClassName("control-group")[2];
-    let colProperties = col.getElementsByClassName("control field");
-    let input;
+    //Find Columns
+    let cols = document.getElementsByClassName("form-group columns")[0];
+    let col = cols.getElementsByClassName("control-group")[0];
+    let colProperties = col.getElementsByTagName("input");
+    let modifiedField;
     let columns = [];
-    for (let colProperty of colProperties) {
-        input = colProperty.getElementsByTagName("input")[0];
-        if (input.getAttributeNames().length > 4) {
-            columns.push(input.attributes[2].nodeValue);
-        }
-    }
-    // add dataset name in front of columns property
-    let j = 0;
-    for (let column of columns) {
-        if (standard.indexOf(column) >= 0) {
-            let newName = dataType + "_" + column;
-            columns[j] = newName;
+    let j = 1;
+    for(let colProperty of colProperties) {
+        if(colProperty.checked){
+            if(j<=10){
+                modifiedField = dataType+"_"+colProperty["value"];
+                columns.push(modifiedField);
+            }else{
+                columns.push(colProperty["value"]);
+            }
         }
         j++;
     }
-    return query;
+    //Find Order
+    let OrderField = document.getElementsByClassName("form-group order")[0];
+    let OrderOptions = OrderField.getElementsByClassName("control order fields")[0];
+    let allOptions = OrderOptions.getElementsByTagName("select")[0];
+    let selectedForOrder = [];
+    for(let eachOption of allOptions){
+        if (eachOption.selected){
+            selectedForOrder.push(eachOption.value);
+        }
+    }
+    let counterForOrder = 0;
+    let orderWithDataType;
+    for(let eachInOrd of selectedForOrder){
+        if(standard.indexOf(eachInOrd)>=0){
+           orderWithDataType = dataType+"_"+eachInOrd;
+           selectedForOrder[counterForOrder] = orderWithDataType;
+        }
+        counterForOrder++;
+    }
+    let descending;
+    let descendingPart = OrderField.getElementsByClassName("control descending")[0];
+    let descendingChecker = descendingPart.getElementsByTagName("input")[0];
+    if (descendingChecker.checked){
+        descending = true;
+    }else{
+        descending= false;
+    }
+    let options = new Object();
+    let oderObject = new Object();
+    options["COLUMNS"]= columns;
+    if(!descending && selectedForOrder.length==1){
+        options["ORDER"]= selectedForOrder[0];
+    }else{
+       oderObject["keys"]=selectedForOrder;
+       if(descending){
+           oderObject["dir"]="DOWN";
 
+       }else{
+           oderObject["dir"] ="UP";
+       }
+       options["ORDER"]=oderObject;
+        }
+
+
+    query["OPTIONS"]=options;
+    return query;
 
 }
 

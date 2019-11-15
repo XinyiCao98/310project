@@ -3,9 +3,9 @@
     "query2": {
         "WHERE": {"AND": [{"NOT": {"LT": {"courses_avg": 80}}},
                    {"IS": {"courses_dept": "math"}}]},
-        "OPTIONS": {"COLUMNS": ["courses_id", "courses_dept", "NumOfCourses"],
+        "OPTIONS": {"COLUMNS": ["courses_id", "courses_dept", "numOfCourses"],
             "ORDER": {
-                "keys": ["NumOfCourses"],
+                "keys": ["numOfCourses"],
                 "dir": "DOWN"}},
         "TRANSFORMATIONS": {"GROUP": ["courses_dept", "courses_id"],
             "APPLY": [
