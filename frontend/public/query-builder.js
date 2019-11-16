@@ -94,25 +94,26 @@ CampusExplorer.buildQuery = function () {
     }
     let connections = document.getElementsByClassName("control-group condition-type")[0];
     let allConnections = connections.getElementsByClassName("control");
-    let inputInConnection, connector;;
-    for(let eachConnection of allConnections) {
+    let inputInConnection, connector;
+    ;
+    for (let eachConnection of allConnections) {
         inputInConnection = eachConnection.getElementsByTagName("input")[0];
-        if(inputInConnection.attributes.length === 5){
+        if (inputInConnection.attributes.length === 5) {
             connector = inputInConnection["value"];
         }
     }
-    if(connector === "all"){
+    if (connector === "all") {
         connector = "AND";
     }
-    if(connector === "any"){
+    if (connector === "any") {
         connector = "OR";
     }
-    if(connector === "none"){
+    if (connector === "none") {
         connector = "NOT";
     }
     if (allConditions.length === 1 && connector !== "NOT") {
         query["WHERE"] = allConditions[0];
-    }else{
+    } else {
         withConnector[connector] = allConditions;
         query["WHERE"] = withConnector;
     }
@@ -125,12 +126,12 @@ CampusExplorer.buildQuery = function () {
     let modifiedField;
     let columns = [];
     let j = 1;
-    for(let colProperty of colProperties) {
-        if(colProperty.checked){
-            if(j<=10){
-                modifiedField = dataType+"_"+colProperty["value"];
+    for (let colProperty of colProperties) {
+        if (colProperty.checked) {
+            if (j <= 10) {
+                modifiedField = dataType + "_" + colProperty["value"];
                 columns.push(modifiedField);
-            }else{
+            } else {
                 columns.push(colProperty["value"]);
             }
         }
@@ -141,46 +142,95 @@ CampusExplorer.buildQuery = function () {
     let OrderOptions = OrderField.getElementsByClassName("control order fields")[0];
     let allOptions = OrderOptions.getElementsByTagName("select")[0];
     let selectedForOrder = [];
-    for(let eachOption of allOptions){
-        if (eachOption.selected){
+    for (let eachOption of allOptions) {
+        if (eachOption.selected) {
             selectedForOrder.push(eachOption.value);
         }
     }
     let counterForOrder = 0;
     let orderWithDataType;
-    for(let eachInOrd of selectedForOrder){
-        if(standard.indexOf(eachInOrd)>=0){
-           orderWithDataType = dataType+"_"+eachInOrd;
-           selectedForOrder[counterForOrder] = orderWithDataType;
+    for (let eachInOrd of selectedForOrder) {
+        if (standard.indexOf(eachInOrd) >= 0) {
+            orderWithDataType = dataType + "_" + eachInOrd;
+            selectedForOrder[counterForOrder] = orderWithDataType;
         }
         counterForOrder++;
     }
     let descending;
     let descendingPart = OrderField.getElementsByClassName("control descending")[0];
     let descendingChecker = descendingPart.getElementsByTagName("input")[0];
-    if (descendingChecker.checked){
+    if (descendingChecker.checked) {
         descending = true;
-    }else{
-        descending= false;
+    } else {
+        descending = false;
     }
     let options = new Object();
     let oderObject = new Object();
-    options["COLUMNS"]= columns;
-    if(!descending && selectedForOrder.length==1){
-        options["ORDER"]= selectedForOrder[0];
-    }else{
-       oderObject["keys"]=selectedForOrder;
-       if(descending){
-           oderObject["dir"]="DOWN";
+    options["COLUMNS"] = columns;
+    if (!descending && selectedForOrder.length == 1) {
+        options["ORDER"] = selectedForOrder[0];
+    } else {
+        oderObject["keys"] = selectedForOrder;
+        if (descending) {
+            oderObject["dir"] = "DOWN";
 
-       }else{
-           oderObject["dir"] ="UP";
-       }
-       options["ORDER"]=oderObject;
+        } else {
+            oderObject["dir"] = "UP";
         }
+        options["ORDER"] = oderObject;
+    }
+    query["OPTIONS"] = options;
 
+    let groupPart = document.getElementsByClassName("form-group groups")[0];
+    let allOptForGroup = groupPart.getElementsByTagName("input");
+    let groupByThem = [];
+    let transOptForGroup;
+    for (let eachOptForGroup of allOptForGroup) {
+        if (eachOptForGroup.checked) {
+            transOptForGroup = dataType + "_" + eachOptForGroup.value;
+            groupByThem.push(transOptForGroup);
+        }
+    }
+    if (groupByThem.length === 0) {
+        return query;
+    }
+    let transObject = new Object();
+    transObject["GROUP"] = groupByThem;
+    // FIND APPLY
+    let applyPart = document.getElementsByClassName("transformations-container")[0];
+    let newApply = applyPart.getElementsByClassName("control-group transformation");
+    let newNames = [];
+    let aggregateOp = [];
+    let aggregateProp = [];
+    let eachName, eachOpt, eachProp, modifiedProp;
+    let term, operationChoicesFrame, operatorChoices, propChoices, propChoicesFrame;
+    for (let eachApply of newApply) {
+        term = eachApply.getElementsByClassName("control term")[0];
+        eachName = term.getElementsByTagName("input")[0]["value"];
+        newNames.push(eachName);
+        operationChoicesFrame = eachApply.getElementsByClassName("control operators")[0];
+        operatorChoices = operationChoicesFrame.getElementsByTagName("select")[0];
+        eachOpt = operatorChoices.options[operatorChoices.selectedIndex].value;
+        aggregateOp.push(eachOpt);
+        propChoicesFrame = eachApply.getElementsByClassName("control fields")[0];
+        propChoices = propChoicesFrame.getElementsByTagName("select")[0];
+        eachProp = propChoices.options[propChoices.selectedIndex].value;
+        modifiedProp = dataType + "_" + eachProp;
+        aggregateProp.push(modifiedProp);
 
-    query["OPTIONS"]=options;
+    }
+    let applyObjects = [];
+    let applyWithOperation = new Object();
+    let applyWithName = new Object();
+    let applyObjectCounter = 0;
+    let applyObjectsNum = newNames.length;
+    for (applyObjectCounter; applyObjectCounter < applyObjectsNum; applyObjectCounter++) {
+        applyWithOperation[aggregateOp[applyObjectCounter]]=aggregateProp[applyObjectCounter];
+        applyWithName[newNames[applyObjectCounter]]=applyWithOperation;
+        applyObjects.push(applyWithName);
+    }
+    transObject["APPLY"]=applyObjects;
+    query["TRANSFORMATIONS"] = transObject;
     return query;
 
 }

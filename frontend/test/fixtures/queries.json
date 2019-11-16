@@ -9,5 +9,15 @@
                 "dir": "DOWN"}},
         "TRANSFORMATIONS": {"GROUP": ["courses_dept", "courses_id"],
             "APPLY": [
-                {"NumOfCourses": {"COUNT": "courses_avg"}}]}}
+                {"numOfCourses": {"COUNT": "courses_avg"}}]}},
+    "query3": {
+        "WHERE": {
+            "OR": [{"GT":{"rooms_seats": 100}},{"IS":{"rooms_shortname":"*B"}}]},
+        "OPTIONS": {"COLUMNS": ["rooms_fullname", "rooms_lat", "num", "maxSeats"],
+            "ORDER": {"dir": "UP", "keys": ["rooms_fullname", "rooms_lat"]}},
+        "TRANSFORMATIONS": {"GROUP": ["rooms_fullname", "rooms_lat"],
+            "APPLY": [
+                {"maxSeats": {"MAX": "rooms_seats"}
+                },{"num":{"COUNT":"rooms_lon"
+                }}]}}
 }
