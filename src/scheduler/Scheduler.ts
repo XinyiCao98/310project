@@ -4,17 +4,23 @@ import Log from "../Util";
 import PerformOrderHelper from "../controller/PerformOrderHelper";
 
 export default class Scheduler implements IScheduler {
+    public schedInNext: SchedSection[] = [];
 
     public schedule(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
         // TODO Implement this
         let sortedRoom = this.sortHelper(rooms, "maxSeats"); // TODO: 不确定
-        let scheduled = [];
-        let toBeSchedule = sections;
+        let toBeSchedule = this.sortSections(sections);
+        toBeSchedule = this.reverseS(toBeSchedule);
         let result: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
 
         for (let singleRoom of sortedRoom) { // check one room at a time until all qualified courses filled
+            let scheduled = []; // every section scheduled in this room
             let timeTable: Map<string, boolean> = new Map<string, boolean>();
             this.setSchedule(timeTable);
+            if (this.schedInNext !== null) {
+                toBeSchedule = this.schedInNext.concat(toBeSchedule);
+                this.schedInNext = [];
+            }
 
             let done: boolean = false;
             while (!done) {
@@ -25,11 +31,16 @@ export default class Scheduler implements IScheduler {
                 target = this.getLargestSec(toBeSchedule, singleRoom["rooms_seats"]);
                 if (target !== false) {
                     if (this.checkroomAvailable(timeTable) !== false
-                        && this.checkNoDuplicateSec(target, scheduled)) {
+                        && this.checkNoDuplicateSec(target, scheduled) === true) {
                         scheduled.push(target);
                         let time: TimeSlot = this.checkroomAvailable(timeTable);
+                        timeTable.set(time, false);
                         result.push([singleRoom, target, time]);
-                        rooms.splice(toBeSchedule.indexOf(target), 1);
+                        toBeSchedule.splice(toBeSchedule.indexOf(target), 1);
+                    } else if (this.checkroomAvailable(timeTable) !== false
+                        && this.checkNoDuplicateSec(target, scheduled) === false) { // duplicated has to be checked
+                        this.schedInNext.push(target);
+                        toBeSchedule.splice(toBeSchedule.indexOf(target), 1);
                     } else { // no more schedule to fit
                         done = true;
                         Log.trace("Room schedule is all full");
@@ -44,18 +55,35 @@ export default class Scheduler implements IScheduler {
         return result;
     }
 
+    public sortSections(sections: SchedSection[]): SchedSection[] {
+        sections.sort(function (a, b) {
+            return (a["courses_pass"] + a["courses_fail"] + a["courses_audit"])
+                - (b["courses_pass"] + b["courses_fail"] + b["courses_audit"]);
+        });
+        return sections;
+    }
+
     public sortHelper(Expected: SchedRoom[], keys: string): SchedRoom[] {
         let initialKey = keys;
         let result: SchedRoom[];
         let Original = this.OrderByString(Expected, initialKey);
-        result = this.Reverse(Original);
+        result = this.reverseR(Original);
         return result;
     }
 
-    public Reverse(Original: SchedRoom[]): SchedRoom[] {
+    public reverseR(Original: SchedRoom[]): SchedRoom[] {
         let reverse: SchedRoom[] = [];
         let n = Object.keys(Original).length;
-        for (let i: number = n - 1; i >= 0; i --) {
+        for (let i: number = n - 1; i >= 0; i--) {
+            reverse.push(Original[i]);
+        }
+        return reverse;
+    }
+
+    public reverseS(Original: SchedSection[]): SchedSection[] {
+        let reverse: SchedSection[] = [];
+        let n = Object.keys(Original).length;
+        for (let i: number = n - 1; i >= 0; i--) {
             reverse.push(Original[i]);
         }
         return reverse;
@@ -99,7 +127,6 @@ export default class Scheduler implements IScheduler {
     public checkroomAvailable(timeTable: Map<string, boolean>): any {
         for (let k of timeTable.keys()) {
             if (timeTable.get(k)) {
-                timeTable.set(k, false);
                 return k;
             }
         }
