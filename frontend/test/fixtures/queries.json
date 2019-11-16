@@ -14,10 +14,10 @@
         "WHERE": {
             "OR": [{"GT":{"rooms_seats": 100}},{"IS":{"rooms_shortname":"*B"}}]},
         "OPTIONS": {"COLUMNS": ["rooms_fullname", "rooms_lat", "num", "maxSeats"],
-            "ORDER": {"dir": "UP", "keys": ["rooms_fullname", "rooms_lat"]}},
+            "ORDER": { "keys": ["rooms_fullname", "rooms_lat"], "dir": "UP"}},
         "TRANSFORMATIONS": {"GROUP": ["rooms_fullname", "rooms_lat"],
             "APPLY": [
+                {"num":{"COUNT":"rooms_lon"}},
                 {"maxSeats": {"MAX": "rooms_seats"}
-                },{"num":{"COUNT":"rooms_lon"
-                }}]}}
+                }]}}
 }

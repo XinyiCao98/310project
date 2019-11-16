@@ -24,8 +24,9 @@ CampusExplorer.buildQuery = function () {
         standard = RP;
         standardN = RNProperties;
     }
+    let content = document.getElementsByClassName("tab-panel active")[0];
     //Find Where
-    let conditionsFrame = document.getElementsByClassName("form-group conditions")[0];
+    let conditionsFrame = content.getElementsByClassName("form-group conditions")[0];
     let conditions = conditionsFrame.getElementsByClassName("conditions-container")[0];
     let filters = conditions.getElementsByClassName("control-group condition");
     let propertiesInCond = [];
@@ -92,7 +93,7 @@ CampusExplorer.buildQuery = function () {
     if (allConditions.length === 0) {
         query["WHERE"] = {};
     }
-    let connections = document.getElementsByClassName("control-group condition-type")[0];
+    let connections = content.getElementsByClassName("control-group condition-type")[0];
     let allConnections = connections.getElementsByClassName("control");
     let inputInConnection, connector;
     ;
@@ -120,7 +121,7 @@ CampusExplorer.buildQuery = function () {
 
 
     //Find Columns
-    let cols = document.getElementsByClassName("form-group columns")[0];
+    let cols = content.getElementsByClassName("form-group columns")[0];
     let col = cols.getElementsByClassName("control-group")[0];
     let colProperties = col.getElementsByTagName("input");
     let modifiedField;
@@ -138,7 +139,7 @@ CampusExplorer.buildQuery = function () {
         j++;
     }
     //Find Order
-    let OrderField = document.getElementsByClassName("form-group order")[0];
+    let OrderField = content.getElementsByClassName("form-group order")[0];
     let OrderOptions = OrderField.getElementsByClassName("control order fields")[0];
     let allOptions = OrderOptions.getElementsByTagName("select")[0];
     let selectedForOrder = [];
@@ -181,7 +182,7 @@ CampusExplorer.buildQuery = function () {
     }
     query["OPTIONS"] = options;
 
-    let groupPart = document.getElementsByClassName("form-group groups")[0];
+    let groupPart = content.getElementsByClassName("form-group groups")[0];
     let allOptForGroup = groupPart.getElementsByTagName("input");
     let groupByThem = [];
     let transOptForGroup;
@@ -197,7 +198,7 @@ CampusExplorer.buildQuery = function () {
     let transObject = new Object();
     transObject["GROUP"] = groupByThem;
     // FIND APPLY
-    let applyPart = document.getElementsByClassName("transformations-container")[0];
+    let applyPart = content.getElementsByClassName("transformations-container")[0];
     let newApply = applyPart.getElementsByClassName("control-group transformation");
     let newNames = [];
     let aggregateOp = [];
@@ -228,7 +229,10 @@ CampusExplorer.buildQuery = function () {
         applyWithOperation[aggregateOp[applyObjectCounter]]=aggregateProp[applyObjectCounter];
         applyWithName[newNames[applyObjectCounter]]=applyWithOperation;
         applyObjects.push(applyWithName);
+        applyWithOperation = new Object();
+        applyWithName = new Object();
     }
+    query["checker"]=applyWithOperation;
     transObject["APPLY"]=applyObjects;
     query["TRANSFORMATIONS"] = transObject;
     return query;
