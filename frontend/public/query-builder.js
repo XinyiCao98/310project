@@ -232,10 +232,9 @@ CampusExplorer.buildQuery = function () {
         applyWithOperation = new Object();
         applyWithName = new Object();
     }
-    query["checker"]=applyWithOperation;
     transObject["APPLY"]=applyObjects;
     query["TRANSFORMATIONS"] = transObject;
     return query;
 
-}
+};
 
