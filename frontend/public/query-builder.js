@@ -90,13 +90,18 @@ CampusExplorer.buildQuery = function () {
         addOperation = new Object();
         propertyAndInput = new Object();
     }
-    if (allConditions.length === 0) {
-        query["WHERE"] = {};
-    }
+
     let connections = content.getElementsByClassName("control-group condition-type")[0];
     let allConnections = connections.getElementsByClassName("control");
     let inputInConnection, connector;
-    ;
+    let connectorIsNOT=new Object();
+    let multipleUnderNOT =[];
+    for(eachNOT of allConditions){
+        connectorIsNOT["NOT"]=eachNOT;
+        multipleUnderNOT.push(connectorIsNOT);
+        connectorIsNOT=new Object();
+    }
+    let overallNot = new Object();
     for (let eachConnection of allConnections) {
         inputInConnection = eachConnection.getElementsByTagName("input")[0];
         if (inputInConnection.attributes.length === 5) {
@@ -112,11 +117,27 @@ CampusExplorer.buildQuery = function () {
     if (connector === "none") {
         connector = "NOT";
     }
+    if(allConditions.length===0){
+        query["WHERE"]={};
+    }else{
     if (allConditions.length === 1 && connector !== "NOT") {
         query["WHERE"] = allConditions[0];
     } else {
+        if(connector === "NOT"){
+            if(allConditions.length===1){
+                overallNot[connector]= allConditions[0];
+                query["WHERE"]=overallNot;
+            }else {
+              overallNot["AND"] = multipleUnderNOT;
+              query["WHERE"]=overallNot;
+
+              }
+
+        }else{
         withConnector[connector] = allConditions;
         query["WHERE"] = withConnector;
+        }
+    }
     }
 
 
@@ -168,10 +189,11 @@ CampusExplorer.buildQuery = function () {
     let options = new Object();
     let oderObject = new Object();
     options["COLUMNS"] = columns;
+    if(selectedForOrder.length > 0 ){
     if (!descending && selectedForOrder.length == 1) {
         options["ORDER"] = selectedForOrder[0];
     } else {
-        oderObject["keys"] = selectedForOrder;
+        oderObject["keys"]= selectedForOrder;
         if (descending) {
             oderObject["dir"] = "DOWN";
 
@@ -181,6 +203,14 @@ CampusExplorer.buildQuery = function () {
         options["ORDER"] = oderObject;
     }
     query["OPTIONS"] = options;
+    }else {
+        if(descending && selectedForOrder.length==0){
+            oderObject["keys"]=[];
+            oderObject["dir"]="DOWN";
+            options["ORDER"]=oderObject;
+        }
+        query["OPTIONS"]=options;
+    }
 
     let groupPart = content.getElementsByClassName("form-group groups")[0];
     let allOptForGroup = groupPart.getElementsByTagName("input");

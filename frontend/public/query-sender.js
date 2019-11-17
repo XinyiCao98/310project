@@ -8,7 +8,8 @@ CampusExplorer.sendQuery = function (query) {
     return new Promise(function (fulfill, reject) {
         // TODO: implement!
         let httpRequest = new XMLHttpRequest();
-        httpRequest.open('POST','http://localhost:4321/query');
+        httpRequest.open("POST","http://localhost:4321/query",true);
+        httpRequest.setRequestHeader("Content-Type","application/json")
         httpRequest.onload = function () {
             if (this.status === 200){
                 fulfill(this.responseText);
