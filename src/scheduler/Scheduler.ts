@@ -18,7 +18,6 @@ export default class Scheduler implements IScheduler {
             let timeTable: Map<string, boolean> = new Map<string, boolean>();
             this.setSchedule(timeTable);
             if (this.schedInNext !== null) {
-                this.schedInNext = this.sortSections(this.schedInNext);
                 toBeSchedule = this.schedInNext.concat(toBeSchedule);
                 this.schedInNext = [];
             }
@@ -49,7 +48,7 @@ export default class Scheduler implements IScheduler {
                     }
                 } else {
                     done = true;
-                    return result;
+                    break;
                 }
             }
         }
@@ -134,7 +133,7 @@ export default class Scheduler implements IScheduler {
         return false;
     }
 
-    public getLargestSec(courses: any[], seats: number): any { // largest section fit in room
+    public getLargestSec(courses: any[], seats: number): any {
         for (let singleSec of courses) {
             if (this.checkRoomSize(singleSec, seats)) {
                 return singleSec;
