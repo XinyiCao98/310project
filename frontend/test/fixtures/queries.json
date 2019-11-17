@@ -19,7 +19,5 @@
             "APPLY": [
                 {"num":{"COUNT":"rooms_lon"}},
                 {"maxSeats": {"MAX": "rooms_seats"}
-                }]}},
-    "query4": {"haha": "mo"},
-    "query5": {"double": "not"}
+                }]}}
 }
