@@ -13,79 +13,7 @@ describe("Facade D3", function () {
     let facade: InsightFacade = null;
     let server: Server = null;
     let SERVER_URL = "http://localhost:4321";
-    // this.timeout(10000);
-    let test1 = {
-        WHERE: {
-            AND: [
-                {
-                    IS: {
-                        courses_dept: "cps*"
-                    }
-                },
-                {
-                    GT: {
-                        courses_avg: 94
-                    }
-                }
-            ]
-        },
-        OPTIONS: {
-            COLUMNS: [
-                "courses_year",
-                "courses_dept",
-                "courses_uuid"
-            ],
-            ORDER: "courses_uuid"
-        }
-    };
-
-    let test2 = {
-        WHERE: {
-            GT: {
-                courses_avg: 97
-            }
-        },
-        OPTIONS: {
-            ORDER: "courses_avg"
-        }
-    };
-
-    let test3 = {
-        WHERE: {
-            AND: [
-                {
-                    IS: {
-                        courses_dept: "cpsc"
-                    }
-                },
-                {
-                    GT: {
-                        courses_avg: 90
-                    }
-                }
-            ]
-        },
-        OPTIONS: {
-            COLUMNS: [
-                "maxPass",
-                "courses_id"
-            ],
-            ORDER: "maxPass"
-        },
-        TRANSFORMATIONS: {
-            GROUP: [
-                "courses_id"
-            ],
-            APPLY: [
-                {
-                    maxPass: {
-                        MAX: "courses_pass"
-                    }
-                }
-            ]
-        }
-    };
-
+    this.timeout(10000);
 
     chai.use(chaiHttp);
 
@@ -135,9 +63,10 @@ describe("Facade D3", function () {
 
     it("test valid query for courses in disk only", function () {
         try {
+            let query = JSON.parse(fs.readFileSync("./test/newQueries/test1.json", "utf8"));
             return chai.request(SERVER_URL)
                 .post("/query")
-                .send(test1)
+                .send(query)
                 .then(function (res: any) {
                     // some logging here please!
                     expect(res.status).to.be.equal(200);
@@ -190,9 +119,10 @@ describe("Facade D3", function () {
 
     it("test valid query for courses", function () {
         try {
+            let query = JSON.parse(fs.readFileSync("./test/newQueries/test1.json", "utf8"));
             return chai.request(SERVER_URL)
                 .post("/query")
-                .send(test1)
+                .send(query)
                 .then(function (res: any) {
                     // some logging here please!
                     Log.trace("inside test valid query");
@@ -225,9 +155,10 @@ describe("Facade D3", function () {
 
     it("test valid query for rooms", function () {
         try {
+            let query = JSON.parse(fs.readFileSync("./test/newQueries/test3.json", "utf8"));
             return chai.request(SERVER_URL)
                 .post("/query")
-                .send(test3)
+                .send(query)
                 .then(function (res: any) {
                     // some logging here please!
                     expect(res.status).to.be.equal(200);
@@ -243,9 +174,10 @@ describe("Facade D3", function () {
 
     it("test invalid query", function () {
         try {
+            let query = JSON.parse(fs.readFileSync("./test/newQueries/test2.json", "utf8"));
             return chai.request(SERVER_URL)
                 .post("/query")
-                .send(test2)
+                .send(query)
                 .then(function (res: Response) {
                     // some logging here please!
                     expect.fail();
@@ -278,9 +210,10 @@ describe("Facade D3", function () {
 
     it("not able to perform when dataset is delete", function () {
         try {
+            let query = JSON.parse(fs.readFileSync("./test/newQueries/test2.json", "utf8"));
             return chai.request(SERVER_URL)
                 .post("/query")
-                .send(test2)
+                .send(query)
                 .then(function (res: Response) {
                     // some logging here please!
                     expect.fail();
@@ -327,5 +260,36 @@ describe("Facade D3", function () {
             Log.trace("fail to test unsuccessful delete dataset : " + err);
         }
     });
+
+    it("test on static", function () {
+        try {
+            return chai.request(SERVER_URL)
+                .get("/index.html")
+                .then(function (res: any) {
+                    expect(res.status).to.deep.equal(200);
+                })
+                .catch(function (err) {
+                    expect.fail();
+                });
+        } catch (err) {
+            //
+        }
+    });
+
+    it("test on echo", function () {
+        try {
+            return chai.request(SERVER_URL)
+                .get("/echo/shelley")
+                .then(function (res: any) {
+                    expect(res.status).to.deep.equal(200);
+                })
+                .catch(function (err) {
+                    expect.fail();
+                });
+        } catch (err) {
+            //
+        }
+    });
+
     // The other endpoints work similarly. You should be able to find all instructions at the chai-http documentation
 });

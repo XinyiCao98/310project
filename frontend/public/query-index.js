@@ -9,12 +9,11 @@
  */
 
 // TODO: implement!
-document.getElementById('submit-button').addEventListener('click', function() {
+document.getElementById('submit-button').addEventListener('click', function () {
     let query = CampusExplorer.buildQuery();
-
-    CampusExplorer.sendQuery(query).then(function (res) {
+    CampusExplorer.sendQuery(query).then((res) => {
         CampusExplorer.renderResult(JSON.parse(res));
-    }).catch(function (e) {
-        CampusExplorer.renderResult(e);
-    })
+    }).catch((err) => {
+        CampusExplorer.renderResult(err);
+    });
 });

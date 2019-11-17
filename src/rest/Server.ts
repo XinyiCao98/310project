@@ -139,13 +139,14 @@ export default class Server {
 
     private static postQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
         let query = req.params;
+        // Log.trace("Inside postQuery" + query);
         Log.trace("::postQuery::");
         Server.inFa.performQuery(query).then((arr: any[]) => {
             Log.trace("success!!!");
             res.json(200, {result: arr});
             Log.trace(arr);
         }).catch((err: any) => {
-            Log.trace("fail!!!");
+            Log.trace("fail!!! :" + err.message);
             res.json(400, {error: err.message});
         });
         return next();
