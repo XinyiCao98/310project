@@ -150,7 +150,7 @@ CampusExplorer.buildQuery = function () {
     let j = 1;
     for (let colProperty of colProperties) {
         if (colProperty.checked) {
-            if (j <= 10) {
+            if (j <= standard.length) {
                 modifiedField = dataType + "_" + colProperty["value"];
                 columns.push(modifiedField);
             } else {
