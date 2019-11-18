@@ -14,6 +14,7 @@ import QueryTree from "./QueryTree";
 import RoomHelper from "./RoomHelper";
 import PerformTransHelper from "./PerformTransHelper";
 import CourseHelper from "./CourseHelper";
+import Log from "../Util";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -138,15 +139,11 @@ export default class InsightFacade implements IInsightFacade {
             trans = query["TRANSFORMATIONS"];
         }
         let Qtree = QueryTR.buildQT(query, trans);
-        if (Object.keys(query["WHERE"]).length === 0 &&
-            Object.keys(ObjectArray).length <= 5000) {
-            Output = PQ.PerformColumns(Qtree.Columns, ObjectArray);
-            if (Object.keys(query["OPTIONS"]).length === 2) {
-                Output = PQ.Order(Output, Qtree.Order);
-            }
-            return Promise.resolve(Output);
-        }
+        if (Object.keys(query["WHERE"]).length === 0) {
+            Output = ObjectArray;
+        } else {
         Output = PQ.GetResult(ObjectArray, Qtree, query);
+        }
         if (query.hasOwnProperty("TRANSFORMATIONS")) {
             Output = transHelp.performTrans(Output, Qtree.Group, Qtree.Apply);
         }

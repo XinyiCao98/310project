@@ -25,7 +25,7 @@ export  default class PerformTransHelper {
         let initialKey = Keys[0];
         output = this.performFirstGroup(Data, initialKey);
         if (n === 1) {
-        return output;
+            return output;
         } else {
             output = this.performRestKeys(output, Keys);
             return output;

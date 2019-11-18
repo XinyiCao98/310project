@@ -231,10 +231,6 @@ export default class CheckQueryHelper {
     }
 
     public BasicCheck(query: any): boolean {
-        Log.trace("Inside BasicCheck" + query);
-        Log.trace("query length : " + Object.keys(query).length);
-        Log.trace("options length : " + Object.keys(query["OPTIONS"]).length);
-        Log.trace("where length : " + Object.keys(query["WHERE"]).length);
         if (query === null || !this.queryOrNot(query) ||
             !query.hasOwnProperty("WHERE") || !query.hasOwnProperty("OPTIONS") ||
             !this.queryOrNot(query["WHERE"]) || !this.queryOrNot(query["OPTIONS"]) || // first layer has be queries

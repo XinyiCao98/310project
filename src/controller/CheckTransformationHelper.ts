@@ -193,7 +193,6 @@ export default class CheckTransformationHelper {
     public CheckDataSet(apply: any, group: any, DataSetName: string): boolean {
         let Operation: { [key: string]: string };
         for (let property of group) {
-            Log.trace([property]);
             let dataN = property.split("_")[0];
             let value = property.split("_")[1];
             if (dataN !== DataSetName) {
