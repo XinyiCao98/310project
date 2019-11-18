@@ -98,7 +98,7 @@ describe("Facade D3", function () {
         }
     });
 
-    it("TEST PUT add a new dataset", function () {
+    it("TEST PUT add a new dataset on courses", function () {
         try {
             return chai.request(SERVER_URL)
                 .put("/dataset/courses/courses")
@@ -111,6 +111,42 @@ describe("Facade D3", function () {
                 })
                 .catch(function (err) {
                     expect.fail();
+                });
+        } catch (err) {
+            Log.trace("add dataset unsuccessful");
+        }
+    });
+
+    it("TEST fail to PUT add a new dataset with incorrect name", function () {
+        try {
+            return chai.request(SERVER_URL)
+                .put("/dataset/courses/shelley")
+                .send(fs.readFileSync("./test/data/courses.zip"))
+                .set("Content-Type", "application/x-zip-compressed")
+                .then(function (res: any) {
+                    expect.fail();
+                    Log.trace("inside test");
+                })
+                .catch(function (err) {
+                    expect(err.status).to.deep.equal(400);
+                });
+        } catch (err) {
+            Log.trace("add dataset unsuccessful");
+        }
+    });
+
+    it("TEST PUT add a new dataset with rooms", function () {
+        try {
+            return chai.request(SERVER_URL)
+                .put("/dataset/courses/rooms")
+                .send(fs.readFileSync("./test/data/courses.zip"))
+                .set("Content-Type", "application/x-zip-compressed")
+                .then(function (res: any) {
+                    expect.fail();
+                    Log.trace("inside test");
+                })
+                .catch(function (err) {
+                    expect(err.status).to.deep.equal(400);
                 });
         } catch (err) {
             Log.trace("add dataset unsuccessful");
